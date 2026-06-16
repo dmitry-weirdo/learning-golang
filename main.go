@@ -42,4 +42,12 @@ Raw string line three.`)
 
 	var i1 int // will be 0
 	println(i1)
+
+	var i int32 = 32
+	var f float32
+
+	// f = i // implicit conversion will NOT work
+	f = float32(i) // explicit conversion
+
+	fmt.Printf("Int64 value: %d, converted to float32 value: %f \n", i, f)
 }
