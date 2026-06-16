@@ -56,4 +56,9 @@ Raw string line three.`)
 	var int16 int16 = 32767
 	var int8 int8 = int8(int16) // won't fail, will be set to -1
 	fmt.Printf("Int16 value: %d, converted to int8 value: %d \n", int16, int8)
+
+	// multiple var declaration in one line
+	// formatting with %s will format to string with writing the variable type
+	a, b, c := 10, 5.3, "string"
+	fmt.Printf("a: %s, b: %s, c: %s \n", a, b, c)
 }
