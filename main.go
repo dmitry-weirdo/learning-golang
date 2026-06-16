@@ -7,4 +7,9 @@ func main() {
 
 	fmt.Println("\nInterpreted string:\n - This will be at the new line.\n")
 	fmt.Println(`Raw string:\n - This will NOT be at the new line, "\n" is not interpreted.`)
+
+	fmt.Println(`
+Raw string line one
+Raw string line two
+Raw string line three.`)
 }
