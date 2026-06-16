@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func main() {
 	fmt.Println("Hello, Gophers!")
@@ -61,4 +64,15 @@ Raw string line three.`)
 	// formatting with %s will format to string with writing the variable type
 	a, b, c := 10, 5.3, "string"
 	fmt.Printf("a: %s, b: %s, c: %s \n", a, b, c)
+
+	// String comparison
+	str1 := "String value äöü"
+	str2 := "String VaLuE ÄÖÜ"
+
+	caseSensitiveEquals := (str1 == str2)
+	caseInsensitiveEquals := strings.EqualFold(str1, str2) // can convert UTF-8 characteers
+
+	fmt.Println()
+	fmt.Printf("str1: \"%s\", str2: \"%s\", case-sensitive equals: %t \n", str1, str2, caseSensitiveEquals)
+	fmt.Printf("str1: \"%s\", str2: \"%s\", case-insensitive equals: %t \n", str1, str2, caseInsensitiveEquals)
 }
