@@ -12,4 +12,11 @@ func main() {
 Raw string line one
 Raw string line two
 Raw string line three.`)
+
+	// try Unicode
+	unicodeInline := "Hello, 世界"
+	fmt.Println(unicodeInline)
+
+	unicodeAsCodes := "\U0001F600" // 😀
+	fmt.Println(unicodeAsCodes)
 }
