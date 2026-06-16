@@ -29,3 +29,8 @@ go run ./main.go
 
 go run main.go
 `````
+
+## Useful documentation links
+
+* https://pkg.go.dev/builtin@go1.26.4 — built-in types
+* https://pkg.go.dev/std — standard library

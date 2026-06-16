@@ -19,4 +19,8 @@ Raw string line three.`)
 
 	unicodeAsCodes := "\U0001F600" // 😀
 	fmt.Println(unicodeAsCodes)
+
+	// error is an interface and it can be nil
+	var x error = nil
+	fmt.Println(x) // will print <nil>
 }
