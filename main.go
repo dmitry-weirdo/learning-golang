@@ -50,4 +50,10 @@ Raw string line three.`)
 	f = float32(i) // explicit conversion
 
 	fmt.Printf("Int64 value: %d, converted to float32 value: %f \n", i, f)
+
+	// overflow conversion test
+	// yes, you can use built-in type names as variable names - it's just a warning
+	var int16 int16 = 32767
+	var int8 int8 = int8(int16) // won't fail, will be set to -1
+	fmt.Printf("Int16 value: %d, converted to int8 value: %d \n", int16, int8)
 }
