@@ -23,4 +23,23 @@ Raw string line three.`)
 	// error is an interface and it can be nil
 	var x error = nil
 	fmt.Println(x) // will print <nil>
+
+	// !!! unused variables won't even compile!
+	// different ways to declare a variable
+	println("\nDifferent way of declaring string variables:")
+
+	var s1 string // declare, this will be an empty string, NOT nil
+	println(s1)
+
+	var s2 string = "initial value" // declare and initialize
+	println(s2)
+
+	var s3 = "inferred type of string" // init with inferred type
+	println(s3)
+
+	s4 := "short declaration string" // short declaration syntax
+	println(s4)
+
+	var i1 int // will be 0
+	println(i1)
 }
