@@ -70,7 +70,7 @@ Raw string line three.`)
 	str2 := "String VaLuE ÄÖÜ"
 
 	caseSensitiveEquals := (str1 == str2)
-	caseInsensitiveEquals := strings.EqualFold(str1, str2) // can convert UTF-8 characteers
+	caseInsensitiveEquals := strings.EqualFold(str1, str2) // can convert UTF-8 characters
 
 	fmt.Println()
 	fmt.Printf("str1: \"%s\", str2: \"%s\", case-sensitive equals: %t \n", str1, str2, caseSensitiveEquals)

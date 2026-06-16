@@ -34,3 +34,4 @@ go run main.go
 
 * https://pkg.go.dev/builtin@go1.26.4 — built-in types
 * https://pkg.go.dev/std — standard library
+* https://go.dev/ref/spec — language specification
