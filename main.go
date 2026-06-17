@@ -77,6 +77,7 @@ Raw string line three.`)
 	fmt.Printf("str1: \"%s\", str2: \"%s\", case-insensitive equals: %t \n", str1, str2, caseInsensitiveEquals)
 
 	// constants
+	// !!! local constant don't have to be used
 	const aConst = 42
 
 	const bConst string = "constant string value"
@@ -131,4 +132,30 @@ Raw string line three.`)
 		Execute             // 0100
 		Delete              // 1000
 	)
+
+	const xConst = 42 // untyped constant
+	// const xConst int = 42 // typed constant - won't be assignable to another type
+	var iVar int = xConst
+	var fVar float64 = xConst // can assign to another type, since constant will be replaced by value and float64 = 32 is valid
+
+	fmt.Println(iVar, fVar)
+
+	constFunction()
+}
+
+func constFunction() {
+	fmt.Println("======= constFunction ======= ")
+
+	const c = iota // 0
+	fmt.Printf("Just iota const: %v \n", c)
+
+	const (
+		d = 2 * 5
+		e             // equal to previous value
+		f = iota      // 2
+		g             // 3
+		h = 10 * iota // 10 * 4 = 40
+	)
+
+	fmt.Println(d, e, f, g, h)
 }

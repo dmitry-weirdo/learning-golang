@@ -36,3 +36,4 @@ go run main.go
 * https://pkg.go.dev/std — standard library
 * https://go.dev/ref/spec — language specification
 * https://go.dev/wiki/Iota - `iota` explanation
+* https://go.dev/doc/effective_go - Effective Go
