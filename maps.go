@@ -100,4 +100,43 @@ func main() {
 
 	m1EqualsM3 := maps.Equal(m1, m3)
 	fmt.Printf("m1 equals m3: %v \n", m1EqualsM3)
+
+	useMaps()
+}
+
+func useMaps() {
+	fmt.Println()
+	fmt.Println("======= useMaps ======= ")
+
+	var m map[string][]string // string -> string[]
+	fmt.Println(m)
+	fmt.Println(m == nil) // true // we can compare to nil
+
+	// multi-line initialization
+	m = map[string][]string{
+		"coffee": {"Coffee", "Espresso", "Cappuccino"},
+		"tea":    {"Hot Tea", "Chai Tea", "Chai Latte"}, // trailing comma required
+	}
+
+	fmt.Println(m)
+	fmt.Println(m == nil)    // true // we can compare to nil
+	fmt.Println(m["coffee"]) // true // we can compare to nil
+
+	m["other category"] = []string{"Hot Chocolate"}
+	fmt.Println(m)
+
+	// note it's NOT m.delete("key")
+	delete(m, "tea")
+	fmt.Println(m)
+	fmt.Println(m["tea"]) // will be []
+
+	v, ok := m["tea"]
+	fmt.Println(v, ok) // [], false
+
+	// m2 update will also update m
+	m2 := m
+	m2["coffee"] = []string{"Coffee"}
+	m2["tea"] = []string{"Hot Tea"}
+	fmt.Println(m)
+	fmt.Println(m2)
 }
