@@ -143,6 +143,8 @@ Raw string line three.`)
 	constFunction()
 
 	pointersFunction()
+
+	arraysFunction()
 }
 
 func constFunction() {
@@ -192,4 +194,35 @@ func pointersFunction() {
 
 	const xx = 12
 	// const xxAddress = &xx // pointer cannot be constant
+}
+
+func arraysFunction() {
+	fmt.Println("======= arrayFunction ======= ")
+
+	var arr [3]int // array of 3 ints, init with zero-values of 0
+	fmt.Println(arr)
+
+	//arr = [4]int{1, 2, 3, 4} // [3]int and [4]int are different types
+	arr = [3]int{1, 2, 3} // [3]int and [4]int are different types
+	fmt.Println(arr)
+
+	fmt.Println(arr[1])
+	arr[1] = 99
+	fmt.Println(arr)
+
+	arrLength := len(arr)
+	fmt.Println(arrLength)
+
+	stringArr1 := [3]string{"foo", "bar", "baz"}
+	stringArr2 := stringArr1 // this will make a copy, not a reference
+	stringArr3 := [2]string{"foo", "bar"}
+
+	stringArr1[0] = "updated_0" // will NOT change stringArr1
+
+	fmt.Println(stringArr1)
+	fmt.Println(stringArr2)
+	fmt.Println(stringArr3)
+
+	fmt.Println(stringArr1 == stringArr2) // false
+	//fmt.Println(stringArr1 == stringArr3) // won't compile for arrays with different lengths
 }
