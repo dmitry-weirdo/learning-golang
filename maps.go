@@ -79,9 +79,25 @@ func main() {
 	// not clone, will be referencing the same map (since it's a reference type)
 	m2 := m1
 
-	m1["foo"], m2["bar"] = 42, 666
+	m1["foo"], m1["bar"] = 42, 666
 	fmt.Println(m1)
 	fmt.Println(m2)
 
 	//m1 == m2 // there is no "==" operator for map
+	m1EqualsM2 := maps.Equal(m1, m2)
+	fmt.Printf("m1 equals m2: %v \n", m1EqualsM2)
+
+	// we can clone with special function, it will be not by reference
+	m3 := maps.Clone(m1)
+
+	m1["foo"], m1["bar"] = 1111, 2222
+	fmt.Println(m1)
+	fmt.Println(m2)
+	fmt.Println(m3)
+
+	m1EqualsM2 = maps.Equal(m1, m2)
+	fmt.Printf("m1 equals m2: %v \n", m1EqualsM2)
+
+	m1EqualsM3 := maps.Equal(m1, m3)
+	fmt.Printf("m1 equals m3: %v \n", m1EqualsM3)
 }
