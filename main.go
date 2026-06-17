@@ -178,4 +178,18 @@ func pointersFunction() {
 	// const c = new(int) // new cannot be used with const
 	var c = new(int) // new cannot
 	fmt.Println(c, *c)
+
+	s := "String value"
+	var p *string = &s // p is the address in memory, type is *string
+	fmt.Println(s, p, *p)
+
+	*p = "Updated string value"
+	fmt.Println(s, p, *p)
+
+	// p = new(int) // cannot reassign to a different pointer type
+	p = new(string)
+	fmt.Println(s, p, *p)
+
+	const xx = 12
+	// const xxAddress = &xx // pointer cannot be constant
 }
