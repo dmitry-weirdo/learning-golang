@@ -9,7 +9,8 @@ import (
 func main() {
 	// Keys in the map are unsorted
 	var m map[string]int
-	fmt.Println(m) // map[] (nil)
+	fmt.Println(m)        // map[] (nil)
+	fmt.Println(m == nil) // true // we can compare to nil
 	fmt.Println(len(m))
 
 	m = map[string]int{"foo": 1, "bar": 2}
