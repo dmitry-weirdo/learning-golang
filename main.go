@@ -141,6 +141,8 @@ Raw string line three.`)
 	fmt.Println(iVar, fVar)
 
 	constFunction()
+
+	pointersFunction()
 }
 
 func constFunction() {
@@ -158,4 +160,22 @@ func constFunction() {
 	)
 
 	fmt.Println(d, e, f, g, h)
+}
+
+func pointersFunction() {
+	a := 42
+	b := &a // pointer, & is address operator
+
+	fmt.Println(a, b, *b)
+
+	a = 27
+	fmt.Println(a, b, *b)
+
+	*b = 666 // dereference
+	fmt.Println(a, b, *b)
+
+	// create a pointer to an anonymous variable
+	// const c = new(int) // new cannot be used with const
+	var c = new(int) // new cannot
+	fmt.Println(c, *c)
 }
