@@ -75,4 +75,60 @@ Raw string line three.`)
 	fmt.Println()
 	fmt.Printf("str1: \"%s\", str2: \"%s\", case-sensitive equals: %t \n", str1, str2, caseSensitiveEquals)
 	fmt.Printf("str1: \"%s\", str2: \"%s\", case-insensitive equals: %t \n", str1, str2, caseInsensitiveEquals)
+
+	// constants
+	const aConst = 42
+
+	const bConst string = "constant string value"
+	const b2Const string = `Raw string constant \n won't be escaped.'`
+	const b3Const = bConst
+
+	// multiple constants declaration in a group
+	const (
+		boolConst = true
+		eConst    = 3.14
+	)
+
+	const (
+		q = "foo"
+		w // unassigned constant receives the previous value
+		e
+		ec = "zoo"
+		fc
+	)
+
+	// iota
+	const ii = iota // will be 0
+
+	const (
+		int0 = iota     // iota = 0
+		int1            // iota = 1
+		int2 = 3 * iota // iota = 2
+	)
+
+	const (
+		newInt0 = iota // iota resets in a new constant block
+	)
+
+	const (
+		_    = iota // 0 ignored
+		ONE         // 1
+		TWO         // 2
+		_           // 3 ignored
+		FOUR        // 4
+	)
+
+	const (
+		ten0 = iota * 10 // set step to 10
+		ten1             // 1 * 10 = 10
+		ten2             // 2 * 10 = 20
+	)
+
+	// use iota for bit flags
+	const (
+		Read    = 1 << iota // 0001
+		Write               // 0010
+		Execute             // 0100
+		Delete              // 1000
+	)
 }
