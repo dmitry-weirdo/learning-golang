@@ -27,4 +27,35 @@ func main() {
 	s2 = slices.Delete(s2, 1, 3) // will remove elements with indices [1; 3) from slice
 	fmt.Println(s)
 	fmt.Println(s2)
+
+	slicesLikeArrays()
+}
+
+func slicesLikeArrays() {
+	fmt.Println()
+	fmt.Println("======= slicesLikeArrays ======= ")
+
+	var s []string
+	fmt.Println(s)
+	fmt.Println(len(s))
+
+	s = []string{"Coffee", "Espresso", "Capuccino"}
+	fmt.Println(s)
+	fmt.Println(len(s))
+
+	s[1] = "Chai Tea"
+	fmt.Println(s)
+
+	s2 := s
+	s2[2] = "Chai Latte" // also updates s, unlike the array
+	fmt.Println(s, s2)
+
+	s = append(s, "Hot Chocolate", "Hot Tea")
+	fmt.Println(s)
+	fmt.Println(len(s))
+
+	//slices.Delete(s, 1, 2) // if we don't re-assign to s, the len does not change, although the value is deleted
+	s = slices.Delete(s, 1, 2) // if we don't re-assign to s, the len does not change, although the value is deleted
+	fmt.Println(s)
+	fmt.Println(len(s))
 }

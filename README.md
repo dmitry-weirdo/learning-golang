@@ -30,6 +30,12 @@ go run ./main.go
 go run main.go
 `````
 
+## Get a dependency
+
+```bash
+go get golang.org/x/exp/slices
+```
+
 ## Useful documentation links
 
 * https://pkg.go.dev/builtin@go1.26.4 — built-in types
