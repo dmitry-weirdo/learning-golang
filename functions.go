@@ -29,7 +29,8 @@ func myFunc(name string, otherName *string) {
 }
 
 func handleDivideSafe(divided int, divisor int) {
-	result, ok := divideSafe(divided, divisor)
+	result, ok := divideSafe2(divided, divisor)
+
 	if ok {
 		fmt.Printf("%v / %v = %v.\n", divided, divisor, result)
 	} else {
@@ -43,4 +44,14 @@ func divideSafe(l, r int) (int, bool) { // multiple return types
 	}
 
 	return l / r, true
+}
+
+func divideSafe2(l, r int) (result int, ok bool) { // will default to 0 and false
+	if r == 0 {
+		return // "naked return" will return the default value
+	}
+
+	result = l / r
+	ok = true // if not set, the default will be used -> very inexplicit
+	return    // "naked return" will return the updated values
 }
