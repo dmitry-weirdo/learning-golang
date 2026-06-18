@@ -43,3 +43,4 @@ go get golang.org/x/exp/slices
 * https://go.dev/ref/spec — language specification
 * https://go.dev/wiki/Iota — `iota` explanation
 * https://go.dev/doc/effective_go — Effective Go
+* https://go-proverbs.github.io/ — Go Proverbs (they link to the video where they were introduced)

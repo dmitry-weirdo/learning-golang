@@ -14,7 +14,7 @@ const DELIMITER = '\n'
 
 func main() {
 
-loop:     // label
+loop: // label
 	for { // infinite loop of actions
 		fmt.Println("")
 		fmt.Println("=======================")
