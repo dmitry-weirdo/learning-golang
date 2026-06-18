@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func main() {
-	//infiniteLoop()
+	infiniteLoop()
 	loopTillCondition()
 	counterBasedLoop()
 }
@@ -16,6 +16,10 @@ func infiniteLoop() {
 	for { // infinite loop - no condition
 		fmt.Println(i)
 		i++
+
+		if i > 666 {
+			break
+		}
 	}
 }
 
