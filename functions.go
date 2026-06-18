@@ -15,6 +15,9 @@ func main() {
 
 	fmt.Printf("Name after function call: %v \n", name)
 	fmt.Printf("OtherName after function call: %v \n", otherName)
+
+	handleDivideSafe(10, 3)
+	handleDivideSafe(12, 0)
 }
 
 func myFunc(name string, otherName *string) {
@@ -23,4 +26,21 @@ func myFunc(name string, otherName *string) {
 
 	fmt.Printf("Name in myFunc: %v \n", name)
 	fmt.Printf("OtherName in myFunc: %v \n", *otherName)
+}
+
+func handleDivideSafe(divided int, divisor int) {
+	result, ok := divideSafe(divided, divisor)
+	if ok {
+		fmt.Printf("%v / %v = %v.\n", divided, divisor, result)
+	} else {
+		fmt.Printf("Dividing %v / %v failed.\n", divided, divisor)
+	}
+}
+
+func divideSafe(l, r int) (int, bool) { // multiple return types
+	if r == 0 {
+		return 0, false
+	}
+
+	return l / r, true
 }
