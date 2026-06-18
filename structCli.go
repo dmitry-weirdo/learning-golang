@@ -42,4 +42,14 @@ func main() {
 	}
 
 	fmt.Println(menu)
+
+	for _, item := range menu { // ignore the array index
+		fmt.Println(item.name)
+		fmt.Println(strings.Repeat("-", 10))
+
+		// iterate the prices
+		for size, price := range item.prices {
+			fmt.Printf("\t%10s: %10.2f\n", size, price) // %10 is "fill with spaces up to 10 characters"
+		}
+	}
 }
