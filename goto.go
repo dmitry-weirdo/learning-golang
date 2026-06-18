@@ -16,6 +16,7 @@ func main() {
 
 myLabel: // out of block, within the containing block
 	j := 42
+	fmt.Println(j)
 labelAfterVariableDeclaration:
 
 	for ; i < 15; i++ {
