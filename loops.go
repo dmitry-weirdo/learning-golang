@@ -6,6 +6,7 @@ func main() {
 	infiniteLoop()
 	loopTillCondition()
 	counterBasedLoop()
+	iterateArray()
 }
 
 func infiniteLoop() {
@@ -41,6 +42,18 @@ func counterBasedLoop() {
 
 	for i := 1; i < 4; i++ { // parentheses not mandatory
 		fmt.Println(i)
+	}
+
+	fmt.Println("Done!")
+}
+
+func iterateArray() {
+	fmt.Println("======= iterateArray ======= ")
+
+	arr := [3]int{101, 102, 103}
+
+	for i, v := range arr { // index, value
+		fmt.Println(i, v)
 	}
 
 	fmt.Println("Done!")
