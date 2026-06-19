@@ -32,11 +32,17 @@ func (m menu) print() {
 	}
 }
 
-func (m *menu) add() {
+func (m *menu) add() error {
 	fmt.Println("Please enter the name of the new item")
 
 	name, _ := in.ReadString(DELIMITER)
 	name = strings.TrimSpace(name) // required to trim the \n delimiter that will be read
+
+	for _, item := range *m {
+		if item.name == name {
+			return fmt.Errorf("menu item \"%v\" already exists", name)
+		}
+	}
 
 	newItem := menuItem{
 		name:   name,
@@ -44,12 +50,14 @@ func (m *menu) add() {
 	}
 
 	*m = append(*m, newItem)
+
+	return nil // no error
 }
 
 func Print() {
 	data.print()
 }
 
-func Add() {
-	data.add()
+func Add() error {
+	return data.add()
 }

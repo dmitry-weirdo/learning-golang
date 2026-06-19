@@ -32,7 +32,10 @@ loop: // label
 			menu.Print()
 
 		case "2":
-			menu.Add()
+			err := menu.Add()
+			if err != nil {
+				fmt.Println(fmt.Errorf("invalid input: %w", err))
+			}
 
 		case "q":
 			// break // this will just break from `switch`, not the outer `for`
