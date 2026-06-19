@@ -36,6 +36,19 @@ go run main.go
 go get golang.org/x/exp/slices
 ```
 
+## Run tests
+
+Run test in a package `testing`:
+```bash
+go testt testing
+```
+
+Run all tests in current directory and all subdirectories (subpackages):
+
+```bash
+go test ./...
+```
+
 ## Useful documentation links
 
 * https://pkg.go.dev/builtin@go1.26.4 — built-in types
@@ -47,3 +60,5 @@ go get golang.org/x/exp/slices
 * https://pkg.go.dev/golang.org/x/exp/constraints — a package with built-in type constraints
 * https://pkg.go.dev/golang.org/x/exp/slices — a package with generic slices operations
 * https://pkg.go.dev/golang.org/x/exp/maps — a package with generic maps operations
+* https://pkg.go.dev/testing — testing package
+* https://go.dev/doc/diagnostics — performance tests
