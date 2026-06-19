@@ -44,3 +44,6 @@ go get golang.org/x/exp/slices
 * https://go.dev/wiki/Iota — `iota` explanation
 * https://go.dev/doc/effective_go — Effective Go
 * https://go-proverbs.github.io/ — Go Proverbs (they link to the video where they were introduced)
+* https://pkg.go.dev/golang.org/x/exp/constraints — a package with built-in type constraints
+* https://pkg.go.dev/golang.org/x/exp/slices — a package with generic slices operations
+* https://pkg.go.dev/golang.org/x/exp/maps — a package with generic maps operations
