@@ -16,8 +16,12 @@ type menuItem struct {
 	prices map[string]float64
 }
 
-func Print() {
-	for _, item := range menu { // ignore the array index
+// do NOT use the = sign here
+// type menu = []menuItem
+type menu []menuItem
+
+func (m menu) print() {
+	for _, item := range m { // ignore the array index
 		fmt.Println(item.name)
 		fmt.Println(strings.Repeat("-", 10))
 
@@ -28,7 +32,7 @@ func Print() {
 	}
 }
 
-func Add() {
+func (m *menu) add() {
 	fmt.Println("Please enter the name of the new item")
 
 	name, _ := in.ReadString(DELIMITER)
@@ -39,5 +43,13 @@ func Add() {
 		prices: make(map[string]float64), // you can also provide size to make
 	}
 
-	menu = append(menu, newItem)
+	*m = append(*m, newItem)
+}
+
+func Print() {
+	data.print()
+}
+
+func Add() {
+	data.add()
 }

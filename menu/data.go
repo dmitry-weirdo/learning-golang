@@ -1,7 +1,7 @@
 package menu
 
 // we cannot use the := syntax for non-local variables
-var menu = []menuItem{
+var data = menu{
 	{
 		name: "Coffee",
 		prices: map[string]float64{
