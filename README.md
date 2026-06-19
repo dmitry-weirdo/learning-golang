@@ -38,9 +38,9 @@ go get golang.org/x/exp/slices
 
 ## Run tests
 
-Run test in a package `testing`:
+Run tests in a package `testing`:
 ```bash
-go testt testing
+go test testing
 ```
 
 Run all tests in current directory and all subdirectories (subpackages):
