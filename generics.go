@@ -3,6 +3,11 @@ package main
 import "fmt"
 
 func main() {
+	cloneSlice()
+	cloneMapExample()
+}
+
+func cloneSlice() {
 	testScores := []float32{ // slice, no fixed size
 		87.3,
 		105,
@@ -25,6 +30,31 @@ func clone[V any](s []V) []V {
 
 	for i, v := range s {
 		result[i] = v
+	}
+
+	return result
+}
+
+// !! no method overloads in Go, you cannot override the same name with different arguments
+func cloneMapExample() {
+	testScores := map[string]float32{ // slice, no fixed size
+		"Harry":    87.3,
+		"Hermione": 105,
+		"Ronald":   63.5,
+		"Neville":  27,
+	}
+
+	c := cloneMap(testScores)
+
+	fmt.Println(c)
+}
+
+// map keys must be comparable
+func cloneMap[K comparable, V any](m map[K]V) map[K]V {
+	result := make(map[K]V, len(m))
+
+	for k, v := range m {
+		result[k] = v
 	}
 
 	return result
