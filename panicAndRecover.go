@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -21,6 +22,17 @@ func main() {
 
 	// todo: this will still called and printed if we recovered from an error in `divide`
 	fmt.Printf("%v divided by %v is %v \n", dividend, divisor, divideResult)
+
+	dividend, divisor = 10, 0
+	//result, err := divide1(dividend, divisor)
+	result, err := divide2(dividend, divisor)
+
+	if err != nil {
+		fmt.Println(err)
+		return // we won't work with result anymore
+	}
+
+	fmt.Printf("%v divided by %v is %v \n", dividend, divisor, result)
 }
 
 func func1() {
@@ -47,4 +59,28 @@ func divide(dividend, divisor int) int {
 	}()
 
 	return dividend / divisor
+}
+
+func divide1(l, r int) (int, error) {
+	if r == 0 {
+		// default return 0 (default value) for the result
+		return 0, errors.New("invalid divisor: must not be zero")
+	}
+
+	return l / r, nil
+}
+
+func divide2(l, r int) (result int, err error) {
+	defer func() { // handle the panic thrown
+		if msg := recover(); msg != nil {
+			// !!! we can access the function arguments if they're named
+			result = 0
+			err = fmt.Errorf("%v", msg)
+
+			// this won't work
+			//return 0, errors.New("invalid divisor: must not be zero")
+		}
+	}()
+
+	return l / r, nil
 }
