@@ -43,7 +43,9 @@ func ladderLength2(beginWord string, endWord string, wordList []string) int {
 
 	var chars = make([]byte, length)
 
-	for queue.Len() > 0 {
+	endWordFound := false
+
+	for (queue.Len() > 0) && !endWordFound { // if end word already reached -> no need to process the further distances
 		currentLevelElements := queue.Len()
 		fmt.Println()
 		fmt.Printf("Current depth: %v, queue elements on this level: %v \n", depth, currentLevelElements)
@@ -102,6 +104,11 @@ func ladderLength2(beginWord string, endWord string, wordList []string) int {
 						fmt.Printf("Setting distance %v to next word \"%v\". Distances: %v \n", distance, potentialWord, distances)
 
 						delete(m, potentialWord)
+
+						if potentialWord == endWord {
+							fmt.Printf("End word \"%v\" found! \n", endWord)
+							endWordFound = true
+						}
 					}
 				}
 
@@ -110,6 +117,8 @@ func ladderLength2(beginWord string, endWord string, wordList []string) int {
 			}
 		}
 	}
+
+	fmt.Printf("End word \"%v\" found: %v \n", endWord, endWordFound)
 
 	return 0
 }
@@ -149,7 +158,7 @@ func main() {
 	// Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
 	beginWord = "hit"
 	endWord = "cog"
-	wordList = []string{"hot", "dot", "dog", "lot", "log", "cog"}
+	wordList = []string{"hot", "dot", "dog", "lot", "log", "cog", "cox"}
 
 	// Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
 	// Output should be 0 since the endWord is not in wordList
