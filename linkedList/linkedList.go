@@ -8,11 +8,11 @@ import (
 type Node struct {
 	name      string
 	frequency int
-	keys      map[string]int // todo: this should be a map as well, to be O(1). So we map to 1
+	keys      map[string]int // this should be a map as well, to be O(1). So we map to 1
 }
 
 type AllOne struct {
-	m map[string]*list.Element // key to node // todo: should it be pointer to Node?
+	m map[string]*list.Element // key to List Element
 	l *list.List
 }
 
@@ -33,7 +33,7 @@ func Constructor() AllOne {
 	l.PushFront(&head)
 	l.PushBack(&tail)
 
-	printList(l)
+	// printList(l)
 
 	return AllOne{
 		make(map[string]*list.Element),
