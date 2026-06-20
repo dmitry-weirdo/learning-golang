@@ -20,3 +20,7 @@ func (s *Stack[T]) Pop() (T, bool) {
 
 	return value, true
 }
+
+func (s *Stack[T]) IsEmpty() bool {
+	return len(s.data) <= 0
+}
