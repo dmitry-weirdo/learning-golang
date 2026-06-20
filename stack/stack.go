@@ -24,3 +24,7 @@ func (s *Stack[T]) Pop() (T, bool) {
 func (s *Stack[T]) IsEmpty() bool {
 	return len(s.data) <= 0
 }
+
+func (s *Stack[T]) Size() int {
+	return len(s.data)
+}
