@@ -6,11 +6,6 @@ import (
 )
 
 func findLadders(beginWord string, endWord string, wordList []string) [][]string {
-	return nil
-}
-
-func ladderLength2(beginWord string, endWord string, wordList []string) int {
-	// todo: implement method
 	m := arrayToMap(wordList)
 	fmt.Printf("List\n %v converted to map\n %v \n", wordList, m)
 
@@ -18,7 +13,7 @@ func ladderLength2(beginWord string, endWord string, wordList []string) int {
 	if !ok {
 		fmt.Printf("End word \"%v\" is not in the map %v. Returning 0. \n", endWord, m)
 
-		return 0
+		return make([][]string, 0)
 	}
 
 	// word to list of nodes of the previous level
@@ -120,7 +115,55 @@ func ladderLength2(beginWord string, endWord string, wordList []string) int {
 
 	fmt.Printf("End word \"%v\" found: %v \n", endWord, endWordFound)
 
-	return 0
+	// with DFS, go from the endWord to the beginWord via previousNodes, collecting all possible paths
+	var result = make([][]string, 0)
+
+	if endWordFound { // should always happen
+		fmt.Println()
+		fmt.Printf("============================")
+		fmt.Printf("Building paths from endWord \"%v\" to beginWord \"%v\"... \n", endWord, beginWord)
+
+		path := list.New() // just the current path in the recursion
+		appendToQueue(path, endWord)
+
+		buildPaths(path, &result, previousNodes, beginWord, endWord)
+
+		fmt.Printf("Returning %v results: \n%v \n", len(result), result)
+	}
+
+	return result
+}
+
+func buildPaths(
+	path *list.List,
+	result *[][]string,
+	previousNodes map[string][]string,
+	beginWord string,
+	currentWord string,
+) {
+	if currentWord == beginWord { // reached the beginWord
+		fmt.Printf("beginWord \"%v\" reached. \n", beginWord)
+
+		resultPath := queueToArray(path)
+
+		fmt.Printf("Adding path %v to result. \n", resultPath)
+		*result = append(*result, resultPath)
+
+		return
+	}
+
+	// iterate through all the predecessors of the currentWord
+	predecessors := previousNodes[currentWord]
+	fmt.Printf("Predecessors of word \"%v\": %v \n", currentWord, predecessors)
+
+	for _, predecessor := range predecessors {
+		appendToQueue(path, predecessor)
+
+		buildPaths(path, result, previousNodes, beginWord, predecessor)
+
+		// remove the handled predecessor
+		removeLastFromQueue(path)
+	}
 }
 
 func addToMap(m map[string][]string, word string, previousWord string) {
@@ -133,12 +176,31 @@ func addToMap(m map[string][]string, word string, previousWord string) {
 	}
 }
 
+func queueToArray(queue *list.List) []string {
+	// todo: probably we need to iterate backwards
+	var array = make([]string, 0)
+
+	element := queue.Back()
+
+	for element != nil {
+		array = append(array, element.Value.(string))
+
+		element = element.Prev()
+	}
+
+	return array
+}
+
 func appendToQueue(queue *list.List, s string) {
 	queue.PushBack(s)
 }
 
 func removeFirstFromQueue(queue *list.List) string {
 	return queue.Remove(queue.Front()).(string)
+}
+
+func removeLastFromQueue(queue *list.List) string {
+	return queue.Remove(queue.Back()).(string)
 }
 
 func arrayToMap(s []string) map[string]int {
@@ -170,5 +232,5 @@ func main() {
 	//endWord = "tax"
 	//wordList = []string{"ted", "tex", "rex", "tax"}
 
-	ladderLength2(beginWord, endWord, wordList)
+	findLadders(beginWord, endWord, wordList)
 }
