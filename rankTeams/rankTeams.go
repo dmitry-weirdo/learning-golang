@@ -59,13 +59,13 @@ func rankTeams(votes []string) string {
 	// sort the matrix
 	slices.SortFunc(m, func(a, b []int) int {
 
-		for i := 1; i < totalTeams+1; i++ {
+		for i := 1; i < totalTeams+1; i++ { // starting from 1, i.e. skip the team name
 			if a[i] != b[i] {
 				return b[i] - a[i] // we sort by votes desc!
 			}
 		}
 
-		// sort alphabetically if all positions are equal
+		// sort alphabetically by team name if all positions are equal
 		return a[0] - b[0]
 	})
 
@@ -122,5 +122,5 @@ func main() {
 	handle([]string{"WXYZ", "XYZW"})
 	handle([]string{"ZMNAGUEDSJYLBOPHRQICWFXTVK"})
 	handle([]string{"AB", "BA"})
-	handle([]string{"AXYB", "AYXB", "AXYB", "AYXB"})
+	handle([]string{"AXYB", "AYXB", "AXYB", "AYXB"}) // letters can be non-consecutive!
 }
