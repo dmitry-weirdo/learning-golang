@@ -61,7 +61,7 @@ func findDiagonalOrder(mat [][]int) []int {
 					dir = TOP_RIGHT
 					j += 1
 				}
-			} else if leftReached { // let reached, change dir and go down
+			} else if leftReached { // left reached, change dir and go down
 				dir = TOP_RIGHT
 				i += 1
 			} else { // normal bottom-left, go diagonally, no direction change
