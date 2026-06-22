@@ -1,8 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
 
 func isZeroArray(nums []int, queries [][]int) bool {
+	fmt.Printf("Int size: %v \n ", unsafe.Sizeof(int(0))*8)
+
 	l := len(nums)
 
 	diff := make([]int, l+1) // can be + 1
