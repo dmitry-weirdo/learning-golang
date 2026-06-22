@@ -36,8 +36,6 @@ func isPalindrome(head *ListNode) bool {
 	var previous *ListNode = nil
 
 	for current != nil {
-		fmt.Printf("Current: %v \n", current.Val)
-
 		temp := current.Next
 		current.Next = previous
 
@@ -76,6 +74,29 @@ func printList(head *ListNode) {
 	}
 
 	fmt.Println()
+}
+
+func reverseList(head *ListNode) *ListNode { // returns the new head (was tail)
+	fmt.Println("Original list:")
+	printList(head)
+
+	var previous *ListNode = nil
+	current := head
+
+	for current != nil {
+		temp := current.Next
+		current.Next = previous
+
+		previous = current
+		current = temp
+	}
+
+	head = previous
+
+	fmt.Println("Reversed list:")
+	printList(head)
+
+	return head
 }
 
 func generateLinkedList(values []int) *ListNode {
@@ -126,4 +147,13 @@ func main() {
 	test2()
 	test3()
 	test4()
+
+	// test the reverseList separate function
+	fmt.Println()
+	fmt.Println("========================")
+
+	values := []int{10, 20, 30, 40, 50}
+	list := generateLinkedList(values)
+	reversedList := reverseList(list)
+	reverseList(reversedList)
 }
