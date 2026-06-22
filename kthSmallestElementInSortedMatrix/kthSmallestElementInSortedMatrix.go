@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 func kthSmallest(matrix [][]int, k int) int {
@@ -18,7 +17,12 @@ func kthSmallest(matrix [][]int, k int) int {
 
 	for left < right {
 		// mid is the binary search border
-		mid = int(math.Floor((float64(left) + float64(right)) / 2))
+
+		// floor ((left + right) / 2)
+		// so for negative values, -7 / 2 = -4, and NOT -3 as it would be for just the integer division
+		// we can also use (left + right) >> 1
+		//mid = int(math.Floor((float64(left) + float64(right)) / 2))
+		mid = (left + right) >> 1
 
 		fmt.Printf("left: %v, right: %v, mid %v \n", left, right, mid)
 
