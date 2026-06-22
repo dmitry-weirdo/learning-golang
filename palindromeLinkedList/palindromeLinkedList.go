@@ -99,6 +99,20 @@ func reverseList(head *ListNode) *ListNode { // returns the new head (was tail)
 	return head
 }
 
+func reverseListRecursive(node *ListNode) *ListNode {
+	if (node == nil) || (node.Next == nil) {
+		return node
+	}
+
+	// we're just returning the last node
+	nextHead := reverseListRecursive(node.Next)
+
+	node.Next.Next = node
+	node.Next = nil
+
+	return nextHead
+}
+
 func generateLinkedList(values []int) *ListNode {
 	head := &ListNode{Val: values[0]}
 
@@ -154,6 +168,7 @@ func main() {
 
 	values := []int{10, 20, 30, 40, 50}
 	list := generateLinkedList(values)
-	reversedList := reverseList(list)
+	//reversedList := reverseList(list)
+	reversedList := reverseListRecursive(list)
 	reverseList(reversedList)
 }
