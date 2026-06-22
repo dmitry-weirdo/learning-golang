@@ -24,16 +24,24 @@ func isZeroArray(nums []int, queries [][]int) bool {
 
 	for i, v := range diff {
 		prefixSums[i+1] = prefixSums[i] + int64(v)
+
+		// we can break at every position before calculating the complete prefixSums array
+		if (i < l) && (int64(nums[i]) > prefixSums[i+1]) {
+			fmt.Printf("nums[%v] = %v > prefixSums[%v] = %v. Returning false. \n", i, nums[i], i+1, prefixSums[i+1])
+			return false
+		}
 	}
 
 	fmt.Printf("Prefix sum array: %v \n", prefixSums)
 
-	for i, n := range nums {
-		if int64(n) > prefixSums[i+1] {
-			fmt.Printf("nums[%v] = %v > prefixSums[%v] = %v. Returning false. \n", i, n, i+1, prefixSums[i+1])
-			return false
+	/*
+		for i, n := range nums {
+			if int64(n) > prefixSums[i+1] {
+				fmt.Printf("nums[%v] = %v > prefixSums[%v] = %v. Returning false. \n", i, n, i+1, prefixSums[i+1])
+				return false
+			}
 		}
-	}
+	*/
 
 	return true
 }
