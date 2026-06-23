@@ -1,0 +1,145 @@
+package main
+
+import "fmt"
+
+var directions = [][]int{
+	{-1, 0}, // top
+	{0, 1},  // right
+	{1, 0},  // bottom
+	{0, -1}, // left
+}
+
+func cellExists(rows, columns, row, column int) bool {
+	return (0 <= row) &&
+		(row < rows) &&
+		(0 <= column) &&
+		(column < columns)
+}
+
+func printMatrix(mat [][]int) {
+	rows := len(mat)
+	columns := len(mat[0])
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < columns; j++ {
+			fmt.Printf("%v ", mat[i][j])
+		}
+
+		fmt.Println()
+	}
+}
+
+func longestIncreasingPath(matrix [][]int) int {
+	rows := len(matrix)
+	columns := len(matrix[0])
+
+	// create a memo matrix of the same size
+	memo := make([][]int, rows)
+	for i := 0; i < rows; i++ {
+		memo[i] = make([]int, columns)
+	}
+
+	maxPathLength := 0
+
+	for i := 0; i < rows; i++ {
+		for j := 0; j < columns; j++ {
+			pathLength := dfs(matrix, memo, rows, columns, i, j)
+
+			fmt.Println("========================")
+			fmt.Printf("[%v][%v], max path length = %v \n", i, j, pathLength)
+
+			fmt.Printf("Memo matrix: \n")
+			printMatrix(memo)
+
+			if pathLength > maxPathLength {
+				maxPathLength = pathLength
+			}
+		}
+	}
+
+	return maxPathLength
+}
+
+func dfs(m [][]int, memo [][]int, rows int, columns int, i int, j int) int {
+	fmt.Printf("==================\n")
+	fmt.Printf("dfs[%v][%v] \n", i, j)
+
+	if memo[i][j] != 0 { // path for this cell already calculated -> return it
+		fmt.Printf("Memo[%v][%v] already calculated and is %v. Returning it. \n", i, j, memo[i][j])
+		return memo[i][j]
+	}
+
+	// iterate all 4 directions
+	for _, d := range directions {
+		row := i + d[0]
+		column := j + d[1]
+
+		if cellExists(rows, columns, row, column) &&
+			(m[row][column] > m[i][j]) { // only move to cells that have bigger value
+
+			cellPath := dfs(m, memo, rows, columns, row, column)
+
+			memo[i][j] = max(memo[i][j], cellPath)
+		}
+	}
+
+	// cell itself counts -> add 1 to the distance for the cell itself
+	memo[i][j] = memo[i][j] + 1
+	return memo[i][j]
+}
+
+func test(m [][]int, expected int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Println("Matrix:")
+	printMatrix(m)
+
+	longestPathLength := longestIncreasingPath(m)
+
+	fmt.Println()
+	fmt.Printf("Expected longest path length: %v \n", expected)
+	fmt.Printf("Calculated longest path length: %v \n", longestPathLength)
+}
+
+func test1() {
+	m := [][]int{
+		{9, 9, 4},
+		{6, 6, 8},
+		{2, 1, 1},
+	}
+
+	expected := 4
+
+	test(m, expected)
+}
+
+func test2() {
+	m := [][]int{
+		{3, 4, 5},
+		{3, 2, 6},
+		{2, 2, 1},
+	}
+
+	expected := 4
+
+	test(m, expected)
+}
+
+func test3() {
+	m := [][]int{
+		{1, 2, 3},
+		{6, 5, 4},
+		{7, 8, 9},
+	}
+
+	expected := 9
+
+	test(m, expected)
+}
+
+func main() {
+	test1()
+	// test2()
+	//test3()
+}
