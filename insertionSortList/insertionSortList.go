@@ -111,7 +111,7 @@ func printList(head *ListNode) {
 	fmt.Println()
 }
 
-func test(arr []int) {
+func arrayToList(arr []int) *ListNode {
 	var node *ListNode = nil
 
 	for i := len(arr) - 1; i >= 0; i-- {
@@ -119,6 +119,11 @@ func test(arr []int) {
 
 		node = nextNode
 	}
+	return node
+}
+
+func test(arr []int) {
+	node := arrayToList(arr)
 
 	// node will be the head
 	fmt.Println("Unsorted list:")
