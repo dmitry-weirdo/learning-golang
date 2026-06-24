@@ -100,6 +100,18 @@ func iterateOptimal(root *TreeNode) bool {
 	return rightValid
 }
 
+func leftRootRightTraversal(root *TreeNode) {
+	if root == nil {
+		return
+	}
+
+	leftRootRightTraversal(root.Left)
+
+	fmt.Printf("Current root: %v \n", root.Val)
+
+	leftRootRightTraversal(root.Right)
+}
+
 func isValidBST(root *TreeNode) bool {
 	if root == nil {
 		return true
@@ -112,6 +124,10 @@ func isValidBST(root *TreeNode) bool {
 
 	valid := iterateOptimal(root) // nice solution, using the value of BST: if we iterate it left -> root -> right, it will be ascending
 	fmt.Printf("Valid: %v \n", valid)
+
+	fmt.Println()
+	fmt.Println("Doing a (left -> root -> right) traversal:")
+	leftRootRightTraversal(root)
 
 	return valid
 }
@@ -158,7 +174,7 @@ func test3() {
 }
 
 func main() {
-	//test1()
+	test1()
 	//test2()
-	test3()
+	//test3()
 }
