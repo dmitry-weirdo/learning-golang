@@ -22,12 +22,13 @@ func insertionSortList(head *ListNode) *ListNode {
 	start := head // can be updated if we insert into the super-beginning of the list
 
 	node := head.Next
-	previousOfNode := head
+	previousOfNode := head // will be NOT null
 
 	for node != nil {
 		fmt.Println()
 		fmt.Println("============================")
-		fmt.Printf("Handling next node %v \n ", node.Val)
+		fmt.Printf("Handling next node %v \n", node.Val)
+		fmt.Printf("Previous of node: %v \n", previousOfNode.Val)
 		printList(start)
 
 		// up to what node we go on insertion
@@ -64,7 +65,7 @@ func insertionSortList(head *ListNode) *ListNode {
 
 				// inserting node between previousNode and insertionNode
 				if previousNode == nil { // inserting before head
-					fmt.Printf("Inserting node %v as the new head.", node.Val)
+					fmt.Printf("Inserting node %v as the new head. \n", node.Val)
 
 					start = node
 					node.Next = insertionNode
@@ -88,6 +89,7 @@ func insertionSortList(head *ListNode) *ListNode {
 		} else {
 			// if it's same node -> previous of the next node remains the current node
 			previousOfNode = node
+			fmt.Printf("Previous of node changed to %v", node.Val)
 		}
 
 		// jump to the next element that was after the node
@@ -124,6 +126,8 @@ func test(arr []int) {
 
 	sortedHead := insertionSortList(node)
 
+	fmt.Println()
+	fmt.Println("============================")
 	fmt.Println("Sorted list:")
 	printList(sortedHead)
 }
@@ -140,7 +144,15 @@ func test2() {
 	test(arr)
 }
 
+func test3() {
+	//arr := []int{4, 3, 2, 1}
+	arr := []int{4, 2, 2, 1}
+
+	test(arr)
+}
+
 func main() {
 	//test1()
-	test2()
+	//test2()
+	test3()
 }
