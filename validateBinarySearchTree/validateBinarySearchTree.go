@@ -53,14 +53,65 @@ func iterate(root *TreeNode) (minValue int, maxValue int, valid bool) {
 	return minResult, maxResult, validResult
 }
 
+var previousNode *TreeNode = nil
+
+func iterateOptimal(root *TreeNode) bool {
+	if root == nil {
+		return true
+	}
+
+	fmt.Println("=============================")
+
+	if previousNode != nil {
+		fmt.Printf("Current root: %v, previous node: %v \n", root.Val, previousNode.Val)
+	} else {
+		fmt.Printf("Current root: %v, previous node: null \n", root.Val)
+	}
+
+	// (left -> root -> right) traversal in a correct BST should be always increasing
+
+	// iterate left
+	leftValid := iterateOptimal(root.Left)
+
+	if !leftValid { // anything invalid -> the whole tree is invalid
+		fmt.Printf("Current root: %v, left is invalid. Returning false. \n", root.Val)
+		return false
+	}
+
+	// left has updated the previous -> check that prev < root
+	if previousNode != nil {
+		fmt.Printf("AT THE CHECKING POINT: Current root: %v, previous node: %v \n", root.Val, previousNode.Val)
+	} else {
+		fmt.Printf("AT THE CHECKING POINT: Current root: %v, previous node: null \n", root.Val)
+	}
+
+	if (previousNode != nil) && (previousNode.Val >= root.Val) {
+		fmt.Printf("Current node %v is NOT less than previous node %v. Returning false. \n", root.Val, previousNode.Val)
+		return false
+	}
+
+	// update previous to the current node
+	previousNode = root
+	fmt.Printf("Set previous node to %v \n", root.Val)
+
+	// iterate right
+	rightValid := iterateOptimal(root.Right)
+
+	return rightValid
+}
+
 func isValidBST(root *TreeNode) bool {
 	if root == nil {
 		return true
 	}
 
-	minValue, maxValue, valid := iterate(root)
+	//minValue, maxValue, valid := iterate(root) // my complex
+	//fmt.Printf("Min value: %d, max value: %d, valid: %v \n", minValue, maxValue, valid)
 
-	fmt.Printf("Min value: %d, max value: %d, valid: %v \n", minValue, maxValue, valid)
+	previousNode = nil // clear a global variable before every test iteration
+
+	valid := iterateOptimal(root) // nice solution, using the value of BST: if we iterate it left -> root -> right, it will be ascending
+	fmt.Printf("Valid: %v \n", valid)
 
 	return valid
 }
@@ -86,7 +137,28 @@ func test2() {
 	isValidBST(root)
 }
 
+func test3() {
+	// valid tree, double-check the order validation
+
+	// 5
+	// / \
+	// 3   8
+	// / \   \
+	// 2   4   9
+	r10 := &TreeNode{2, nil, nil}
+	r11 := &TreeNode{4, nil, nil}
+	r12 := &TreeNode{9, nil, nil}
+
+	r00 := &TreeNode{3, r10, r11}
+	r01 := &TreeNode{8, nil, r12}
+
+	root := &TreeNode{5, r00, r01}
+
+	isValidBST(root)
+}
+
 func main() {
 	//test1()
-	test2()
+	//test2()
+	test3()
 }
