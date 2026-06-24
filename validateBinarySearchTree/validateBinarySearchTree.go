@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 type TreeNode struct {
@@ -14,30 +13,30 @@ type TreeNode struct {
 func iterate(root *TreeNode) (minValue int, maxValue int, valid bool) {
 	fmt.Printf("Current root: %v \n", root.Val)
 
-	var minsToCompare []int = []int{root.Val}
-	var maxesToCompare []int = []int{root.Val}
+	var minResult int
+	var maxResult int
 
 	var minLeft, maxLeft int
 	var validLeft bool
 	if root.Left != nil {
 		minLeft, maxLeft, validLeft = iterate(root.Left)
 
-		minsToCompare = append(minsToCompare, minLeft)
+		minResult = min(minLeft, root.Val)
 	} else {
-		minLeft, maxLeft, validLeft = math.MinInt64, math.MinInt64, true
+		validLeft = true
+		minResult = root.Val
 	}
 
 	var minRight, maxRight int
 	var validRight bool
 	if root.Right != nil {
 		minRight, maxRight, validRight = iterate(root.Right)
-		maxesToCompare = append(maxesToCompare, maxRight)
-	} else {
-		minRight, maxRight, validRight = math.MaxInt64, math.MaxInt64, true
-	}
 
-	minResult := minOfArray(minsToCompare)
-	maxResult := maxOfArray(maxesToCompare)
+		maxResult = max(maxRight, root.Val)
+	} else {
+		validRight = true
+		maxResult = root.Val
+	}
 
 	leftMaxValidity := (root.Left == nil) || (maxLeft < root.Val)
 	rightMinValidity := (root.Right == nil) || (root.Val < minRight)
@@ -54,32 +53,6 @@ func iterate(root *TreeNode) (minValue int, maxValue int, valid bool) {
 	return minResult, maxResult, validResult
 }
 
-func minOfArray(arr []int) int {
-	// we assume a non-empty array
-	result := arr[0]
-
-	for _, v := range arr {
-		if v < result {
-			result = v
-		}
-	}
-
-	return result
-}
-
-func maxOfArray(arr []int) int {
-	// we assume a non-empty array
-	result := arr[0]
-
-	for _, v := range arr {
-		if v > result {
-			result = v
-		}
-	}
-
-	return result
-}
-
 func isValidBST(root *TreeNode) bool {
 	if root == nil {
 		return true
@@ -92,7 +65,7 @@ func isValidBST(root *TreeNode) bool {
 	return valid
 }
 
-func main() {
+func test1() {
 	r11 := &TreeNode{3, nil, nil}
 	r12 := &TreeNode{6, nil, nil}
 
@@ -102,4 +75,18 @@ func main() {
 	root := &TreeNode{5, r01, r02}
 
 	isValidBST(root)
+}
+
+func test2() {
+	r01 := &TreeNode{1, nil, nil}
+	r02 := &TreeNode{3, nil, nil}
+
+	root := &TreeNode{2, r01, r02}
+
+	isValidBST(root)
+}
+
+func main() {
+	//test1()
+	test2()
 }
