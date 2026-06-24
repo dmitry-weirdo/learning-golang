@@ -203,6 +203,13 @@ func main() {
 	//Validating that the array is sorted...
 	//2026-06-24 22:41:21.9633242 +0200 CEST m=+19.378677801 - Finished validating an array of size: 100000000. Sorted: true
 
+	// ONE_HUNDRED_MILLION with values in range [-1000000; 1000000] - much longer! - sorting was 6.5 minutes
+	//2026-06-24 22:42:43.4374361 +0200 CEST m=+0.000000001 - Generating a random unsorted array of size: 1000000000
+	//2026-06-24 22:43:01.7047376 +0200 CEST m=+18.267301501 - Sorting a random unsorted array of size: 1000000000
+	//2026-06-24 22:50:27.2164805 +0200 CEST m=+463.779044401 - Finished sorting an array of size: 1000000000
+	//Validating that the array is sorted...
+	//2026-06-24 22:50:29.2163715 +0200 CEST m=+465.778935401 - Finished validating an array of size: 1000000000. Sorted: true
+
 	//arr := []int{5, 1, 1, 2, 0, 0}
 
 	fmt.Printf("%v - Sorting a random unsorted array of size: %d \n", time.Now(), len(arr))
