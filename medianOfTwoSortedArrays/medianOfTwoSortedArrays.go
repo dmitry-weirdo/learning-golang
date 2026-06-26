@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"sort"
 )
+
+const INFINITY = math.MaxInt
 
 func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	m := len(nums1)
@@ -38,25 +41,118 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	fmt.Printf("Merged array length = %v. We will find an average between [%v]-th and [%v]-th biggest elements in the merged array. \n", mergedLength, k1, k2)
 
 	k1Element := findKthBiggestElement(nums1, nums2, 0, 0, k1)
+
+	fmt.Printf("================================================\n")
+	fmt.Printf("================================================\n")
+
 	k2Element := findKthBiggestElement(nums1, nums2, 0, 0, k2)
 
 	// For odd total length: both positions point to the same middle element
 	// For even total length: positions point to the two middle elements
 
+	fmt.Printf("Returning average between %v and %v. \n", k1Element, k2Element)
 	return float64(k1Element+k2Element) / 2.0
 }
 
 // i - starting index in array a
 // j - starting index in array b
-// k - we search for the k-th smallest element value. It is NOT 0-based
+// k - we search for the k-th smallest element value. Value K is NOT 0-based.
 func findKthBiggestElement(a []int, b []int, i int, j int, k int) int {
+	// we're using the arrays starting with a[i] and b[j]
 
-	// end case -> both arrays not empty
-	if k == 1 {
-		return min(a[i], b[j])
+	fmt.Println()
+	fmt.Printf("============================\n")
+	fmt.Printf("a start index: [%v], b start index [%v], k = %d \n", i, j, k)
+
+	totalElementsAlreadyRemoved := i + j
+	fmt.Printf("We already removed (%v elements from A) and (%v elements from B). Total of %v elements removed. \n", i, j, totalElementsAlreadyRemoved)
+
+	// end case -> first array is empty -> just 1 array b left -> return k-th element starting with b[j]
+	if i >= len(a) {
+		bIndexForKthElement := j + k - 1 // array index starts with 0
+		result := b[bIndexForKthElement]
+		fmt.Printf("Array a exhausted. Returning %v-th biggest element starting with index %v. Returning b[%v] = %v. \n", k, i, bIndexForKthElement, result)
+
+		return result
 	}
 
-	return 0
+	// end case -> second array is empty -> just 1 array a left -> return k-th element starting with a[i]
+	if j >= len(b) {
+		aIndexForKthElement := i + k - 1 // array index starts with 0
+		result := a[aIndexForKthElement]
+		fmt.Printf("Array b exhausted. Returning %v-th biggest element starting with index %v. Returning b[%v] = %v. \n", k, j, aIndexForKthElement, result)
+
+		return result
+	}
+
+	// end case -> k = 1 and both arrays not empty -> return min of just 1 element from 2 arrays
+	if k == 1 {
+		result := min(a[i], b[j])
+		fmt.Printf("k = 1 reached. Returning minimum of single elements a[%v] = %v and b[%v] = %v. Returning %v. \n", i, a[i], j, b[j], result)
+
+		return result
+	}
+
+	elementsToRemove := k / 2
+	elementsForNextIteration := k - elementsToRemove
+	fmt.Printf("Current k: %v. Elements to remove: %v. Elements for the next run: %v \n", k, elementsToRemove, elementsForNextIteration)
+
+	aMidIndex := i + elementsToRemove - 1
+	bMidIndex := j + elementsToRemove - 1
+
+	fmt.Printf("[i + k / 2] index in array a: %v \n", aMidIndex)
+	fmt.Printf("[j + k / 2] index in array b: %v \n", bMidIndex)
+
+	var removeFromA bool
+
+	var aValue int
+	if aMidIndex < len(a) {
+		aValue = a[aMidIndex]
+	} else {
+		removeFromA = false
+		aValue = INFINITY
+
+		fmt.Printf("Index [%v] gets over array A of length %v. We will skip values from array B. \n", aMidIndex, len(a))
+	}
+
+	var bValue int
+	if bMidIndex < len(b) {
+		bValue = b[bMidIndex]
+	} else {
+		removeFromA = true
+		bValue = INFINITY
+
+		fmt.Printf("Index [%v] gets over array B of length %v. We will skip values from array A. \n", bMidIndex, len(b))
+	}
+
+	// todo: exhausting both arrays should NOT happen
+
+	removeFromA = aValue < bValue
+
+	var aNewIndex int
+	var bNewIndex int
+
+	if removeFromA {
+		aNewIndex = i + elementsToRemove
+		bNewIndex = j
+
+		fmt.Printf("a[%v] = %v < b[%v] = %v \n", aMidIndex, aValue, bMidIndex, bValue)
+
+		// aNewIndex can jump over len(a) - 1, therefore not logging a[aNewIndex]
+		fmt.Printf("Jumping %v values ahead in array A. From a[%v] = %v to a[%v]. \n", elementsToRemove, i, a[i], aNewIndex)
+		//fmt.Printf("Jumping %v values ahead in array A. From a[%v] = %v to a[%v] = %v. \n", elementsToRemove, i, a[i], aNewIndex, a[aNewIndex])
+	} else {
+		aNewIndex = i
+		bNewIndex = j + elementsToRemove
+
+		fmt.Printf("a[%v] = %v > b[%v] = %v \n", aMidIndex, aValue, bMidIndex, bValue)
+
+		// bNewIndex can jump over len(b) - 1, therefore not logging b[bNewIndex]
+		fmt.Printf("Jumping %v values ahead in array B. From b[%v] = %v to b[%v]. \n", elementsToRemove, j, b[j], bNewIndex)
+		//fmt.Printf("Jumping %v values ahead in array B. From b[%v] = %v to b[%v] = %v. \n", elementsToRemove, j, b[j], bNewIndex, b[bNewIndex])
+	}
+
+	return findKthBiggestElement(a, b, aNewIndex, bNewIndex, elementsForNextIteration)
 }
 
 func findMedianSortedArraysNaive(nums1 []int, nums2 []int) float64 {
@@ -97,10 +193,10 @@ func test(a1 []int, a2 []int) {
 	fmt.Printf("array 1: %v \n", a1)
 	fmt.Printf("array 2: %v \n", a2)
 
-	//medianNaive := findMedianSortedArraysNaive(a1, a2)
+	medianNaive := findMedianSortedArraysNaive(a1, a2)
 	median := findMedianSortedArrays(a1, a2)
 
-	//fmt.Printf("Naive median: %v \n", medianNaive)
+	fmt.Printf("Naive median: %v \n", medianNaive)
 	fmt.Printf("O( log(m + n) ) median: %v \n", median)
 }
 
@@ -118,7 +214,23 @@ func test2() {
 	test(a1, a2)
 }
 
+func test3() {
+	a1 := []int{1, 2}
+	a2 := []int{3, 4}
+
+	test(a1, a2)
+}
+
+func test4() {
+	a1 := []int{3}
+	a2 := []int{1, 2, 4}
+
+	test(a1, a2)
+}
+
 func main() {
-	test1()
-	test2()
+	//test1()
+	//test2()
+	//test3()
+	test4()
 }
