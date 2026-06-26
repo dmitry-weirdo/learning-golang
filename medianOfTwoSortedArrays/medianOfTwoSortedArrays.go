@@ -17,7 +17,8 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	mergedLength := m + n
 	fmt.Printf("Merged array will have length %v \n", mergedLength)
 
-	if mergedLength%2 == 1 {
+	oddLength := mergedLength%2 == 1
+	if oddLength {
 		// if mergedLength is odd, we need to find the middle element [mergedLength / 2]
 		// len = 5 -> we need to find the merged[2], i.e. the 3rd biggest
 
@@ -27,6 +28,20 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		// len = 6 -> we need to find (merged[2] + merged[3]) / 2, i.e. between 3rd and 4th biggest
 
 		fmt.Printf("Merged array length %v is even. We need to find average between elements [%v] and [%v] in the merged array. \n", mergedLength, mergedLength/2-1, mergedLength/2)
+	}
+
+	// Without heuristic -> separate and obvious handling of odd and even cases
+	if oddLength {
+		// len = 5 -> we need the 3-rd biggest element
+		k := (mergedLength + 1) / 2
+
+		fmt.Printf("Merged array length = %v is odd. We will find %v-th biggest element in the merged array. \n", mergedLength, k)
+
+		kElement := findKthBiggestElement(nums1, nums2, 0, 0, k)
+
+		fmt.Printf("Returning %v-th biggest element = %v. \n", k, kElement)
+
+		return float64(kElement)
 	}
 
 	// Heuristic: we will find the average between
@@ -50,7 +65,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 	// For odd total length: both positions point to the same middle element
 	// For even total length: positions point to the two middle elements
 
-	fmt.Printf("Returning average between %v and %v. \n", k1Element, k2Element)
+	fmt.Printf("Returning average between %v-th biggest element = %v and %v-th biggest element = %v. \n", k1, k1Element, k2, k2Element)
 	return float64(k1Element+k2Element) / 2.0
 }
 
@@ -229,8 +244,8 @@ func test4() {
 }
 
 func main() {
-	//test1()
+	test1()
 	//test2()
 	//test3()
-	test4()
+	//test4()
 }
