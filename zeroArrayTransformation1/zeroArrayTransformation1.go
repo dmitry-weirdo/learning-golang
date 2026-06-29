@@ -10,9 +10,9 @@ func isZeroArray(nums []int, queries [][]int) bool {
 
 	l := len(nums)
 
-	diff := make([]int, l+1) // can be + 1
+	diff := make([]int, l+1) // can be + 1, after the last element
 
-	// fill the diff array ( +1 at query start, - 1 at query end + 1 )
+	// fill the diff array ( +1 at [query start], - 1 at [query end + 1] )
 	for _, v := range queries {
 		left := v[0]
 		right := v[1]

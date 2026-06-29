@@ -7,10 +7,10 @@ func subarraysWithKDistinct(nums []int, k int) int {
 
 	// todo: we can just calculate for every pos and not store the complete arrays, but we need to store all variable from the function
 	kMinusOnePositions := getLeftPos(nums, k-1)
-	fmt.Printf("(k - 1) = %v positions: %v \n", k-1, kMinusOnePositions)
+	fmt.Printf("At most (k - 1) = %v distinct values - leftmost positions: %v \n", k-1, kMinusOnePositions)
 
 	kPositions := getLeftPos(nums, k)
-	fmt.Printf("(k) = %v positions: %v \n", k, kPositions)
+	fmt.Printf("At most (k) = %v distinct values - leftmost positions: %v \n", k, kPositions)
 
 	result := 0
 
@@ -58,7 +58,7 @@ func getLeftPos(nums []int, k int) []int {
 		// move the left pointers until we reach the distinctCount <= k
 		for distinctCount > k {
 			leftValue := nums[left]
-			fmt.Printf("Left index: %v \n", right)
+			fmt.Printf("Left index: %v \n", left)
 
 			_, ok = frequencies[leftValue]
 			if !ok {
@@ -118,7 +118,17 @@ func test2() {
 	test(nums, k, expected)
 }
 
+func test3() {
+	nums := []int{1, 1, 1, 2, 2, 3}
+	k := 3
+
+	expected := 3
+
+	test(nums, k, expected)
+}
+
 func main() {
-	test1()
-	test2()
+	//test1()
+	//test2()
+	test3()
 }
