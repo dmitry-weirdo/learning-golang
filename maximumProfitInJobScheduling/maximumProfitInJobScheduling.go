@@ -73,7 +73,10 @@ func dfs(jobs []Job, memo []int, jobIndex int) int {
 	return maxResult
 }
 
-func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // return N if there are no jobs
+func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // returns N if there are no jobs
+	// this is the left-most variant of the binary search -> within the same values, it will return the left-most
+	// also, it does NOT return on value find -> it will return the len(arr) value if no value found
+
 	// we cannot just iterate from startIndex to n,
 	// so we have to use the binary search for O(log n) complexity
 
