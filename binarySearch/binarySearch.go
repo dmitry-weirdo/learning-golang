@@ -4,7 +4,7 @@ import "fmt"
 
 func leftMostBinarySearch(a []int, v int) int { // returns index
 	left := 0
-	right := len(a) // todo: what if len - 1?
+	right := len(a) // (len -1) fails on finding 0-th of array of 1 element
 
 	for left < right {
 		mid := (left + right) / 2
@@ -21,7 +21,7 @@ func leftMostBinarySearch(a []int, v int) int { // returns index
 
 func rightMostBinarySearch(a []int, v int) int { // returns index
 	left := 0
-	right := len(a) // todo: what if len - 1?
+	right := len(a) // (len -1) fails on finding 0-th of array of 1 element
 
 	for left < right {
 		mid := (left + right) / 2
@@ -87,6 +87,42 @@ func test(a []int, v int, expectedLeftMost int, expectedRightMost int) {
 	fmt.Printf("(Alg. 2) Right-most position of %v = [%v] \n", v, rightOne2)
 	fmt.Printf("Expected left-most position of %v = [%v] \n", v, expectedLeftMost)
 	fmt.Printf("Expected right-most position of %v = [%v] \n", v, expectedRightMost)
+
+	// write failures if any
+
+	// check left-most alg
+	if expectedLeftMost == -1 {
+		if (leftOne != -1) && (leftOne != len(a)) { // can return both -1 and len(arr)
+			fmt.Printf("FAILURE: expected left-most = %v, actual left-most = %v \n", expectedLeftMost, leftOne)
+		}
+	} else {
+		if leftOne != expectedLeftMost {
+			fmt.Printf("FAILURE: expected left-most = %v, actual left-most = %v \n", expectedLeftMost, leftOne)
+		}
+	}
+
+	// check right-most alg 1
+	if expectedRightMost == -1 {
+		if (rightOne != -1) && (rightOne != len(a)) { // can return both -1 and len(arr)
+			fmt.Printf("FAILURE: (right-most Alg. 1) expected right-most = %v, actual right-most = %v \n", expectedRightMost, rightOne)
+		}
+	} else {
+		if rightOne != expectedRightMost { // can return both -1 and len(1)
+			fmt.Printf("FAILURE: (right-most Alg. 1) expected right-most = %v, actual right-most = %v \n", expectedRightMost, rightOne)
+		}
+	}
+
+	// check right-most alg 2
+	if expectedRightMost == -1 {
+		if (rightOne2 != -1) && (rightOne2 != len(a)) { // can return both -1 and len(arr)
+			fmt.Printf("FAILURE: (right-most Alg. 2) expected right-most = %v, actual right-most = %v \n", expectedRightMost, rightOne2)
+		}
+	} else {
+		if rightOne2 != expectedRightMost { // can return both -1 and len(1)
+			fmt.Printf("FAILURE: (right-most Alg. 2) expected right-most = %v, actual right-most = %v \n", expectedRightMost, rightOne2)
+		}
+	}
+
 }
 
 func test1() {
