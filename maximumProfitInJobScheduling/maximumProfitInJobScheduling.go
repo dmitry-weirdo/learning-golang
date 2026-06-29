@@ -77,15 +77,17 @@ func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // retu
 	// we cannot just iterate from startIndex to n,
 	// so we have to use the binary search for O(log n) complexity
 
+	// all values are indexes in the array
 	left := startIndex
 	right := len(jobs)
 
 	for left < right {
 		mid := (left + right) / 2
 
-		if jobs[mid].start >= minStartTime { // move to the left of mid, even if it's the same value
+		// we need to search "to the left" since we're searching the minimal (leftmost) index satisfying the condition
+		if jobs[mid].start >= minStartTime { // arr[mid] matchets -> move to the left of mid, even if it's the same value. Including the [mid] index.
 			right = mid
-		} else { // move to the right of mid
+		} else { // even arr[mid] does not match -> move to the right of mid, starting with [mid + 1]
 			left = mid + 1
 		}
 	}
