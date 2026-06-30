@@ -6,9 +6,10 @@ func search(nums []int, target int) int {
 	left := 0
 	right := len(nums) - 1 // arr[right] is inclusive
 
-	// arr[left:right] - right is NOT inclusive -> we need to do right + 1
+	// arr[left:right] - right is NOT inclusive -> we need to do [left:right + 1]
 
-	for (left <= right) && (left < len(nums)) {
+	//for (left <= right) && (left < len(nums)) {
+	for left <= right { // since we're starting with (right = len - 1), we cannot go over the size of the array
 		mid := (left + right) / 2
 
 		fmt.Println()
@@ -22,7 +23,7 @@ func search(nums []int, target int) int {
 			return mid
 		}
 
-		leftPartIsSorted := nums[left] <= nums[mid] // equality - to save for the size 1
+		leftPartIsSorted := nums[left] <= nums[mid] // <= - equal included to work for the size 1 (if left == mid)
 
 		if leftPartIsSorted {
 			fmt.Printf("Left part of the array a[%v:%v] = %v is sorted. \n", left, mid, nums[left:mid+1])
@@ -115,9 +116,9 @@ func test5() {
 }
 
 func main() {
-	//test1()
-	//test2()
-	//test3()
-	//test4()
+	test1()
+	test2()
+	test3()
+	test4()
 	test5()
 }
