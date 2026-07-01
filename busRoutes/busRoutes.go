@@ -99,6 +99,13 @@ func numBusesToDestination(routes [][]int, source int, target int) int {
 					continue
 				}
 
+				// if we're about to add the target stop -> we already found it,
+				// no need to do the further operations until we reach it via the queue
+				if routeStop == target {
+					fmt.Printf("Stop %v from route %v is the target stop. Returning %v. \n", routeStop, route, currentStop.busCount+1)
+					return currentStop.busCount + 1
+				}
+
 				// add stop to visited stops
 				visitedStops[routeStop] = true
 
