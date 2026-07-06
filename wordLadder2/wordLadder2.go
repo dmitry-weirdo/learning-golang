@@ -76,13 +76,14 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 						}
 					}
 
-					if _, ok := m[potentialWord]; ok {
+					if _, ok := m[potentialWord]; ok { // only proceed if potential char-generated word is in wordList
 						fmt.Printf("From word \"%v\", potential word found: \"%v\" \n", word, potentialWord)
 
 						addToMap(previousNodes, potentialWord, word)
 
 						fmt.Printf("Added previous word \"%v\" to next word \"%v\". Previous map: %v \n", word, potentialWord, previousNodes)
 
+						// in Word Ladder 1, we returned the depth immediately on reaching the endWord
 						/*						if potentialWord == endWord {
 													fmt.Printf("End word \"%v\" found as potential word! Returning depth = %v.", potentialWord, depth)
 
@@ -92,12 +93,12 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 						appendToQueue(queue, potentialWord)
 
 						// todo: think about removing from a separate copy
-						// todo: this should be different for word ladder 2
 
 						// word found the first time -> save its distance
 						distances[potentialWord] = distance
 						fmt.Printf("Setting distance %v to next word \"%v\". Distances: %v \n", distance, potentialWord, distances)
 
+						// word already handled -> removed it from the dictionary, we cannot use it in the further path
 						delete(m, potentialWord)
 
 						if potentialWord == endWord {
@@ -171,7 +172,7 @@ func addToMap(m map[string][]string, word string, previousWord string) {
 
 	if !ok { // add new key
 		m[word] = []string{previousWord}
-	} else {
+	} else { // add one more previous word of the same distance to the map of the word
 		m[word] = append(existingPreviousWords, previousWord)
 	}
 }
