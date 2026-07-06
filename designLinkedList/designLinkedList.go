@@ -70,6 +70,14 @@ func (this *MyLinkedList) PrintWithoutDummyNodes() {
 }
 
 func (this *MyLinkedList) GetAtIndex(index int) *MyListNode { // helper function, not in the ticket
+	if index < 0 {
+		if this.debug {
+			fmt.Printf("Index [%v] is < 0. Returning nil node. \n", index)
+		}
+
+		return nil
+	}
+
 	if index >= this.size {
 		if this.debug {
 			fmt.Printf("Index [%v] is greater than size %v. Returning nil node. \n", index, this.size)
@@ -94,7 +102,7 @@ func (this *MyLinkedList) Get(index int) int {
 
 	if n == nil {
 		if this.debug {
-			fmt.Printf("Index [%v] is greater than size %v. Cannot get element at index [%v]. \n", index, this.size, index)
+			fmt.Printf("Index [%v] is greater than size %v or < 0. Cannot get element at index [%v]. \n", index, this.size, index)
 		}
 
 		return -1
@@ -165,7 +173,7 @@ func (this *MyLinkedList) AddAtIndex(index int, val int) {
 
 	if n == nil {
 		if this.debug {
-			fmt.Printf("Index [%v] is greater than size %v. Cannot add element %v at index %v. \n", index, this.size, val, index)
+			fmt.Printf("Index [%v] is greater than size %v or < 0. Cannot add element %v at index %v. \n", index, this.size, val, index)
 		}
 
 		return
@@ -198,7 +206,7 @@ func (this *MyLinkedList) DeleteAtIndex(index int) {
 
 	if n == nil {
 		if this.debug {
-			fmt.Printf("Index [%v] is greater than size %v. Cannot delete element at index %v. \n", index, this.size, index)
+			fmt.Printf("Index [%v] is greater than size %v or < 0. Cannot delete element at index %v. \n", index, this.size, index)
 		}
 
 		return
