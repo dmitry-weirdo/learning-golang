@@ -3,26 +3,26 @@ package main
 import "fmt"
 
 type MyLinkedList struct {
-	head  *ListNode
-	tail  *ListNode
+	head  *MyListNode
+	tail  *MyListNode
 	size  int
 	debug bool
 }
 
-type ListNode struct {
+type MyListNode struct {
 	val  int
-	prev *ListNode
-	next *ListNode
+	prev *MyListNode
+	next *MyListNode
 }
 
 func Constructor() MyLinkedList {
-	dummyHead := &ListNode{
+	dummyHead := &MyListNode{
 		val:  -666,
 		prev: nil,
 		next: nil,
 	}
 
-	dummyTail := &ListNode{
+	dummyTail := &MyListNode{
 		val:  777,
 		prev: dummyHead,
 		next: nil,
@@ -69,7 +69,7 @@ func (this *MyLinkedList) PrintWithoutDummyNodes() {
 	fmt.Println()
 }
 
-func (this *MyLinkedList) GetAtIndex(index int) *ListNode { // helper function, not in the ticket
+func (this *MyLinkedList) GetAtIndex(index int) *MyListNode { // helper function, not in the ticket
 	if index >= this.size {
 		if this.debug {
 			fmt.Printf("Index [%v] is greater than size %v. Returning nil node. \n", index, this.size)
@@ -112,7 +112,7 @@ func (this *MyLinkedList) AddAtHead(val int) {
 	// we will insert AFTER dummyHead
 	firstElement := this.head.next
 
-	newHead := &ListNode{
+	newHead := &MyListNode{
 		val:  val,
 		prev: this.head, // dummyHead
 		next: firstElement,
@@ -133,7 +133,7 @@ func (this *MyLinkedList) AddAtTail(val int) {
 	// we will insert BEFORE dummyTail
 	lastElement := this.tail.prev
 
-	newTail := &ListNode{
+	newTail := &MyListNode{
 		val:  val,
 		prev: lastElement,
 		next: this.tail, // dummyTail
@@ -172,7 +172,7 @@ func (this *MyLinkedList) AddAtIndex(index int, val int) {
 	}
 
 	// we insert BEFORE this node
-	newNode := &ListNode{
+	newNode := &MyListNode{
 		val:  val,
 		prev: n.prev,
 		next: n, // insert BEFORE n
