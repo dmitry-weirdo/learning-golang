@@ -9,7 +9,7 @@ func lengthOfLongestSubstring(s string) int {
 
 	maxLength := 1
 
-	// character
+	// character to its frequency
 	m := make(map[byte]int)
 
 	left := 0
@@ -18,7 +18,7 @@ func lengthOfLongestSubstring(s string) int {
 	for right < len(s) {
 		chRight := s[right]
 
-		if v, ok := m[chRight]; ok { // value exists -> increase
+		if v, ok := m[chRight]; ok { // value exists -> increase existing frequency
 			m[chRight] = v + 1
 		} else { // value doesn't yet exist -> add frequency 1
 			m[chRight] = 1
@@ -48,7 +48,7 @@ func lengthOfLongestSubstring(s string) int {
 
 			fmt.Printf("Moved left to [%v]. Current non-repeating substring: [%v, %v] = \"%v\". \n", left, left, right, s[left:right+1])
 
-			// we still move to the next position
+			// we still move to the next position after jumping left
 			right++
 		}
 	}
