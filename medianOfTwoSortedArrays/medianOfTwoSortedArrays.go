@@ -30,6 +30,7 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 		fmt.Printf("Merged array length %v is even. We need to find average between elements [%v] and [%v] in the merged array. \n", mergedLength, mergedLength/2-1, mergedLength/2)
 	}
 
+	// K is NOT zero-based, it's 1-based (just humanly N-th biggest element)
 	// Without heuristic -> separate and obvious handling of odd and even cases
 	if oddLength {
 		// len = 5 -> we need the 3-rd biggest element
