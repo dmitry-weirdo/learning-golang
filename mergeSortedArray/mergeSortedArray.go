@@ -35,6 +35,7 @@ func merge(nums1 []int, m int, nums2 []int, n int) {
 			continue
 		}
 
+		// todo: this is actually the same action as if (left < 0), so we can merge them
 		// copy from the right array
 		nums1[writePos] = nums2[right]
 		right--
