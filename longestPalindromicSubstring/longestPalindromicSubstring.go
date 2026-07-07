@@ -18,7 +18,49 @@ func longestPalindrome(s string) string {
 	fmt.Println("Initialized the matrix:")
 	printMatrix(m)
 
-	return ""
+	// initialize the max palindrome as just the first character
+	maxPalindromeStart := 0
+	maxPalindromeLength := 1
+
+	// we skip i = n - 1, it's just the last string that is already true
+	for i := n - 2; i >= 0; i-- {
+		// go from smaller intervals to bigger since we need the values of [i + 1; j - 1]
+		for j := i + 1; j <= n-1; j++ {
+			if s[i] != s[j] {
+				// first and last characters of substring are non-equal -> not a palindrome
+				m[i][j] = false // todo: this is not super-necessary since initialized to false anyway
+				continue
+			}
+
+			isPalindrome := false
+
+			if ((i + 1) >= (j - 1)) || // if i + 1 = j, it is a palindrome of 2 characters!
+				m[i+1][j-1] { // substring within i and j is a palindrome
+				isPalindrome = true
+			}
+
+			if !isPalindrome {
+				m[i][j] = false // todo: this is not super-necessary since initialized to false anyway
+				continue
+			}
+
+			// [i;j] is a palindrome -> check whether it's longer than the current max palindrome
+			m[i][j] = true
+			currentLength := j - i + 1
+
+			if currentLength > maxPalindromeLength {
+				maxPalindromeStart = i
+				maxPalindromeLength = currentLength
+
+				fmt.Printf("New max palindrome [%v, %v] \"%v\" of length %v found. \n", i, j, s[i:j+1], currentLength)
+			}
+		}
+	}
+
+	fmt.Println("Matrix after all checks:")
+	printMatrix(m)
+
+	return s[maxPalindromeStart : maxPalindromeStart+maxPalindromeLength]
 }
 
 func printMatrix(mat [][]bool) {
@@ -55,11 +97,18 @@ func test(s string) {
 }
 
 func test1() {
-	s := "babab"
+	s := "babad"
+
+	test(s)
+}
+
+func test2() {
+	s := "cbbd"
 
 	test(s)
 }
 
 func main() {
 	test1()
+	test2()
 }
