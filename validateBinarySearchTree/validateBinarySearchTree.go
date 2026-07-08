@@ -78,7 +78,7 @@ func iterateOptimal(root *TreeNode) bool {
 		return false
 	}
 
-	// left has updated the previous -> check that prev < root
+	// left has updated the previous -> check that (prev < root)
 	if previousNode != nil {
 		fmt.Printf("AT THE CHECKING POINT: Current root: %v, previous node: %v \n", root.Val, previousNode.Val)
 	} else {
@@ -174,6 +174,7 @@ func test3() {
 }
 
 func main() {
+	// 98. Validate Binary Search Tree
 	test1()
 	//test2()
 	//test3()
