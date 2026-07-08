@@ -25,7 +25,7 @@ func removeDuplicates(nums []int) int {
 		}
 	}
 
-	return writePos // 0-based, and we need to return the count
+	return writePos // we increased if after the last write, so it will be +1 of the elements count, no need to do +1
 }
 
 func removeDuplicatesNaive(nums []int) int {
