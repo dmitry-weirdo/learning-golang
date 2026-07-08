@@ -21,7 +21,7 @@ func isPalindrome(s string) bool {
 			return true
 		}
 
-		if !letterEqualCaseInsensitive(s[i], s[j]) {
+		if !alphanumericEqualCaseInsensitive(s[i], s[j]) {
 			return false
 		}
 
@@ -38,7 +38,7 @@ func isAlphanumeric(c byte) bool {
 		('0' <= c && c <= '9')
 }
 
-func letterEqualCaseInsensitive(a byte, b byte) bool {
+func alphanumericEqualCaseInsensitive(a byte, b byte) bool {
 	return toLowerCase(a) == toLowerCase(b)
 }
 
