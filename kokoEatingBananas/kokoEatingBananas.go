@@ -25,7 +25,7 @@ func minEatingSpeed(piles []int, h int) int {
 	for left <= right {
 		mid := (left + right) / 2
 
-		hoursRequired := calculate(piles, mid)
+		hoursRequired := calculate(piles, mid, h)
 
 		if hoursRequired > h { // not reached the target hours -> we need to increase the speed K
 			left = mid + 1
@@ -38,12 +38,17 @@ func minEatingSpeed(piles []int, h int) int {
 	return minResult
 }
 
-func calculate(piles []int, k int) int {
+func calculate(piles []int, k int, breakOnLimit int) int {
 	totalHours := 0
 
 	for _, v := range piles {
 		// todo: we can also break earlier if sum overrides the limit
 		totalHours += ceil(v, k)
+
+		// we are already at overflow -> no need to calculate further
+		if totalHours > breakOnLimit {
+			return totalHours
+		}
 	}
 
 	return totalHours
