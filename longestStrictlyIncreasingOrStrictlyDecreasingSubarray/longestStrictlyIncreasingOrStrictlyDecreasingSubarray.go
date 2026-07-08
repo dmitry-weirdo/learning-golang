@@ -8,6 +8,54 @@ func longestMonotonicSubarray(nums []int) int {
 	// find max increasing length
 	maxIncreasingLength := 1
 
+	currentLength := 1
+	i := 1
+
+	for i < n {
+		for (i < n) && (nums[i] > nums[i-1]) {
+			i++
+			currentLength++
+		}
+
+		maxIncreasingLength = max(currentLength, maxIncreasingLength)
+
+		// reset increasing sequence start
+		currentLength = 1
+		i++
+	}
+
+	fmt.Printf("Max increasing subarray length: %d \n", maxIncreasingLength)
+
+	// find max decreasing length
+	maxDecreasingLength := 1
+
+	currentLength = 1
+	i = 1
+
+	for i < n {
+		for (i < n) && (nums[i] < nums[i-1]) {
+			i++
+			currentLength++
+		}
+
+		maxDecreasingLength = max(currentLength, maxDecreasingLength)
+
+		// reset decreasing sequence start
+		currentLength = 1
+		i++
+	}
+
+	fmt.Printf("Max decreasing subarray length: %d \n", maxIncreasingLength)
+
+	return max(maxIncreasingLength, maxDecreasingLength)
+}
+
+func longestMonotonicSubarrayNaive(nums []int) int {
+	n := len(nums)
+
+	// find max increasing length
+	maxIncreasingLength := 1
+
 	start := 0
 	i := 1
 
@@ -42,7 +90,7 @@ func longestMonotonicSubarray(nums []int) int {
 
 		maxDecreasingLength = max(newLength, maxDecreasingLength)
 
-		// reset increasing sequence start
+		// reset decreasing sequence start
 		start = i
 		i++
 	}
