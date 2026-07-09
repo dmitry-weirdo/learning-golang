@@ -38,17 +38,23 @@ func deleteNode(root *TreeNode, key int) *TreeNode {
 		// hard case 3 - both left and right child present
 
 		// find the minimum node of root.right
-		minNode := getMinNode(root.Right)
-		fmt.Printf("Found min node %v in the right subtree of node %v. \n", minNode.Val, root.Val)
+		minNode, minNodeParent := getMinNodeAndItsParent(root.Right, root)
+		fmt.Printf("Found min node %v in the right subtree of node %v. Min node parent: %v \n", minNode.Val, root.Val, getNodeValSafe(minNodeParent))
 
 		// replace the root value with the min node value
 		root.Val = minNode.Val
 		fmt.Printf("Found deleted node with the min node value %v. \n", minNode.Val)
 
 		// remove the old min node from the right subtree. Its value is now in the being removed node.
-		root.Right = deleteNode(root.Right, minNode.Val)
-		fmt.Printf("Removed the old min node %v from the right subtree of the deleted node. \n", minNode.Val)
+		//root.Right = deleteNode(root.Right, minNode.Val)
 
+		if minNodeParent != root {
+			minNodeParent.Left = deleteNode(minNodeParent.Left, minNode.Val)
+		} else {
+			minNodeParent.Right = deleteNode(minNodeParent.Right, minNode.Val)
+		}
+
+		fmt.Printf("Removed the old min node %v from the right subtree of the deleted node. \n", minNode.Val)
 	}
 
 	// replaced or non-replaced, return the current node to the parent
@@ -76,6 +82,23 @@ func getMinNode(root *TreeNode) *TreeNode {
 	}
 
 	return node
+}
+
+func getMinNodeAndItsParent(root *TreeNode, rootParent *TreeNode) (minNode *TreeNode, minNodeParent *TreeNode) {
+	if root == nil {
+		return nil, nil
+	}
+
+	// to find the min, we constantly move to the left
+	var parent *TreeNode = rootParent
+	node := root
+
+	for node.Left != nil {
+		parent = node
+		node = node.Left
+	}
+
+	return node, parent
 }
 
 func treeFromArray(arr []any) *TreeNode {
@@ -196,13 +219,25 @@ func treeHeight(node *TreeNode) int {
 
 func main() {
 	// 450. Delete Node in a BST
-	nodes := []any{5, 3, 6, 2, 4, nil, 7}
+	/*	nodes := []any{5, 3, 6, 2, 4, nil, 7}
+		tree := treeFromArray(nodes)
+		//printTree(tree)
+		//fmt.Printf("====================")
+		PrintTreeTopDown(tree)
+
+		key := 5
+		deleteNode(tree, key)
+
+		fmt.Printf("Tree after removing the node %v: \n", key)
+		PrintTreeTopDown(tree)
+	*/
+	// failing test-case
+	nodes := []any{50, 30, 70, nil, 40, 60, 80}
 	tree := treeFromArray(nodes)
-	//printTree(tree)
-	//fmt.Printf("====================")
 	PrintTreeTopDown(tree)
 
-	key := 100
+	key := 50
+
 	deleteNode(tree, key)
 
 	fmt.Printf("Tree after removing the node %v: \n", key)
