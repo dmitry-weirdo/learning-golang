@@ -7,10 +7,11 @@ type TreeNode struct {
 }
 
 func insertIntoBST(root *TreeNode, val int) *TreeNode {
-	return insert(root, val)
+	//return insertIterative(root, val)
+	return insertRecursive(root, val)
 }
 
-func insert(root *TreeNode, val int) *TreeNode {
+func insertRecursive(root *TreeNode, val int) *TreeNode {
 	// this is a trivial solution without any rebalancing
 	// it also implies that the value does not exist in the tree (it's the problem condition).
 	if root == nil { // this also handles the case if initial root was null
@@ -20,13 +21,46 @@ func insert(root *TreeNode, val int) *TreeNode {
 
 	if val < root.Val { // go left
 		// will only change if root.Left was null -> then the new node will be set
-		root.Left = insert(root.Left, val)
+		root.Left = insertRecursive(root.Left, val)
 	} else if val > root.Val { // go right
 		// will only change if root.Right was null -> then the new node will be set
-		root.Right = insert(root.Right, val)
+		root.Right = insertRecursive(root.Right, val)
 	}
 
 	// root was existing -> return it, so that it doesn't change in the parent
+	return root
+}
+
+func insertIterative(root *TreeNode, val int) *TreeNode {
+	if root == nil {
+		return &TreeNode{Val: val}
+	}
+
+	node := root
+	//parent := nil
+
+	newNode := &TreeNode{Val: val}
+
+	for node != nil {
+		// parent = node
+
+		if val < node.Val { // go left
+			if node.Left == nil {
+				node.Left = newNode
+				break
+			} else {
+				node = node.Left
+			}
+		} else if val > node.Val { // go right
+			if node.Right == nil {
+				node.Right = newNode
+				break
+			} else {
+				node = node.Right
+			}
+		}
+	}
+
 	return root
 }
 
