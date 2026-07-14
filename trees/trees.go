@@ -90,3 +90,20 @@ func PrintTreeTopDown(root *TreeNode) {
 		current = next
 	}
 }
+
+func FindInTree(root *TreeNode, value int) *TreeNode { // not assuming it is a BST, just searching the complete tree
+	if root == nil {
+		return nil
+	}
+
+	if root.Val == value {
+		return root
+	}
+
+	left := FindInTree(root.Left, value)
+	if left != nil {
+		return left
+	}
+
+	return FindInTree(root.Right, value)
+}
