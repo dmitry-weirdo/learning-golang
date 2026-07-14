@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+type Node struct { // has a link to parent!
+	Val    int
+	Left   *Node
+	Right  *Node
+	Parent *Node
+}
+
 type TreeNode struct {
 	Val   int
 	Left  *TreeNode

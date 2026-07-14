@@ -89,8 +89,21 @@ func test2() {
 	test(arr, p, q, expected)
 }
 
+func test3() {
+	// failing test-case from BST variant
+	// https://neetcode.io/problems/lowest-common-ancestor-in-binary-search-tree/question
+	// the problem was that nodes were not the same memory, so we have to compare values
+	arr := []any{5, 3, 8, 1, 4, 7, 9, nil, 2}
+	p := 3
+	q := 8
+	expected := 5
+
+	test(arr, p, q, expected)
+}
+
 func main() {
 	// 236. Lowest Common Ancestor of a Binary Tree
 	test1()
 	test2()
+	test3()
 }
