@@ -242,5 +242,4 @@ func main() {
 
 	fmt.Printf("Tree after removing the node %v: \n", key)
 	PrintTreeTopDown(tree)
-
 }
