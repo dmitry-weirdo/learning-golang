@@ -2,7 +2,7 @@ package main
 
 import (
 	"demo/trees"
-	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without package prefix
 	"fmt"
 )
 
