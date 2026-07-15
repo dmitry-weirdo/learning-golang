@@ -9,11 +9,56 @@ var directions = [][]int{
 	{0, -1}, // left
 }
 
+func cellExists(rows, columns, row, column int) bool {
+	return (0 <= row) &&
+		(row < rows) &&
+		(0 <= column) &&
+		(column < columns)
+}
+
 func floodFill(image [][]int, sr int, sc int, color int) [][]int {
 	originalColor := image[sr][sc]
 
 	if originalColor == color {
-		fmt.Printf("Image[%v][%v] is already in color %v. Nothing to do", sr, sc, color)
+		fmt.Printf("Image[%v][%v] is already in color %v. Nothing to do. \n", sr, sc, color)
+		return image
+	}
+
+	rows := len(image)
+	columns := len(image[0])
+
+	// avoid passing the same arguments, the inner function will see its closure
+	var dfsInner func(i, j int) // we need to declare it separate from assigning to function, to be able to call recursively from the inner function
+
+	dfsInner = func(i, j int) {
+		// something not correct -> return
+		if !cellExists(rows, columns, i, j) ||
+			image[i][j] != originalColor {
+			return
+		}
+
+		// fill the current point
+		image[i][j] = color
+
+		for _, v := range directions { // top, right, bottom, left
+			newRow := i + v[0]
+			newColumn := j + v[1]
+
+			dfsInner(newRow, newColumn)
+		}
+	}
+
+	dfsInner(sr, sc)
+
+	// we're updating the colours in the original image matrix
+	return image
+}
+
+func floodFillOriginal(image [][]int, sr int, sc int, color int) [][]int {
+	originalColor := image[sr][sc]
+
+	if originalColor == color {
+		fmt.Printf("Image[%v][%v] is already in color %v. Nothing to do. \n", sr, sc, color)
 		return image
 	}
 
@@ -42,13 +87,6 @@ func dfs(m [][]int, rows, columns, i, j int, originalColor int, newColor int) {
 
 		dfs(m, rows, columns, newRow, newColumn, originalColor, newColor)
 	}
-}
-
-func cellExists(rows, columns, row, column int) bool {
-	return (0 <= row) &&
-		(row < rows) &&
-		(0 <= column) &&
-		(column < columns)
 }
 
 func test(image [][]int, sr int, sc int, color int) { // nodes can be null
