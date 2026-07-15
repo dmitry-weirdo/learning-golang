@@ -69,6 +69,8 @@ func mergeKLists(lists []*ListNode) *ListNode {
 
 	for pq.Len() > 0 {
 		// append the top to the result list
+		// heap.Pop(pq) does return the smallest element
+		// However, pq.Pop does NOT return the smallest element
 		smallestNode := heap.Pop(pq).(*ListNode)
 
 		currentNode.Next = smallestNode
