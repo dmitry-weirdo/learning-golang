@@ -72,6 +72,7 @@ func shortestPathBinaryMatrix(grid [][]int) int {
 				continue
 			}
 
+			visited[newRow][newColumn] = true
 			queue.PushBack([3]int{newRow, newColumn, length + 1})
 		}
 	}
@@ -82,7 +83,8 @@ func shortestPathBinaryMatrix(grid [][]int) int {
 
 func createVisitedMatrix(rows int, columns int) [][]bool {
 	visited := make([][]bool, rows)
-	for i := 0; i < columns; i++ {
+
+	for i := 0; i < rows; i++ {
 		visited[i] = make([]bool, columns)
 	}
 
@@ -131,7 +133,27 @@ func test1() {
 	test(m, expected)
 }
 
+func test2() {
+	// throws OOM when using list as a queue
+	// fixed: I forgot to set the new added node to visited = true
+	m := [][]int{
+		{0, 1, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1, 0, 0, 0, 0, 0},
+		{0, 1, 0, 1, 1, 1, 1, 0},
+		{0, 1, 0, 1, 1, 1, 1, 0},
+		{0, 1, 1, 0, 0, 1, 1, 0},
+		{0, 1, 1, 1, 1, 0, 1, 0},
+		{0, 0, 0, 0, 0, 1, 1, 0},
+		{1, 1, 1, 1, 1, 1, 1, 0},
+	}
+
+	expected := 25
+
+	test(m, expected)
+}
+
 func main() {
 	// 1091. Shortest Path in Binary Matrix
-	test1()
+	//test1()
+	test2()
 }
