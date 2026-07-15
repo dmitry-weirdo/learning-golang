@@ -42,39 +42,43 @@ func shortestPathBinaryMatrix(grid [][]int) int {
 
 	queue := list.New()
 
-	// we're pushing row, col, length
+	// we're pushing row, col
 	// start with top-left
-	queue.PushBack([3]int{0, 0, 1})
+	queue.PushBack([2]int{0, 0})
 	visited[0][0] = true
 
-	//level := 0
+	level := 1
 
 	for queue.Len() > 0 {
-		// todo: we can handle the current length of the queue, as usual, and just increase the length
+		currentQueueLength := queue.Len()
 
-		// pop from the queue
-		cell := queue.Remove(queue.Front()).([3]int)
+		for i := 0; i < currentQueueLength; i++ {
+			// pop from the queue
+			cell := queue.Remove(queue.Front()).([2]int)
 
-		row, column, length := cell[0], cell[1], cell[2]
+			row, column := cell[0], cell[1]
 
-		if (row == rows-1) && (column == columns-1) {
-			// bottom-right reached
-			return length
-		}
-
-		for _, d := range directions {
-			newRow := row + d[0]
-			newColumn := column + d[1]
-
-			if !cellExists(rows, columns, newRow, newColumn) ||
-				visited[newRow][newColumn] ||
-				grid[newRow][newColumn] == 1 { // we can travel only via 0 values
-				continue
+			if (row == rows-1) && (column == columns-1) {
+				// bottom-right reached
+				return level
 			}
 
-			visited[newRow][newColumn] = true
-			queue.PushBack([3]int{newRow, newColumn, length + 1})
+			for _, d := range directions {
+				newRow := row + d[0]
+				newColumn := column + d[1]
+
+				if !cellExists(rows, columns, newRow, newColumn) ||
+					visited[newRow][newColumn] ||
+					grid[newRow][newColumn] == 1 { // we can travel only via 0 values
+					continue
+				}
+
+				visited[newRow][newColumn] = true
+				queue.PushBack([2]int{newRow, newColumn})
+			}
 		}
+
+		level++
 	}
 
 	// no path found with full BFS
@@ -154,6 +158,6 @@ func test2() {
 
 func main() {
 	// 1091. Shortest Path in Binary Matrix
-	//test1()
-	test2()
+	test1()
+	//test2()
 }
