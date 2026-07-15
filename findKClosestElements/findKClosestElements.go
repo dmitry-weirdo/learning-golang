@@ -15,10 +15,10 @@ func findClosestElements(arr []int, k int, x int) []int {
 	left := 0
 	right := len(arr) - k // we should have k elements at the end
 
-	bestWindowStart := -1
+	//bestWindowStart := -1
 
 	// we're searching for the leftmost window since the minimum values are preferred in case of same distance
-	for left <= right { // todo: why <=, not <?
+	for left < right { // todo: why <=, not <?
 		// <= to handle left = 0, right = 2 -> mid = 1 -> right = 0 -> next iteration: left = 0, right = 0
 		// left <= right if we're using right = mid - 1
 		// left < right if we're using right = mid
@@ -68,16 +68,16 @@ func findClosestElements(arr []int, k int, x int) []int {
 
 			fmt.Printf("Moving left to mid + 1 = %v. \n", left)
 		} else {
-			bestWindowStart = mid // no moving to the right, keep this as current result
+			//bestWindowStart = mid // no moving to the right, keep this as current result
 
 			// move left
-			right = mid - 1
+			right = mid
 
 			fmt.Printf("Moving right to mid - 1 = %v. \n", right)
 		}
 	}
 
-	return arr[bestWindowStart : bestWindowStart+k]
+	return arr[left : left+k]
 }
 
 func dist(val int, target int) int {
