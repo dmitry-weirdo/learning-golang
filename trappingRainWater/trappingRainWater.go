@@ -5,12 +5,52 @@ import (
 )
 
 func trap(height []int) int {
+	// optimized to use just 2 pointers, not 2 pre-calculated arrays
+
+	left := 0
+	right := len(height) - 1
+
+	leftMax := height[0]
+	rightMax := height[len(height)-1]
+
+	sum := 0
+
+	// move left and right pointers until they reach the same point that should be already calculated in the previous step
+	for left < right {
+		if leftMax < rightMax {
+			// leftMax will be the defining minimum
+			left++
+
+			// update leftMax with the new position increased from left
+			leftMax = max(leftMax, height[left])
+
+			// if leftMax was set to height[left], the amount on this position will be 0, even if height[left] > rightMax
+			// else leftMax is defining the min of (leftMax, rightMax)
+			sum += leftMax - height[left]
+		} else {
+			// rightMax will be the defining minimum
+			right--
+
+			// update rightMax with the new position decreased from right
+			rightMax = max(rightMax, height[right])
+
+			// if rightMax was set to height[right], the amount on this position will be 0, even if height[right] > leftMax
+			// else rightMax is defining the min of (leftMax, rightMax)
+			sum += rightMax - height[right]
+		}
+	}
+
+	return sum
+}
+
+func trapWithPrefixArrays(height []int) int {
 	n := len(height)
 
 	if n < 3 { // no in-between space for water
 		return 0
 	}
 
+	// 2 arrays will take 2 * O(n) space.
 	// calculate max left heights (including self)
 	left := make([]int, n)
 
