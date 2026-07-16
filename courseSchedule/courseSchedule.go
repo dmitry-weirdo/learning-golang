@@ -116,6 +116,90 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
 	return index == numCourses
 }
 
+func findOrder(numCourses int, prerequisites [][]int) []int {
+	// This is a solution of "210. Course Schedule II".
+	// It is the same problem, but we need to return the top-sort array
+
+	// this version is using the Kahn's algorithm
+	// if we added all nodes to the top-sort array -> no cycles
+
+	// every course is identified by i = [0; numCourses - 1]
+	// so we can identify a course with just a position in the array
+
+	// adjacency list -> for every vertex, we keep a list of destination from this vertex
+	adj := make([][]int, numCourses)
+
+	// initialize adj with empty lists for every vertex
+	for i := 0; i < len(adj); i++ {
+		adj[i] = []int{}
+	}
+
+	// how many inbound edges are there for every vertex
+	inDegree := make([]int, numCourses)
+
+	for _, v := range prerequisites {
+		// For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+		from := v[1]
+		to := v[0]
+
+		inDegree[to]++
+
+		adj[from] = append(adj[from], to)
+	}
+
+	fmt.Printf("adjacency list: %v \n", adj)
+	fmt.Printf("inDegree list: %v \n", inDegree)
+
+	// queue of nodes to process
+	queue := []int{}
+
+	// add all nodes that have 0 inDegree to the queue
+	for i, v := range inDegree {
+		if v == 0 {
+			queue = append(queue, i)
+		}
+	}
+
+	fmt.Printf("Initial nodes without incoming edges (with inDegree = 0): %v \n", queue)
+
+	// topological sort array
+	index := 0 // index in top-sort array
+	order := make([]int, numCourses)
+
+	for len(queue) > 0 {
+		// pop from the queue
+		node := queue[0]
+		queue = queue[1:]
+
+		// put the popped vertex to the top-sort
+		order[index] = node
+		index++ // will also be increased after the last node -> although this is 0-based, it will reach N (numCourses) if all nodes have been processed
+
+		// for all nodes going out of the node, decrease their inDegree
+		for _, dest := range adj[node] {
+			inDegree[dest]--
+
+			// if the neighbour going out of the node now has inDegree == 0 -> put it to the queue
+			if inDegree[dest] == 0 {
+				queue = append(queue, dest)
+			}
+		}
+	}
+
+	// If we handled all the nodes via inDegree == 0 logic, then there are no cycles.
+	// If there are some cycles, nodes with inDegree > 0 will remain.
+	fmt.Printf("Topological sort: %v \n", order)
+	fmt.Printf("Topological sort covered %v of %v vertexes. \n", index, numCourses)
+	fmt.Printf("Topological sort finished (i.e. no cycles in the graph): %v \n", index == numCourses)
+
+	if index == numCourses {
+		return order
+	}
+
+	// graph has cycles -> return empty array
+	return []int{}
+}
+
 func test(numCourses int, prerequisites [][]int, expectedResult bool) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
