@@ -7,15 +7,18 @@ func checkInclusion(s1 string, s2 string) bool {
 		return false
 	}
 
+	// todo: many solutions just use array[26] and do not exclude the non-s1 characters.
+	// todo: in that case, non-s1 characters just have frequencies decreasing from 0 to negative, and never go above 0, i.e. they won't affect both decreasing and increasing cases hurting the charactersRequired variable
+	// count frequencies of characters
 	freq := make(map[rune]int)
 
-	// count frequencies of characters
 	for _, v := range s1 {
 		freq[v]++ //  wow, it works even without initializing to 0
 	}
 
 	fmt.Printf("Map of frequencies of string \"%v\": \n%v \n", s1, freq)
 
+	// this is the main trick of not checking the complete freq[i] to have 0 values.
 	charactersRequired := len(freq)
 	fmt.Printf("Total different characters in string \"%v\": %v \n", s1, charactersRequired)
 
@@ -27,7 +30,7 @@ func checkInclusion(s1 string, s2 string) bool {
 		fmt.Printf("i: %v, s2[i] = %c \n", i, char)
 
 		// add the new character
-		if _, ok := freq[char]; ok {
+		if _, ok := freq[char]; ok { // only handle characters from s1
 			freq[char]--
 
 			fmt.Printf("Decreased frequency of char %c to %v \n", char, freq[char])
@@ -44,12 +47,20 @@ func checkInclusion(s1 string, s2 string) bool {
 
 			fmt.Printf("Window moved. Decreasing frequency of s2[%v] = %c. \n", removedCharPosition, removedChar)
 
-			if _, ok := freq[removedChar]; ok {
+			if _, ok := freq[removedChar]; ok { // only handle characters from s1
 				freq[removedChar]++
 
 				fmt.Printf("Increased frequency of removed char %c to %v \n", char, freq[removedChar])
 
 				if freq[removedChar] == 1 {
+					// we moved from 0 required to 1 required -> charactersRequired has to be increased
+					// !!! Notably, when we move from -1 to 0, it's ok, no need to increase charactersRequired, character frequency still satisfied
+
+					// s1 = "adc"
+					// s2 = "dcda"
+					// By i = 2, freq[d] = -1, freq[a] = 1
+					// By i = 3, freq[a] will go from 1 to 0, freq[d] will go from -1 to 0, and this doesn't hurt the charactersRequired
+
 					charactersRequired++
 					fmt.Printf("Frequency of removed char %c set to 1. Increased charactersRequired to %v. \n", removedChar, charactersRequired)
 				}
