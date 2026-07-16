@@ -60,6 +60,7 @@ func findItinerary(tickets [][]string) []string {
 
 	dfs("JFK", adj, out, path)
 
+	// convert the linked list to an array of strings
 	result := []string{}
 
 	for e := path.Front(); e != nil; e = e.Next() {
@@ -75,7 +76,14 @@ func dfs(
 	out map[string]int,
 	path *list.List,
 ) {
+	// this is a post-order DFS:
+	// we add the deepest nodes first, and then the parent
+	// each addition is to the start of the list
+	// todo: we can also add to the end of the list, and then reverse the complete list before the final return
+
 	outgoingEdges := adj[node]
+
+	// todo: in many solutions, we're just removing the outgoing edges from adj[node] instead of keeping edges. We then stop the iteration when adj[node] has become empty.
 
 	// while the current node has outgoing edges
 	for out[node] > 0 {
@@ -84,19 +92,29 @@ func dfs(
 		nextNodeIndex := len(outgoingEdges) - out[node]
 		nextNode := outgoingEdges[nextNodeIndex]
 
-		// decrease the node
+		// decrease the node outgoing edges left
 		out[node]--
+
+		fmt.Printf("Going through the %v -> %v edge. \n", node, nextNode)
 
 		dfs(nextNode, adj, out, path)
 	}
 
+	// notably, we can visit the out-exhausted (out == 0) node from another incoming edge,
+	// so this exhausted node can be added to the path multiple times
+
+	// example: A -> B -> D -> B -> C
+	// After back-tracking from C, we'll go to the next B -> D edge.
+	// Then B will be added after coming through B -> D -> B edges.
+	// Then we backtrack the D.
+	// Then B will we added again after dfs of its outgoing neighbours C and D has been ended.
+
 	// add current node post-order BEFORE the dfs-later neighbours
-	path.PushFront(node) // todo: should we push back?
+	path.PushFront(node)
 
 	fmt.Printf("Added node %v to the front of the list after going through all of its outgoing edges. \n", node)
 	fmt.Println("Current path:")
 	printList(path)
-	//path.PushBack()
 }
 
 func printList(l *list.List) {
@@ -141,8 +159,20 @@ func test2() {
 	test(tickets)
 }
 
+func test3() {
+	tickets := [][]string{
+		{"JFK", "B"},
+		{"B", "C"},
+		{"B", "D"},
+		{"D", "B"},
+	}
+
+	test(tickets)
+}
+
 func main() {
 	// 332. Reconstruct Itinerary
 	test1()
 	test2()
+	test3()
 }
