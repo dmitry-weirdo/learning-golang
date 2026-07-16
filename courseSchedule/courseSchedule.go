@@ -84,6 +84,7 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
 		currentPath := make(map[int]bool, 0)
 
 		// todo: better structure than slice?
+		// todo: we can just pass the order array, return the new index from DFS and decrease to i - 1 when returning from DFS. Maybe reaching i = 0 will be the indicator of "no cycles exist".
 		nodesVisitedInCurrentIteration := make([]int, 0)
 
 		dfsResult := dfs(adj, visited, i, &nodesVisitedInCurrentIteration, currentPath)
