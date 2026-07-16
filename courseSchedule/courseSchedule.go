@@ -41,6 +41,88 @@ func canFinishReadySolution(numCourses int, prerequisites [][]int) bool {
 }
 
 func canFinish(numCourses int, prerequisites [][]int) bool {
+	// This version is using the DFS, selecting the random nodes for the start (no inDegree prioritization)
+	// We need to track the current path, and if the node exists in the current path -> we have a cycle
+
+	// every course is identified by i = [0; numCourses - 1]
+	// so we can identify a course with just a position in the array
+
+	// adjacency list -> for every vertex, we keep a list of destination from this vertex
+	adj := make([][]int, numCourses)
+
+	// initialize adj with empty lists for every vertex
+	for i := 0; i < len(adj); i++ {
+		adj[i] = []int{}
+	}
+
+	for _, v := range prerequisites {
+		// For example, the pair [0, 1], indicates that to take course 0 you have to first take course 1.
+		from := v[1]
+		to := v[0]
+
+		adj[from] = append(adj[from], to)
+	}
+
+	fmt.Printf("adjacency list: %v \n", adj)
+
+	// visited array, to exclude already visited nodes
+	visited := make([]bool, numCourses)
+
+	// topological sort
+	order := make([]int, numCourses)
+
+	// instead of reversing the array, we fill it from the end
+	index := len(order) - 1
+
+	// iterate all the nodes
+	for i := 0; i < numCourses; i++ {
+		if visited[i] {
+			fmt.Printf("Node %v already visited. Do not start DFS for it. \n", i)
+			continue
+		}
+
+		// todo: better structure than slice?
+		nodesVisitedInCurrentIteration := make([]int, 0)
+
+		// todo: should we return true/false from dfs?
+		dfs(adj, visited, i, &nodesVisitedInCurrentIteration)
+
+		// add the current DFS iteration to the top-sort array, from right to left
+		for _, v := range nodesVisitedInCurrentIteration {
+			order[index] = v
+			index--
+		}
+	}
+
+	fmt.Printf("Topological sort: %v \n", order)
+
+	return true
+}
+
+func dfs(adj [][]int, visited []bool, node int, nodesVisitedInCurrentIteration *[]int) {
+	// todo: check that node is not yet in the current path
+
+	fmt.Println()
+	fmt.Printf("DFS. Current node: %v. Nodes visited in current iteration: %v \n", node, *nodesVisitedInCurrentIteration)
+
+	visited[node] = true
+
+	// DFS - iterate all outgoing nodes of the current node
+	for _, dest := range adj[node] {
+		if visited[dest] {
+			fmt.Printf("Edge %v -> %v. Node %v already visited. Do not start DFS for it. \n", node, dest, dest)
+			continue
+		}
+
+		dfs(adj, visited, dest, nodesVisitedInCurrentIteration)
+	}
+
+	// add the current root to the current path in reverse
+	// (post-order processing -> first children, then the parent)
+	*nodesVisitedInCurrentIteration = append(*nodesVisitedInCurrentIteration, node)
+}
+
+func canFinishWithKahnsAlgorithm(numCourses int, prerequisites [][]int) bool {
 	// this version is using the Kahn's algorithm
 	// if we added all nodes to the top-sort array -> no cycles
 
@@ -290,10 +372,10 @@ func test4() {
 
 func main() {
 	// 207. Course Schedule
-	test1()
-	test2()
+	//test1()
+	//test2()
 	test3()
-	test4()
+	//test4()
 
 	/*	// test if the graph is split
 		result := canFinishReadySolution(2, [][]int{})
