@@ -81,11 +81,15 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
 			continue
 		}
 
+		currentPath := make(map[int]bool, 0)
+
 		// todo: better structure than slice?
 		nodesVisitedInCurrentIteration := make([]int, 0)
 
-		// todo: should we return true/false from dfs?
-		dfs(adj, visited, i, &nodesVisitedInCurrentIteration)
+		dfsResult := dfs(adj, visited, i, &nodesVisitedInCurrentIteration, currentPath)
+		if !dfsResult {
+			return false
+		}
 
 		// add the current DFS iteration to the top-sort array, from right to left
 		for _, v := range nodesVisitedInCurrentIteration {
@@ -99,27 +103,44 @@ func canFinish(numCourses int, prerequisites [][]int) bool {
 	return true
 }
 
-func dfs(adj [][]int, visited []bool, node int, nodesVisitedInCurrentIteration *[]int) {
+func dfs(adj [][]int, visited []bool, node int, nodesVisitedInCurrentIteration *[]int, currentPath map[int]bool) bool {
 	// todo: check that node is not yet in the current path
 
 	fmt.Println()
-	fmt.Printf("DFS. Current node: %v. Nodes visited in current iteration: %v \n", node, *nodesVisitedInCurrentIteration)
+	fmt.Printf("DFS. Current node: %v. Nodes visited in current iteration (post-order): %v. Current path: %v \n", node, *nodesVisitedInCurrentIteration, currentPath)
 
 	visited[node] = true
 
+	// append the current node to current path BEFORE going into dfs
+	currentPath[node] = true
+
 	// DFS - iterate all outgoing nodes of the current node
 	for _, dest := range adj[node] {
+		if _, ok := currentPath[dest]; ok {
+			fmt.Printf("Edge %v -> %v. Node %v is already present in the current path. Graph contains cycles -> returning false. \n", node, dest, dest)
+			return false
+		}
+
 		if visited[dest] {
 			fmt.Printf("Edge %v -> %v. Node %v already visited. Do not start DFS for it. \n", node, dest, dest)
 			continue
 		}
 
-		dfs(adj, visited, dest, nodesVisitedInCurrentIteration)
+		dfsResult := dfs(adj, visited, dest, nodesVisitedInCurrentIteration, currentPath)
+
+		if !dfsResult { // propagate the cycle failure to parent
+			return false
+		}
 	}
+
+	// remove the current node from the current path
+	delete(currentPath, node)
 
 	// add the current root to the current path in reverse
 	// (post-order processing -> first children, then the parent)
 	*nodesVisitedInCurrentIteration = append(*nodesVisitedInCurrentIteration, node)
+
+	return true
 }
 
 func canFinishWithKahnsAlgorithm(numCourses int, prerequisites [][]int) bool {
@@ -372,10 +393,10 @@ func test4() {
 
 func main() {
 	// 207. Course Schedule
-	//test1()
-	//test2()
+	test1()
+	test2()
 	test3()
-	//test4()
+	test4()
 
 	/*	// test if the graph is split
 		result := canFinishReadySolution(2, [][]int{})
