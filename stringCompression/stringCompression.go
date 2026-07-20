@@ -18,9 +18,16 @@ func compress(chars []byte) int {
 
 		fmt.Printf("Index updated to %v \n", index)
 
-		if index >= len(chars) { // reached the end of the string
-			fmt.Println()
-			fmt.Printf("Reached the end of the string. \n")
+		endOfStringReached := index >= len(chars)
+
+		if endOfStringReached || (chars[index] != currentChar) { // char changed
+			if endOfStringReached {
+				fmt.Println()
+				fmt.Printf("Reached the end of the string. \n")
+			} else {
+				fmt.Println()
+				fmt.Printf("Char changed from %c to %c \n", currentChar, chars[index])
+			}
 
 			count := index - currentCharStartIndex
 
@@ -40,63 +47,69 @@ func compress(chars []byte) int {
 
 			fmt.Printf("Appended %v of char %c \n", count, currentChar)
 
-			break
-		}
+			if !endOfStringReached {
+				fmt.Printf("New chars: %v \n", string(chars))
 
-		if chars[index] != currentChar { // char changed
-			fmt.Println()
-			fmt.Printf("Char changed from %c to %c \n", currentChar, chars[index])
+				// change the current character
+				writeIndex++
+				currentChar = chars[index]
+				currentCharStartIndex = index
 
-			count := index - currentCharStartIndex
-
-			// append the previous char
-			chars[writeIndex] = currentChar
-
-			if count > 1 { // if count is 1, we don't append it
-				countString := strconv.Itoa(count)
-
-				countBytes := []byte(countString)
-
-				for j := 0; j < len(countBytes); j++ {
-					writeIndex++
-					chars[writeIndex] = countBytes[j]
-				}
+				fmt.Printf("New writeIndex: %v \n", writeIndex)
+				fmt.Printf("New char: %c \n", currentChar)
+				fmt.Printf("New current char %c starts at %v \n", currentChar, currentCharStartIndex)
 			}
-
-			fmt.Printf("Appended %v of char %c \n", count, currentChar)
-			fmt.Printf("New chars: %v \n", string(chars))
-
-			// change the current character
-			writeIndex++
-			currentChar = chars[index]
-			currentCharStartIndex = index
-
-			fmt.Printf("New writeIndex: %v \n", writeIndex)
-			fmt.Printf("New char: %c \n", currentChar)
-			fmt.Printf("New current char %c starts at %v \n", currentChar, currentCharStartIndex)
-		} else {
-
 		}
 	}
 
 	return writeIndex + 1 // length is 1 more than the index
 }
 
-func main() {
-	var originalString string
+func test(s string, expectedResult string) {
+	fmt.Println()
+	fmt.Println("========================")
 
-	originalString = "aabbccc"
-	originalString = "aabbccc"
-	originalString = "a"
-	originalString = "aaabba"
+	fmt.Printf("Original string: %v \n", s)
 
-	fmt.Printf("Original string: \n%v \n", originalString)
-
-	chars := []byte(originalString)
+	chars := []byte(s)
 	compressedLength := compress(chars)
 
 	compressedChars := chars[:compressedLength]
 	compressedString := string(compressedChars)
 
-	fmt.Printf("String \n%v \ncompressed to \n%v \n", originalString, compressedString)
+	fmt.Println()
+	fmt.Printf("String \"%v\" compressed to \"%v\". \n", s, compressedString)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if compressedString != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, compressedString)
+	}
+}
+
+func test1() {
+	s := "aabbccc"
+	expectedResult := "a2b2c3"
+
+	test(s, expectedResult)
+}
+
+func test2() {
+	s := "a"
+	expectedResult := "a"
+
+	test(s, expectedResult)
+}
+
+func test3() {
+	s := "aaabba"
+	expectedResult := "a3b2a"
+
+	test(s, expectedResult)
+}
+
+func main() {
+	// 443. String Compression
+	test1()
+	test2()
+	test3()
 }
