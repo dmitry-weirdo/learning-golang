@@ -18,7 +18,7 @@ func jobScheduling(startTime []int, endTime []int, profit []int) int {
 	jobs := convertToJobsArray(startTime, endTime, profit, n)
 	fmt.Printf("Converted %v jobs into a job objects array: \n%v \n", n, jobs)
 
-	// sort the array just by endTime
+	// sort the array just by startTime
 	comparator := func(j1, j2 Job) int {
 		return j1.start - j2.start
 	}
@@ -57,7 +57,7 @@ func dfs(jobs []Job, memo []int, jobIndex int) int {
 	// just handle the next job
 	nextJobIndexIfWeSkipJob := jobIndex + 1
 
-	// starting for the next job, get the next job in the array where (newJob.startTime
+	// starting for the next job, get the next job in the array where (newJob.startTime >= currenJob.endTime)
 	currentJobEndTime := jobs[jobIndex].end
 	nextJobIndexIfWeTakeJob := getNextJobIndex(jobs, currentJobEndTime, jobIndex+1)
 
@@ -88,7 +88,7 @@ func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // retu
 		mid := (left + right) / 2
 
 		// we need to search "to the left" since we're searching the minimal (leftmost) index satisfying the condition
-		if jobs[mid].start >= minStartTime { // arr[mid] matchets -> move to the left of mid, even if it's the same value. Including the [mid] index.
+		if jobs[mid].start >= minStartTime { // arr[mid] matches -> move to the left of mid, even if it's the same value. Including the [mid] index.
 			right = mid
 		} else { // even arr[mid] does not match -> move to the right of mid, starting with [mid + 1]
 			left = mid + 1
@@ -124,5 +124,6 @@ func test() {
 }
 
 func main() {
+	// 1235. Maximum Profit in Job Scheduling
 	test()
 }

@@ -58,14 +58,20 @@ func countValues(m [][]int, n int, mid int) int {
 
 	for j < n {
 		for (m[i][j] > mid) && (i > 0) {
+			// in the current column j, go up until we find a row where mid can be
+			// or until we reach the 0-th row
+			// I.e. we're skipping the values from the bottom of the current column that exceed the mid value
 			i--
 
 			fmt.Printf("i, j: [%v, %v] \n", i, j)
 		}
 
+		// after going up, we're sure that the lower rows can be excluded,
+		// since it's guaranteed that every column is sorted
+
 		// all values above in the column are added
 		if m[i][j] <= mid { // do not add values of 0th row if they're above the value
-			count += i + 1
+			count += i + 1 // Index i is 0-based, we're adding values including the i-th row in the current column
 		}
 
 		// go one right
@@ -215,6 +221,7 @@ func test6() { // with repeating values
 }
 
 func main() {
+	// 378. Kth Smallest Element in a Sorted Matrix
 	test1()
 	test2()
 	test3()

@@ -126,6 +126,7 @@ func test3() {
 }
 
 func main() {
+	// 1760. Minimum Limit of Balls in a Bag
 	/*	max := 3
 		for i := 0; i < 20; i++ {
 			result := calculate(i, max)

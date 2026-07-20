@@ -24,7 +24,7 @@ func isPalindrome(head *ListNode) bool {
 	middle := slow
 	var secondHalfHead = middle.Next
 
-	// todo: disconnect 2nd path from the first path, to avoid cycles
+	// disconnect 2nd path from the first path, to avoid cycles
 	slow.Next = nil
 
 	fmt.Println("Disconnected the 2nd half, 1st half is: ")
@@ -157,6 +157,7 @@ func test4() {
 }
 
 func main() {
+	// 234. Palindrome Linked List
 	test1()
 	test2()
 	test3()

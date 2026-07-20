@@ -76,9 +76,11 @@ func dfs(m [][]int, memo [][]int, rows int, columns int, i int, j int) int {
 
 		if cellExists(rows, columns, row, column) &&
 			(m[row][column] > m[i][j]) { // only move to cells that have bigger value
+			// !!! the main trick is that not visiting the already visited cell is auto-covered by "go only to the bigger value" logic
 
 			cellPath := dfs(m, memo, rows, columns, row, column)
 
+			// this is the DP-logic: max of the current cell depends on pre-calculated values
 			memo[i][j] = max(memo[i][j], cellPath)
 		}
 	}
@@ -139,6 +141,7 @@ func test3() {
 }
 
 func main() {
+	// 329. Longest Increasing Path in a Matrix
 	test1()
 	// test2()
 	//test3()

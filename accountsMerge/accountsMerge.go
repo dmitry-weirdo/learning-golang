@@ -79,6 +79,7 @@ func accountsMerge(accounts [][]string) [][]string {
 	// accounts[1...] are emails
 	n := len(accounts)
 
+	// uf will be initialized with account indexes [0; n-1], each accountIndex a root pointing to itself
 	uf := newUnionFind(n)
 
 	fmt.Printf("Initialized the union-find structure of size %v. \n", n)
@@ -204,5 +205,6 @@ func test1() {
 }
 
 func main() {
+	// 721. Accounts Merge
 	test1()
 }
