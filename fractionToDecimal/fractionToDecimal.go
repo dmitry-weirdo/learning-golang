@@ -43,6 +43,9 @@ func fractionToDecimal(numerator int, denominator int) string {
 	var pos = sb.Len()
 
 	for !remainderFoundInMap {
+		// we're first handling the previous reminder.
+		// the division digits for this remainder have already been added to the string
+
 		// if newRemainder == 0 -> no brackets, it's a non-periodic division
 		if remainder == 0 {
 			fmt.Printf("Divided with 0 remainder! Returning non-periodic result %v. \n", sb.String())
@@ -51,7 +54,7 @@ func fractionToDecimal(numerator int, denominator int) string {
 		}
 
 		remainderPos, ok := m[remainder]
-		if ok {
+		if ok { // repeating reminder -> division is periodical add () brackets around this remainder and return the string.
 			remainderFoundInMap = true
 
 			fmt.Printf("Remainder %v already found in position %v \n", remainder, remainderPos)
@@ -62,7 +65,7 @@ func fractionToDecimal(numerator int, denominator int) string {
 			withoutOpeningBracket := sb.String()
 
 			return withoutOpeningBracket[:remainderPos] + "(" + withoutOpeningBracket[remainderPos:]
-		} else { // handle the new reminder
+		} else { // handle the new remainder
 			m[remainder] = pos
 			pos++
 
@@ -107,6 +110,7 @@ func sig(i int) int {
 }
 
 func main() {
+	// 166. Fraction to Recurring Decimal
 	var n, d int
 
 	n, d = 1, 2
