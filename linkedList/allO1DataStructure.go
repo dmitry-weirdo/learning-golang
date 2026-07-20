@@ -209,7 +209,37 @@ func (this *AllOne) GetMinKey() string {
 	return ""
 }
 
+func printAllOne(allOne AllOne) {
+	fmt.Println("=====================")
+
+	fmt.Printf("Min Key: %v \n", allOne.GetMinKey())
+	fmt.Println()
+
+	fmt.Printf("Max Key: %v \n", allOne.GetMaxKey())
+	fmt.Println()
+
+	fmt.Println(allOne.m)
+
+	printMap(allOne.m)
+	fmt.Println()
+	printList(allOne.l)
+	fmt.Println("=====================")
+}
+
+func printMap(m map[string]*list.Element) {
+	for k, v := range m {
+		fmt.Printf("%v: %v \n", k, v.Value.(*Node))
+	}
+}
+
+func printList(l *list.List) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		fmt.Println(e.Value)
+	}
+}
+
 func main() {
+	// 432. All O`one Data Structure
 	allOne := Constructor()
 	printAllOne(allOne)
 
@@ -239,33 +269,4 @@ func main() {
 
 	allOne.Dec("hello")
 	printAllOne(allOne)
-}
-
-func printAllOne(allOne AllOne) {
-	fmt.Println("=====================")
-
-	fmt.Printf("Min Key: %v \n", allOne.GetMinKey())
-	fmt.Println()
-
-	fmt.Printf("Max Key: %v \n", allOne.GetMaxKey())
-	fmt.Println()
-
-	fmt.Println(allOne.m)
-
-	printMap(allOne.m)
-	fmt.Println()
-	printList(allOne.l)
-	fmt.Println("=====================")
-}
-
-func printMap(m map[string]*list.Element) {
-	for k, v := range m {
-		fmt.Printf("%v: %v \n", k, v.Value.(*Node))
-	}
-}
-
-func printList(l *list.List) {
-	for e := l.Front(); e != nil; e = e.Next() {
-		fmt.Println(e.Value)
-	}
 }
