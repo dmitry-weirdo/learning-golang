@@ -48,8 +48,7 @@ func rankTeams(votes []string) string {
 			columnIndex := 1 + j // skip the 0th with team name
 
 			//fmt.Printf("Increasing team %v, vote %v \n", string(team), j)
-
-			inc(m, rowIndex, columnIndex)
+			m[rowIndex][columnIndex]++
 		}
 	}
 
@@ -82,19 +81,15 @@ func rankTeams(votes []string) string {
 	return string(resultBytes)
 }
 
-func inc(mat [][]int, row int, column int) {
-	curr := mat[row][column]
-	mat[row][column] = curr + 1
-}
-
 func printMatrix(mat [][]int) {
+	// this is a special handling where we print the first column as character and other columns as int
 	rows := len(mat)
 	columns := len(mat[0])
 
 	for i := 0; i < rows; i++ {
 		for j := 0; j < columns; j++ {
 			if j == 0 { // print as string instead of numeric byte
-				fmt.Printf("%v ", string(mat[i][j]))
+				fmt.Printf("%c ", mat[i][j])
 			} else {
 				fmt.Printf("%v ", mat[i][j])
 			}
@@ -105,7 +100,7 @@ func printMatrix(mat [][]int) {
 	}
 }
 
-func handle(votes []string) {
+func test(votes []string) {
 	fmt.Println()
 	fmt.Printf("======================= \n")
 
@@ -117,10 +112,11 @@ func handle(votes []string) {
 }
 
 func main() {
-	handle([]string{"ABC", "ACB", "ABC", "ACB", "ACB"})
+	// 1366. Rank Teams by Votes
+	test([]string{"ABC", "ACB", "ABC", "ACB", "ACB"})
 	//handle([]string{"CAB", "ACB", "ABC", "ACB", "ACB"})
-	handle([]string{"WXYZ", "XYZW"})
-	handle([]string{"ZMNAGUEDSJYLBOPHRQICWFXTVK"})
-	handle([]string{"AB", "BA"})
-	handle([]string{"AXYB", "AYXB", "AXYB", "AYXB"}) // letters can be non-consecutive!
+	test([]string{"WXYZ", "XYZW"})
+	test([]string{"ZMNAGUEDSJYLBOPHRQICWFXTVK"})
+	test([]string{"AB", "BA"})
+	test([]string{"AXYB", "AYXB", "AXYB", "AYXB"}) // letters can be non-consecutive!
 }
