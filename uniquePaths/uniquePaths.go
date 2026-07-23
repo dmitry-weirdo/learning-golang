@@ -12,8 +12,8 @@ func uniquePaths(m int, n int) int {
 	// (m - 1) row -> last 0, all previous are 1 (since we can only go right in the last row)
 	previousRow := make([]int, n)
 
-	for i := range previousRow {
-		previousRow[i] = 1 // the very last is actually 0, but we don't care
+	for j := range previousRow {
+		previousRow[j] = 1 // the very last is actually 0, but we don't care
 	}
 
 	// (m - 2) row
