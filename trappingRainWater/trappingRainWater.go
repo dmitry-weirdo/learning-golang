@@ -10,6 +10,7 @@ func trap(height []int) int {
 	left := 0
 	right := len(height) - 1
 
+	// !! note that [0] and [len - 1] heights have no 2nd boundary, so their sum will be 0
 	leftMax := height[0]
 	rightMax := height[len(height)-1]
 
