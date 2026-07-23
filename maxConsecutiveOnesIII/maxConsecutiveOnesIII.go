@@ -3,6 +3,34 @@ package main
 import "fmt"
 
 func longestOnes(nums []int, k int) int {
+	//maxWindowLen := 0 // if k = 0 and all elements are 0, we can have 0 result
+
+	left := 0
+	zeroesCount := 0
+
+	for right := 0; right < len(nums); right++ {
+		if nums[right] == 0 {
+			zeroesCount++
+		}
+
+		if zeroesCount > k { // move left until we have a zeroes-valid window
+			if nums[left] == 0 {
+				zeroesCount--
+			}
+
+			// shrink just by 1 - we'll move the current max window on 1 position
+			left++
+		}
+
+		// maxWindowLen not required anymore since we will move the max windows to the right
+		//maxWindowLen = max(maxWindowLen, right-left+1)
+	}
+
+	// since max window was moved right -> we can just subtract the left and get the max window size
+	return len(nums) - left
+}
+
+func longestOnesTrivial(nums []int, k int) int {
 	maxWindowLen := 0 // if k = 0 and all elements are 0, we can have 0 result
 
 	left := 0
