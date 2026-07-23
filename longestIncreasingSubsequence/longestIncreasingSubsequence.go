@@ -5,6 +5,10 @@ import (
 )
 
 func lengthOfLIS(nums []int) int {
+	return lengthOfLIS_dp_fromEnd(nums)
+}
+
+func lengthOfLIS_binarySearch(nums []int) int {
 	// heuristic solution of O(n * log n)
 
 	// we can just keep a sorted list of last elements of a sequence, so that we keep the lowest possible value on every position
@@ -80,6 +84,35 @@ func lengthOfLIS_dp(nums []int) int {
 			fmt.Printf("Increased max increasing subsequence length from %d to %d. \n", maxSequenceLength, memo[i])
 			maxSequenceLength = memo[i]
 		}
+	}
+
+	fmt.Printf("Memo: %v \n", memo)
+
+	return maxSequenceLength
+}
+
+func lengthOfLIS_dp_fromEnd(nums []int) int {
+	// see https://www.youtube.com/watch?v=cjWnW0hdF1Y - explanation from Neetcode
+
+	// solution with DP, time O(n^2) - on every index, we check all the next indexes
+	n := len(nums)
+	memo := make([]int, n)
+
+	for i := range memo { // "longest sequence" for every index is set to 1 at the beginning
+		memo[i] = 1
+	}
+
+	maxSequenceLength := 1
+
+	// skipping the (n - 1) since its LIS is always 1
+	for i := n - 2; i >= 0; i-- {
+		for j := i + 1; j < n; j++ {
+			if nums[i] < nums[j] { // we can extend from [i] with nums[j]
+				memo[i] = max(memo[i], memo[j]+1)
+			}
+		}
+
+		maxSequenceLength = max(maxSequenceLength, memo[i])
 	}
 
 	fmt.Printf("Memo: %v \n", memo)
