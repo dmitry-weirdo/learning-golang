@@ -41,7 +41,7 @@ func longestOnesTrivial(nums []int, k int) int {
 			zeroesCount++
 		}
 
-		// todo: we can shrink left just by 1, so that we keep it at max size
+		// We can shrink left just by 1, so that we keep it at max size,
 		// but I find this logic more straightforward and comprehensive
 		for zeroesCount > k { // move left until we have a zeroes-valid window
 			if nums[left] == 0 {
