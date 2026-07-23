@@ -6,7 +6,37 @@ import (
 )
 
 func numSquares(n int) int {
-	return numSquaresBfs(n)
+	return numSquaresDp(n)
+	//return numSquaresBfs(n)
+}
+
+func numSquaresDp(n int) int {
+	dp := make([]int, n+1)
+
+	// initialize all values to worst-case -> sum of all ones up to this value
+	for i := 0; i <= n; i++ {
+		dp[i] = i
+	}
+
+	//// for 0, we don't require any
+	//dp[0] = 0
+
+	for x := 1; x <= n; x++ { // calculate every next value based on previous
+		for i := 1; i*i <= x; i++ { // iterate all squares up to X
+			// subtract the square of i, this is one square (therefore + 1 in the "count of squares")
+			// the dp[x - i*i] is the remaining part, we take it from the DP memo
+
+			// example for x = 4
+			// i goes from 1 to 2
+			// x - 1*1 = 3, dp[3] = 3, + 1 = 4 -> this is the first result (1 + 1 + 1 + 1)
+			// x - 2*2 = 0, dp[0] = 0, + 1 = 1 -> this is the better result (4 = 4)
+
+			subtractISquareResult := dp[x-i*i] + 1
+			dp[x] = min(dp[x], subtractISquareResult)
+		}
+	}
+
+	return dp[n]
 }
 
 func numSquaresBfs(n int) int {
@@ -31,6 +61,7 @@ func numSquaresBfs(n int) int {
 			fmt.Printf("Trying to subtract squares from %v... \n", k)
 
 			// generate next level
+			// todo: it would be more optimal to iterate down from sqrt(n), to find the terminal case a bit faster
 			for _, v := range squares {
 				if k-v > 0 {
 					fmt.Printf("Added %v - %v = %v to the next level. \n", k, v, k-v)
