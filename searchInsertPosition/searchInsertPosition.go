@@ -19,6 +19,7 @@ func searchInsert(nums []int, target int) int {
 		}
 	}
 
+	// after exiting the while loop, left is the minimal k satisfying the condition function;
 	return left
 }
 
