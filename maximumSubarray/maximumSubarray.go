@@ -5,7 +5,8 @@ import (
 )
 
 func maxSubArray(nums []int) int {
-	return kadane(nums)
+	//return kadane(nums)
+	return prefixSums(nums)
 	// todo: divide and conquer solution of O(n * log n) ???
 }
 
@@ -70,6 +71,24 @@ func kadaneWithBorders(nums []int) (maxLeft int, maxRight int, maxSum int) {
 	}
 
 	return maxLeft, maxRight, maxSum
+}
+
+func prefixSums(nums []int) int {
+	// prefixSums[i] - prefixSums[j] = sum of subarray[i; j]
+	prefixSum := 0
+	minPrefixSum := 0
+
+	maxSubarraySum := nums[0]
+
+	for _, v := range nums {
+		prefixSum += v
+
+		maxSubarraySum = max(maxSubarraySum, prefixSum-minPrefixSum)
+
+		minPrefixSum = min(minPrefixSum, prefixSum)
+	}
+
+	return maxSubarraySum
 }
 
 func test(arr []int, expectedResult int) {
