@@ -20,9 +20,16 @@ func kadane(nums []int) int {
 	// currentSum is the maximum of the arrays that end on the previous element
 	// if the best currentSum before the current element is negative,
 	// we're just using the current element
+
+	// currentSum is NOT "the best sum of all subarrays in [0; i],
+	// it is just "the best sum of all subarrays ending in [i]"
+	// So it will contain a[i] even if a[i] < 0.
 	currentSum := 0
 
 	for _, v := range nums {
+		// current sum is the sum of the best subarray that is ending on [i - 1]
+		// !!! note that it will include arr[i - 1] even if it is negative
+
 		// if previous values sum up to negative, we don't take them, and previous sum is 0
 		currentSum = max(currentSum, 0)
 
