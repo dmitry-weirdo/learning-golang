@@ -151,7 +151,7 @@ func test3() {
 
 func main() {
 	// 209. Minimum Size Subarray Sum
-	//test1()
-	//test2()
+	test1()
+	test2()
 	test3()
 }
