@@ -53,6 +53,7 @@ func test(a, b [][]int, expectedResult [][]int) {
 
 	if len(result) != len(expectedResult) {
 		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
 	}
 
 	for i := 0; i < len(expectedResult); i++ {
