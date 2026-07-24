@@ -140,10 +140,18 @@ func test4() {
 	test(arr, expected)
 }
 
+func test5() {
+	arr := []int{-3, -2, -3}
+	expected := -2
+
+	test(arr, expected)
+}
+
 func main() {
 	// 53. Maximum Subarray
 	test1()
 	test2()
 	test3()
 	test4()
+	test5()
 }
