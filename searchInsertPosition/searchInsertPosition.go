@@ -3,6 +3,26 @@ package main
 import "fmt"
 
 func searchInsert(nums []int, target int) int {
+	// Using a template from:
+	// https://leetcode.com/discuss/post/786126/python-powerful-ultimate-binary-search-t-rwv8/
+
+	left := 0
+	right := len(nums) // it can be after the end of the array // !!! this will fail the test if we set len(nums) - 1
+
+	for left < right {
+		mid := (left + right) / 2
+
+		if nums[mid] >= target { // target condition
+			right = mid // in this template it is always mid, NOT mid - 1
+		} else {
+			left = mid + 1
+		}
+	}
+
+	return left
+}
+
+func searchInsert_working(nums []int, target int) int {
 	// we need to find the first index where nums[i] >= target
 
 	left := 0
