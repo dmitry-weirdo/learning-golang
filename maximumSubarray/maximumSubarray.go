@@ -1,10 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func maxSubArray(nums []int) int {
 	return kadane(nums)
-	// todo: divide and conquer solution of O(log n) ???
+	// todo: divide and conquer solution of O(n * log n) ???
 }
 
 func kadane(nums []int) int {
@@ -14,6 +16,10 @@ func kadane(nums []int) int {
 	}
 
 	maxSum := nums[0]
+
+	// currentSum is the maximum of the arrays that end on the previous element
+	// if the best currentSum before the current element is negative,
+	// we're just using the current element
 	currentSum := 0
 
 	for _, v := range nums {
@@ -23,10 +29,40 @@ func kadane(nums []int) int {
 		// add the current number
 		currentSum += v
 
+		// previous 2 lines can be written as this (either take current value and previous array ending on the previous element, or just take the current element)
+		//currentSum = max(v, v + currentSum)
+
 		maxSum = max(maxSum, currentSum)
 	}
 
 	return maxSum
+}
+
+func kadaneWithBorders(nums []int) (maxLeft int, maxRight int, maxSum int) {
+	maxSum = nums[0]
+	currentSum := 0
+
+	maxLeft = 0
+	maxRight = 0
+
+	left := 0
+
+	for right := 0; right < len(nums); right++ {
+		if currentSum < 0 { // new optimal subarray will start with just the current element, i.e. we move the left
+			currentSum = 0
+			left = right
+		}
+
+		currentSum += nums[right]
+
+		if currentSum > maxSum {
+			maxSum = currentSum
+			maxLeft = left
+			maxRight = right
+		}
+	}
+
+	return maxLeft, maxRight, maxSum
 }
 
 func test(arr []int, expectedResult int) {
@@ -37,7 +73,11 @@ func test(arr []int, expectedResult int) {
 
 	result := maxSubArray(arr)
 
+	left, right, _ := kadaneWithBorders(arr)
+	subArrayWithMaxSum := arr[left : right+1]
+
 	fmt.Printf("Maximum subarray sum:   %v \n", result)
+	fmt.Printf("Maximum subarray:       %v \n", subArrayWithMaxSum)
 	fmt.Printf("Expected result:        %v \n", expectedResult)
 
 	if result != expectedResult {
