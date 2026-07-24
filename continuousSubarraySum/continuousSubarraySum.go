@@ -59,7 +59,34 @@ func test1() {
 	test(arr, k, expected)
 }
 
+func test2() {
+	arr := []int{23, 2, 4, 6, 7}
+	k := 6
+	expected := true
+
+	test(arr, k, expected)
+}
+
+func test3() {
+	arr := []int{23, 2, 6, 4, 7}
+	k := 6
+	expected := true
+
+	test(arr, k, expected)
+}
+
+func test4() {
+	arr := []int{23, 2, 6, 4, 7}
+	k := 13
+	expected := false
+
+	test(arr, k, expected)
+}
+
 func main() {
 	// 523. Continuous Subarray Sum
 	test1()
+	test2()
+	test3()
+	test4()
 }
