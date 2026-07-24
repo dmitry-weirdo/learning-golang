@@ -3,6 +3,45 @@ package main
 import "fmt"
 
 func productExceptSelf(nums []int) []int {
+	return productExceptSelf_simplified(nums)
+	//return productExceptSelf_simplified(nums)
+}
+
+func productExceptSelf_simplified(nums []int) []int {
+	// for a[i], we need
+	// prefix product: a[0] * a[1] * ... * a[i - 1]
+	// postfix product: a[i + 1] * a[i + 2] * ... * a[len - 1]
+
+	// so we need to multiply prefix[i - 1] * postfix[i + 1]
+
+	// actually, we don't need a prefix and postfix arrays, we can just multiply directly into the result array
+
+	n := len(nums)
+	result := make([]int, n)
+
+	// go from 0 to n - 1, a[0] = 1, then multiply on a[i - 1]
+	prefixProduct := 1
+
+	for i := range nums {
+		result[i] = prefixProduct // set to the prefixProduct of [i - 1]
+		prefixProduct *= nums[i]  // calculate for the next step
+	}
+
+	// go down from n - 1 to 0, a[n - 1] = 1, then multiply on a[i + 1]
+	// for postfix values, we just need 2 values - current and next
+	postfixProduct := 1
+
+	for i := n - 1; i >= 0; i-- {
+		// multiply the prefixSum on the postfixSum
+		result[i] = result[i] * postfixProduct
+
+		postfixProduct *= nums[i] // calculate for the next step
+	}
+
+	return result
+}
+
+func productExceptSelf_basic(nums []int) []int {
 	// for a[i], we need
 	// prefix product: a[0] * a[1] * ... * a[i - 1]
 	// postfix product: a[i + 1] * a[i + 2] * ... * a[len - 1]
