@@ -17,6 +17,12 @@ func threeSumWithTarget(nums []int, target int) [][]int {
 	result := make([][]int, 0)
 
 	for i := 0; i < len(nums)-2; i++ { // 2 remaining values are required to search values 2 and 3
+		// todo: this is an unnecessary small optimization that works only if target > 0
+		// think about target = -10, arr = { -5, -4, -1 } -> bigger negative values will actually INCREASE the result, but a[0] = -5 > -10
+		//if (target >= 0) && (nums[i] > target) {
+		//	break
+		//}
+
 		if (i > 0) && (nums[i] == nums[i-1]) {
 			// skip duplicate a[i] values
 			continue
@@ -41,18 +47,20 @@ func twoSum(arr []int, firstElementIndex int, target int, result *[][]int) {
 		if sum == target { // found the result!
 			*result = append(*result, []int{firstElement, arr[left], arr[right]})
 
-			// skip duplicates from left
-			for left < right && arr[left] == arr[left+1] {
+			// go to next values on both sides
+			left++
+			right--
+
+			// skip duplicates from left, we compare to the successful left and move until the value is changed
+			for left < right && arr[left] == arr[left-1] {
 				left++
 			}
 
-			// skip duplicates from right
-			for left < right && arr[right] == arr[right-1] {
+			// skip duplicates from right, we compare to the successful right and move until the value is changed
+			for left < right && arr[right] == arr[right+1] {
 				right--
 			}
-		}
-
-		if sum < target {
+		} else if sum < target {
 			// we need to increase -> increase the smaller
 			left++
 		} else {
@@ -60,6 +68,17 @@ func twoSum(arr []int, firstElementIndex int, target int, result *[][]int) {
 			right--
 		}
 	}
+}
+
+func twoSumTest() {
+	result := make([][]int, 0)
+
+	arr := []int{0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 8, 9, 9, 9, 9}
+	target := 10
+
+	twoSum(arr, 0, target, &result)
+
+	fmt.Printf("Result from twoSum: \n%v \n", result)
 }
 
 func test(arr []int, target int, expectedResult [][]int) {
@@ -111,5 +130,7 @@ func test1() {
 
 func main() {
 	// 15. 3Sum
-	test1()
+	//test1()
+
+	twoSumTest()
 }
