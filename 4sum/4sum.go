@@ -41,18 +41,20 @@ func twoSum(arr []int, firstElementIndex int, secondElementIndex int, target int
 		if sum == target { // found the result!
 			*result = append(*result, []int{firstElement, secondElement, arr[left], arr[right]})
 
-			// skip duplicates from left
-			for left < right && arr[left] == arr[left+1] {
+			// go to next values on both sides
+			left++
+			right--
+
+			// skip duplicates from left, we compare to the successful left and move until the value is changed
+			for left < right && arr[left] == arr[left-1] {
 				left++
 			}
 
-			// skip duplicates from right
-			for left < right && arr[right] == arr[right-1] {
+			// skip duplicates from right, we compare to the successful right and move until the value is changed
+			for left < right && arr[right] == arr[right+1] {
 				right--
 			}
-		}
-
-		if sum < target {
+		} else if sum < target {
 			// we need to increase -> increase the smaller
 			left++
 		} else {
