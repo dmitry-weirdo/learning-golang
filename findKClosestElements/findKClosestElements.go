@@ -73,7 +73,7 @@ func findClosestElements(arr []int, k int, x int) []int {
 			// move left
 			right = mid
 
-			fmt.Printf("Moving right to mid - 1 = %v. \n", right)
+			fmt.Printf("Moving right to mid = %v. \n", right)
 		}
 	}
 
