@@ -40,7 +40,7 @@ func (this *HitCounter) GetHits(timestamp int) int {
 // !!! We assume that timestamps are always increasing, i.e. duplicate count can ONLY add to the latest hit
 // The count of hits is stored as a separate variable.
 
-type Hit struct {
+/*type Hit struct {
 	timestamp int
 	count     int
 }
@@ -93,6 +93,69 @@ func (this *HitCounter) GetHits(timestamp int) int {
 
 	return this.count
 }
+*/
+
+// option 3 - binary search
+// we're saving all the values (and assume they're adding with the non-decreasing timestamp (i.e. the array will be sorted).
+// This is if we need to query retrospectively - we don't delete the values and can search any interval.
+
+type HitCounter struct {
+	arr []int
+}
+
+func Constructor() HitCounter {
+	return HitCounter{
+		arr: make([]int, 0),
+	}
+}
+
+func (this *HitCounter) Hit(timestamp int) {
+	// O(1) - we're just appending
+	this.arr = append(this.arr, timestamp)
+}
+
+func (this *HitCounter) GetHits(timestamp int) int {
+	targetLeft := timestamp - 299
+
+	// search for leftmost value that is >= timestamp - 299
+	left := 0
+	right := len(this.arr) // - 1 // insert position -> we can return value after the right border
+
+	for left < right {
+		mid := (left + right) / 2
+
+		if this.arr[mid] >= targetLeft {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	// not retrospective -> don't search the right border
+	if len(this.arr) == 0 || timestamp >= this.arr[len(this.arr)-1] {
+		return len(this.arr) - left
+	}
+
+	leftIndex := left
+
+	// search for leftmost value that is >= timestamp
+	targetRight := timestamp
+
+	left = 0
+	right = len(this.arr) // insert position -> we can return value after the right border // todo: in this case we can be sure it will be less, but let's stay consistent
+
+	for left < right {
+		mid := (left + right) / 2
+
+		if this.arr[mid] >= targetRight {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	return left - leftIndex
+}
 
 // ===================================================================== tests =========================================
 func printQueue(queue list.List) {
@@ -114,7 +177,10 @@ func getHits(c *HitCounter, timestamp int, expectedResult int) {
 	}
 }
 
-func test() {
+func test1() {
+	fmt.Println()
+	fmt.Println("=======================")
+
 	hc := Constructor()
 	c := &hc
 
@@ -122,17 +188,41 @@ func test() {
 	c.Hit(1)
 	c.Hit(1)
 	c.Hit(300)
-	getHits(c, 300, 4) // 1, 1, 1, 300
+	getHits(c, 300, 4) // [1:300] = 1, 1, 1, 300
 
 	c.Hit(300)
-	getHits(c, 300, 5) // 1, 1, 1, 300, 300
+	getHits(c, 300, 5) // [1:300] = 1, 1, 1, 300, 300
 
 	c.Hit(301)
 	c.GetHits(301)
-	getHits(c, 301, 3) // 300, 300, 301
+	getHits(c, 301, 3) // [2:301] = 300, 300, 301
+}
+
+func test2() {
+	fmt.Println()
+	fmt.Println("=======================")
+
+	hc := Constructor()
+	c := &hc
+
+	c.Hit(2)
+	c.Hit(3)
+	c.Hit(4)
+	getHits(c, 300, 3) // [1:300] = 2, 3, 4
+	getHits(c, 301, 3) // [2: 301] = 2, 3, 4
+	getHits(c, 302, 2) // [3: 302] = 3, 4
+	getHits(c, 303, 1) // [4: 303] = 4
+	getHits(c, 304, 0) // [5: 304] =
+
+	c.Hit(501)
+	getHits(c, 600, 1) // [301:600] = 501
+
+	// retrospective query - not within the problem, but this is why we're using the binary search option
+	getHits(c, 300, 3) // [1:300] = 2, 3, 4
 }
 
 func main() {
 	// 362. Design Hit Counter
-	test()
+	test1()
+	test2()
 }
