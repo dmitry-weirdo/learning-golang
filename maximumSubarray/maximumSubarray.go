@@ -74,7 +74,7 @@ func kadaneWithBorders(nums []int) (maxLeft int, maxRight int, maxSum int) {
 }
 
 func prefixSums(nums []int) int {
-	// prefixSums[i] - prefixSums[j] = sum of subarray[i; j]
+	// prefixSums[i+1] - prefixSums[j] = sum of subarray[i; j]
 	prefixSum := 0
 	minPrefixSum := 0
 
