@@ -98,7 +98,7 @@ func (this *HitCounter) GetHits(timestamp int) int {
 // option 3 - binary search
 // we're saving all the values (and assume they're adding with the non-decreasing timestamp (i.e. the array will be sorted).
 // This is if we need to query retrospectively - we don't delete the values and can search any interval.
-
+/*
 type HitCounter struct {
 	arr []int
 }
@@ -155,6 +155,59 @@ func (this *HitCounter) GetHits(timestamp int) int {
 	}
 
 	return left - leftIndex
+}
+*/
+
+// option 4 - store 2 arrays of size 300: timestamps array and hits array
+// Index = timestamp % 300
+// if timestamps[index] == timestamp, we increase hits[index]++
+// if timestamps[index] != timestamp, we set new timestamps[index] and set hits[index] = 1
+// This solution is better so that it can handle hits added unordered.
+// Although we'll reset the values if they're on more than 300 diff for timestamp % 300
+
+type HitCounter struct {
+	timestamps []int
+	hits       []int
+	size       int
+}
+
+func Constructor() HitCounter {
+	size := 300
+
+	return HitCounter{
+		timestamps: make([]int, size),
+		hits:       make([]int, size),
+		size:       size,
+	}
+}
+
+func (this *HitCounter) Hit(timestamp int) {
+	// O(1)
+	index := timestamp % this.size
+
+	if this.timestamps[index] == timestamp {
+		// add count to the existing timestamp
+		this.hits[index]++
+	} else {
+		// reset to a new timestamp
+		this.timestamps[index] = timestamp
+		this.hits[index] = 1
+	}
+}
+
+func (this *HitCounter) GetHits(timestamp int) int {
+	// O(300) = O(1)
+
+	// !!! since some timestamps may be outdated (out of the range), we need to check all the timestamps
+	sum := 0
+
+	for i, v := range this.timestamps {
+		if v >= timestamp-(this.size-1) {
+			sum += this.hits[i]
+		}
+	}
+
+	return sum
 }
 
 // ===================================================================== tests =========================================
@@ -217,8 +270,9 @@ func test2() {
 	c.Hit(501)
 	getHits(c, 600, 1) // [301:600] = 501
 
+	// !!! this will only work for binary search option (or any options that allow queries for older timestamps
 	// retrospective query - not within the problem, but this is why we're using the binary search option
-	getHits(c, 300, 3) // [1:300] = 2, 3, 4
+	//getHits(c, 300, 3) // [1:300] = 2, 3, 4
 }
 
 func main() {
