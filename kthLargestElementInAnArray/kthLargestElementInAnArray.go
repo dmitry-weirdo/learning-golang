@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 func findKthLargest(nums []int, k int) int {
 	// todo: this implementations is failing with TLE on testcase 44/46 that is k = 50000, array = [1, 2, 3, 4, 5, 1 ..... 1, -5, -4, -3, -2, -1]
@@ -18,8 +21,11 @@ func findKthLargest(nums []int, k int) int {
 	// k-th largest means index ( len(n) - k ) in the sorted array
 	targetIndex := len(nums) - k
 
-	//return quickSelect(nums, targetIndex, 0, len(nums)-1) // fails TLE on arrays with big repeating values
-	return quickSelectWithThreeWayPartition(nums, targetIndex, 0, len(nums)-1) // this passes the test, even without the random pivot
+	// fails TLE on arrays with big repeating values
+	//return quickSelect(nums, targetIndex, 0, len(nums)-1)
+
+	// this passes the tests, even if the pivot is selected as the last element [right] instead of random element within [left; right]
+	return quickSelectWithThreeWayPartition(nums, targetIndex, 0, len(nums)-1)
 }
 
 func quickSelect(a []int, targetIndex int, left int, right int) int {
@@ -56,8 +62,12 @@ func quickSelect(a []int, targetIndex int, left int, right int) int {
 }
 
 func quickSelectWithThreeWayPartition(a []int, targetIndex int, left int, right int) int {
-	// todo: it's better to select a random pivot instead, it will improve the case of already sorted array
-	pivotIndex := right
+	// it's better to select a random pivot instead, it will improve the case of already sorted array
+	//pivotIndex := right
+
+	// left + [0; len([left; right])]
+	pivotIndex := left + rand.Intn(right-left+1)
+
 	pivot := a[pivotIndex]
 
 	firstIndexEqualToPivot, firstIndexBiggerThanPivot := threeWayPartition(a, left, right, pivot)
