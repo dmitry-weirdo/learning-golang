@@ -18,7 +18,8 @@ func findKthLargest(nums []int, k int) int {
 	// k-th largest means index ( len(n) - k ) in the sorted array
 	targetIndex := len(nums) - k
 
-	return quickSelect(nums, targetIndex, 0, len(nums)-1)
+	//return quickSelect(nums, targetIndex, 0, len(nums)-1) // fails TLE on arrays with big repeating values
+	return quickSelectWithThreeWayPartition(nums, targetIndex, 0, len(nums)-1) // this passes the test, even without the random pivot
 }
 
 func quickSelect(a []int, targetIndex int, left int, right int) int {
@@ -52,6 +53,89 @@ func quickSelect(a []int, targetIndex int, left int, right int) int {
 	} else { // pivot is the target -> return it!
 		return pivot
 	}
+}
+
+func quickSelectWithThreeWayPartition(a []int, targetIndex int, left int, right int) int {
+	// todo: it's better to select a random pivot instead, it will improve the case of already sorted array
+	pivotIndex := right
+	pivot := a[pivotIndex]
+
+	firstIndexEqualToPivot, firstIndexBiggerThanPivot := threeWayPartition(a, left, right, pivot)
+
+	if targetIndex < firstIndexEqualToPivot {
+		// search left
+		return quickSelectWithThreeWayPartition(a, targetIndex, left, firstIndexEqualToPivot-1)
+	}
+
+	if targetIndex >= firstIndexBiggerThanPivot {
+		// search right
+		return quickSelectWithThreeWayPartition(a, targetIndex, firstIndexBiggerThanPivot, right)
+	}
+
+	// we're in the pivot range!
+	return pivot
+}
+
+func threeWayPartition(a []int, left int, right int, pivot int) (firstIndexEqualToPivot int, firstIndexBiggerThanPivot int) {
+	leftIndex := left
+	pivotIndex := left
+	rightIndex := right
+
+	// [left, leftIndex) are values < pivot
+	// [leftIndex, pivotIndex) are values == pivot
+	// [pivotIndex, rightIndex] are values not yet sorted
+	// [rightIndex+1, right] are values > pivot
+
+	for pivotIndex <= rightIndex {
+		if a[pivotIndex] < pivot { // write to the left
+			a[leftIndex], a[pivotIndex] = a[pivotIndex], a[leftIndex]
+
+			// we're sure that a[leftIndex] is now < pivot
+			leftIndex++
+
+			// element that was at a[leftIndex] must be == pivot
+			// because the only case when pivot goes ahead of left is skipping the pivot
+
+			// pivot = 5 example:
+			// 1 2 5 5 3 7 5.
+			// L           R
+			// P
+
+			// 1 2 5 5 3 7 5
+			//   L         R
+			//   P
+
+			// 1 2 5 5 3 7 5
+			//     L       R
+			//     P
+
+			// pivot progresses right, left stays at the first pivot element
+			// 1 2 5 5 3 7 5
+			//     L       R
+			//         P
+
+			// now this swap left with pivot happens. left was at the pivot area
+			// 1 2 3 5 5 7 5
+			//     L       R
+			//         P
+
+			// leftIndex++, pivotIndex++ (we know that current pivotIndex == pivot)
+			// 1 2 3 5 5 7 5
+			//       L     R
+			//           P
+
+			pivotIndex++
+		} else if a[pivotIndex] > pivot { // write to the right
+			a[rightIndex], a[pivotIndex] = a[pivotIndex], a[rightIndex]
+
+			// we're sure that a[rightIndex] is now > pivot
+			rightIndex--
+		} else { // a[pivotIndex] == pivot -> do nothing, skip this at pivotIndex, element is at its right place
+			pivotIndex++
+		}
+	}
+
+	return leftIndex, pivotIndex
 }
 
 func test(a []int, k int, expectedResult int) {
