@@ -49,7 +49,7 @@ func (this *Stack) IsEmpty() bool {
 }
 
 type MyQueue struct {
-	front int // cash of queue front (first inserted), just for s1! I.e. the bottom element of s1
+	front int // cache of queue front (first inserted), just for s1! I.e. the bottom element of s1
 	s1    Stack
 	s2    Stack // stack with queue order
 }
@@ -85,6 +85,7 @@ func (this *MyQueue) Pop() int {
 
 func (this *MyQueue) Peek() int {
 	if this.s2.IsEmpty() {
+		// todo: this will be incorrect if s1 is also empty
 		return this.front // return the bottom of s1
 	}
 

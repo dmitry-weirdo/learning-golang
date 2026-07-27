@@ -9,7 +9,7 @@ import (
 func lowestCommonAncestor(p *Node, q *Node) *Node {
 	// if we want O(1) space optimization logic, we can:
 	// - calculate depths of both nodes
-	// - go from the deeper to align the depths
+	// - go from the deeper node up to align the depths
 	// - move up step by step until the nodes are the same
 	// It will still be O(h) time complexity
 

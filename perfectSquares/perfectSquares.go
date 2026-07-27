@@ -21,7 +21,8 @@ func numSquaresDp(n int) int {
 	//// for 0, we don't require any
 	//dp[0] = 0
 
-	for x := 1; x <= n; x++ { // calculate every next value based on previous
+	// we can actually start from x = 4, since dp[0] = 0, dp[1] = 1, dp[2] = 2, dp[3] = 3
+	for x := 4; x <= n; x++ { // calculate every next value based on previous
 		for i := 1; i*i <= x; i++ { // iterate all squares up to X
 			// subtract the square of i, this is one square (therefore + 1 in the "count of squares")
 			// the dp[x - i*i] is the remaining part, we take it from the DP memo

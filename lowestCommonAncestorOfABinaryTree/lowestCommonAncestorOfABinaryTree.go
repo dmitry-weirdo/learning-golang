@@ -7,6 +7,49 @@ import (
 )
 
 func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
+	// this is a true DFS that really searches for P and Q presence
+	return lca_dfs(root, p, q)
+
+	// this will return P or Q if the 2nd node does not exist,
+	// since this version implies if we found P we don't search below from it and Q will be there if not found elsewhere
+	//return lowestCommonAncestor_old(root, p, q)
+}
+
+func lca_dfs(root, p, q *TreeNode) *TreeNode {
+	var lca *TreeNode = nil
+
+	var dfs func(node *TreeNode) (foundP bool, foundQ bool)
+
+	dfs = func(node *TreeNode) (foundP bool, foundQ bool) {
+		if node == nil { // reached leaf, nothing found
+			return false, false
+		}
+
+		if lca != nil { // LCA already found earlier -> do nothing
+			return false, false
+		}
+
+		leftFoundP, leftFoundQ := dfs(node.Left)
+		rightFoundP, rightFoundQ := dfs(node.Right)
+
+		// this assures the true "found P" and "found Q", no implications that one will be under another
+		foundP = leftFoundP || rightFoundP || node == p
+		foundQ = leftFoundQ || rightFoundQ || node == q
+
+		// we're the lowest LCA -> save this node to LCA
+		if lca == nil && foundP && foundQ {
+			lca = node
+		}
+
+		return foundP, foundQ
+	}
+
+	dfs(root)
+
+	return lca
+}
+
+func lowestCommonAncestor_old(root, p, q *TreeNode) *TreeNode {
 	if root == nil {
 		// reached the leaf and not found neither p nor q
 		return nil
@@ -16,6 +59,7 @@ func lowestCommonAncestor(root, p, q *TreeNode) *TreeNode {
 		// reached one of the target nodes -> immediately return it
 		// - if other target node is below it -> this is LCA
 		// - if other node is NOT below it -> we have to only search above the current node
+		// !!! this implies that both P and Q nodes exist in the tree (by problem description)
 		return root
 	}
 
@@ -63,11 +107,18 @@ func test(arr []any, p, q int, expectedResult int) { // nodes can be null
 
 	result := lowestCommonAncestor(root, pNode, qNode)
 
-	fmt.Printf("LCA of elements p = %v and q = %v: %v \n", p, q, result.Val)
+	var resultValue any
+	if result == nil {
+		resultValue = nil
+	} else {
+		resultValue = result.Val
+	}
+
+	fmt.Printf("LCA of elements p = %v and q = %v: %v \n", p, q, resultValue)
 	fmt.Printf("Expected LCA of elements p = %v and q = %v: %v \n", p, q, expectedResult)
 
-	if result.Val != expectedResult {
-		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result.Val)
+	if resultValue != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, resultValue)
 	}
 }
 
@@ -101,9 +152,20 @@ func test3() {
 	test(arr, p, q, expected)
 }
 
+func test4() {
+	// hacky test - Q does not exist. By the problem conditions, we will return the P node
+	arr := []any{1, 2, 3}
+	p := 2
+	q := 10
+	expected := 2 // P will be returned even if Q does not exist
+
+	test(arr, p, q, expected)
+}
+
 func main() {
 	// 236. Lowest Common Ancestor of a Binary Tree
 	test1()
 	test2()
 	test3()
+	test4()
 }

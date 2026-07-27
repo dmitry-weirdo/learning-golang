@@ -24,10 +24,13 @@ func checkSubarraySum_optimized(nums []int, k int) int {
 	count := 0
 
 	for _, v := range nums {
+		// this is prefixSum[i + 1] since we've added a[i] to it.
+		// e.g. prefixSum[0] will be 0 (see `m[0] = 1` above).
+		// and for i = 0, this is prefixSum[1].
 		currentSum = currentSum + v
 
-		// we search for prefixSum[i] - prefixSum[prev] = k
-		// -> prefixSum[prev] = prefixSum[i] - k
+		// we search for prefixSum[i+1] - prefixSum[prev] = k
+		// -> prefixSum[prev] = prefixSum[i+1] - k
 		targetEarlierSum := currentSum - k
 
 		if earlierPrefixSumsEqualToTarget, ok := m[targetEarlierSum]; ok { // target sum already exists

@@ -8,6 +8,27 @@ import (
 func moveZeroes(nums []int) {
 	writePos := 0
 
+	// The magic is:
+	// - For the starting non-0 values, it will swap with self
+	// - When 0 is encountered, writePos stays at this 0 and i skips up to next non-0 value.
+	// - Then we swap the values, and the value at [i] is now 0.
+	// - If there are further 0-values skipped, writePos is again at 0.
+	// - If this was a single 0, we've just swapped the next non-0 value with previous 0, and this is again 0.
+
+	// [1, 2, 3, 0, 10]
+	//           W
+	//           I
+
+	// Pointer I skips the 0 value:
+	// [1, 2, 3, 0, 10]
+	//           W
+	//              I
+
+	// Swap is made - since it's the next element after the previous 0 position, W is again at 0:
+	// [1, 2, 3, 10, 0]
+	//               W
+	//                  I
+
 	for i, v := range nums {
 		if v != 0 {
 			// we can always swap and avoid this check
