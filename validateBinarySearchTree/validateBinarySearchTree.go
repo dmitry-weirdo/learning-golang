@@ -170,8 +170,10 @@ func validateBstIterative(root *TreeNode) bool {
 
 	var prev *TreeNode = nil
 
+	// see https://www.geeksforgeeks.org/dsa/inorder-tree-traversal-without-recursion/
 	for stack.Len() > 0 || current != nil {
 		// first we push all left nodes
+		// Reach the leftmost node of the current node
 		for current != nil {
 			stack.PushFront(current)
 			current = current.Left
@@ -183,6 +185,10 @@ func validateBstIterative(root *TreeNode) bool {
 		if prev != nil && current.Val <= prev.Val {
 			return false
 		}
+
+		// We have visited the node and its left subtree.
+		// Now, it's right subtree's turn.
+		// For the right node, the same process will follow: add all leftmost nodes, etc.
 
 		// add the last left.right element, even if it's null
 		// if we don't push, we'll iterate to the previous left again from the current node
