@@ -122,7 +122,34 @@ func test(a []int, v int, expectedLeftMost int, expectedRightMost int) {
 			fmt.Printf("FAILURE: (right-most Alg. 2) expected right-most = %v, actual right-most = %v \n", expectedRightMost, rightOne2)
 		}
 	}
+}
 
+func search(nums []int, target int) int {
+	// 704. Binary Search
+	// this is the default solution of finding some of the indexes (not leftmost)
+	// works even for arrays of size 1 (since `left <= right` clause).
+
+	// If we do the leftmost option, array won't execute `left < right` for array size 1,
+	// , and we have to check after the cycle whether arr[left] == target.
+
+	left := 0
+	right := len(nums) - 1
+
+	for left <= right {
+		mid := (left + right) / 2
+
+		if nums[mid] == target {
+			return mid
+		}
+
+		if nums[mid] >= target {
+			right = mid - 1
+		} else {
+			left = mid + 1
+		}
+	}
+
+	return -1
 }
 
 func test1() {
