@@ -28,12 +28,14 @@ func checkSubarraySum_optimized_2(nums []int, k int) bool {
 
 		remainder := currentSum % k
 
+		prefixSumIndex := i + 1
+
 		if remainderFirstIndex, ok := m[remainder]; ok { // remainder already exists
-			if ((i + 1) - remainderFirstIndex) >= 2 {
+			if (prefixSumIndex - remainderFirstIndex) >= 2 {
 				return true
 			}
 		} else { // remainder found the first time -> put the first index into the map
-			m[remainder] = i + 1
+			m[remainder] = prefixSumIndex
 		}
 	}
 
@@ -54,16 +56,17 @@ func checkSubarraySum_optimized(nums []int, k int) bool {
 	m[0] = 0
 
 	for i, v := range nums {
-		prefixSums[i+1] = prefixSums[i] + v
+		prefixSumIndex := i + 1
+		prefixSums[prefixSumIndex] = prefixSums[i] + v
 
-		remainder := prefixSums[i+1] % k
+		remainder := prefixSums[prefixSumIndex] % k
 
 		if remainderFirstIndex, ok := m[remainder]; ok { // remainder already exists
-			if ((i + 1) - remainderFirstIndex) >= 2 {
+			if (prefixSumIndex - remainderFirstIndex) >= 2 {
 				return true
 			}
 		} else { // remainder found the first time -> put the first index into the map
-			m[remainder] = i + 1
+			m[remainder] = prefixSumIndex
 		}
 	}
 

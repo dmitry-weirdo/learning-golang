@@ -51,8 +51,14 @@ func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
 
 	// Example even: len = 6 -> between 7 / 2 and 8 / 2 -> between 3-th and 4-th biggest elements -> expected median behaviour
 	// Example odd: len = 5 -> between 6 / 2 and 7 / 2 -> between 3-th and 3-th biggest elements -> we'll return the same middle element
-	k1 := (mergedLength + 1) / 2
-	k2 := (mergedLength + 2) / 2
+
+	// Heuristic values that work for both even and odd
+	//k1 := (mergedLength + 1) / 2
+	//k2 := (mergedLength + 2) / 2
+
+	// Obvious values for even - for len 6, we need to find 3-rd and 4-th biggest elements
+	k1 := mergedLength / 2   // 6 / 2 = 3
+	k2 := mergedLength/2 + 1 // 6 / 2 + 1 = 4
 
 	fmt.Printf("Merged array length = %v. We will find an average between [%v]-th and [%v]-th biggest elements in the merged array. \n", mergedLength, k1, k2)
 
@@ -246,8 +252,8 @@ func test4() {
 
 func main() {
 	// 4. Median of Two Sorted Arrays
-	test1()
+	//test1()
 	//test2()
-	//test3()
+	test3()
 	//test4()
 }

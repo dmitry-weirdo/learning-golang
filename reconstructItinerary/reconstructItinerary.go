@@ -84,6 +84,7 @@ func dfs(
 	outgoingEdges := adj[node]
 
 	// todo: in many solutions, we're just removing the outgoing edges from adj[node] instead of keeping edges. We then stop the iteration when adj[node] has become empty.
+	// apart from this, removing from an array beginning is O(n) operation. That's why in the solution they sort adjacency list desc, to remove from the end
 
 	// while the current node has outgoing edges
 	for out[node] > 0 {

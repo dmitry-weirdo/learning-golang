@@ -24,10 +24,11 @@ func diameterOfBinaryTree(root *TreeNode) int {
 		rightLongestPath := dfs(node.Right)
 
 		// the current node path is leftPath -> node -> rightPath
+		// !!! we're not adding + 1 for the node since we're counting edges. Children already returned their count of edges up to the current node.
 		currentDiameter := leftLongestPath + rightLongestPath
 		diameter = max(diameter, currentDiameter)
 
-		// to the parent node, we return the longest path either from left or from right + 1 for node itself
+		// to the parent node, we return the longest path either from left or from right + 1 for node itself (for the edge between node and parent)
 		return max(leftLongestPath, rightLongestPath) + 1
 	}
 

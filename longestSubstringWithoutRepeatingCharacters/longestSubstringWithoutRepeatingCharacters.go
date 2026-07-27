@@ -22,7 +22,7 @@ func lengthOfLongestSubstring(s string) int {
 		chRight := s[right]
 
 		if v, ok := m[chRight]; ok {
-			if v < left { // old index was before the current range -> update it to right
+			if v < left { // old index was before the current range -> update this index to right
 				fmt.Printf("Character '%c' was before the current range [%v; %v]. Updating its lastIndex to right = %v.\n", chRight, left, right, right)
 				m[chRight] = right
 			}
@@ -31,7 +31,7 @@ func lengthOfLongestSubstring(s string) int {
 		}
 
 		if m[chRight] == right {
-			// no duplicate chars -> check whether current string is longer then max
+			// no duplicate chars -> check whether current string is longer than max
 			currentLength := right - left + 1
 
 			if currentLength > maxLength {

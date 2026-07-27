@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
 )
 
@@ -8,6 +9,43 @@ type TreeNode struct {
 	Val   int
 	Left  *TreeNode
 	Right *TreeNode
+}
+
+func isValidBST(root *TreeNode) bool {
+	return isValidBST_iterative(root)
+	//return isValidBST_old(root)
+}
+
+func isValidBST_iterative(root *TreeNode) bool {
+	if root == nil {
+		return true
+	}
+
+	return validateBstIterative(root)
+}
+
+func isValidBST_old(root *TreeNode) bool {
+	if root == nil {
+		return true
+	}
+
+	//minValue, maxValue, valid := iterate(root) // my complex
+	//fmt.Printf("Min value: %d, max value: %d, valid: %v \n", minValue, maxValue, valid)
+
+	previousNode = nil // clear a global variable before every test iteration
+
+	valid := iterateOptimal(root) // nice solution, using the value of BST: if we iterate it left -> root -> right, it will be ascending
+	fmt.Printf("Valid: %v \n", valid)
+
+	fmt.Println()
+	fmt.Println("Doing a (left -> root -> right) recursive traversal:")
+	leftRootRightTraversal(root)
+
+	fmt.Println()
+	fmt.Println("Doing a (left -> root -> right) iterative traversal:")
+	leftRootRightTraversalIterative(root)
+
+	return valid
 }
 
 func iterate(root *TreeNode) (minValue int, maxValue int, valid bool) {
@@ -100,6 +138,73 @@ func iterateOptimal(root *TreeNode) bool {
 	return rightValid
 }
 
+func leftRootRightTraversalIterative(root *TreeNode) {
+	stack := list.New()
+
+	current := root
+
+	for stack.Len() > 0 || current != nil {
+		// first we push all left nodes
+		for current != nil {
+			stack.PushFront(current)
+			current = current.Left
+		}
+
+		//fmt.Println("Stack after adding left nodes:")
+		//printList(stack)
+
+		// pop the last left element
+		current = stack.Remove(stack.Front()).(*TreeNode)
+		fmt.Printf("Iterative, current node: %d \n", current.Val)
+
+		// add the last left.right element, even if it's null
+		// if we don't push, we'll iterate to the previous left again from the current node
+		current = current.Right
+	}
+}
+
+func validateBstIterative(root *TreeNode) bool {
+	stack := list.New()
+
+	current := root
+
+	var prev *TreeNode = nil
+
+	for stack.Len() > 0 || current != nil {
+		// first we push all left nodes
+		for current != nil {
+			stack.PushFront(current)
+			current = current.Left
+		}
+
+		// pop the last left element
+		current = stack.Remove(stack.Front()).(*TreeNode)
+
+		if prev != nil && current.Val <= prev.Val {
+			return false
+		}
+
+		// add the last left.right element, even if it's null
+		// if we don't push, we'll iterate to the previous left again from the current node
+		prev = current
+		current = current.Right
+	}
+
+	return true
+}
+
+func printList(l *list.List) {
+	for e := l.Front(); e != nil; e = e.Next() {
+		if e.Value == nil || e.Value.(*TreeNode) == nil {
+			fmt.Printf("%v ", nil)
+		} else {
+			fmt.Printf("%v ", e.Value.(*TreeNode).Val)
+		}
+	}
+
+	fmt.Println()
+}
+
 func leftRootRightTraversal(root *TreeNode) {
 	if root == nil {
 		return
@@ -110,26 +215,6 @@ func leftRootRightTraversal(root *TreeNode) {
 	fmt.Printf("Current root: %v \n", root.Val)
 
 	leftRootRightTraversal(root.Right)
-}
-
-func isValidBST(root *TreeNode) bool {
-	if root == nil {
-		return true
-	}
-
-	//minValue, maxValue, valid := iterate(root) // my complex
-	//fmt.Printf("Min value: %d, max value: %d, valid: %v \n", minValue, maxValue, valid)
-
-	previousNode = nil // clear a global variable before every test iteration
-
-	valid := iterateOptimal(root) // nice solution, using the value of BST: if we iterate it left -> root -> right, it will be ascending
-	fmt.Printf("Valid: %v \n", valid)
-
-	fmt.Println()
-	fmt.Println("Doing a (left -> root -> right) traversal:")
-	leftRootRightTraversal(root)
-
-	return valid
 }
 
 func test1() {
@@ -176,6 +261,6 @@ func test3() {
 func main() {
 	// 98. Validate Binary Search Tree
 	test1()
-	//test2()
-	//test3()
+	test2()
+	test3()
 }
