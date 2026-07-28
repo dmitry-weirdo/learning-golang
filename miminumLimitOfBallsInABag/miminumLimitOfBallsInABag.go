@@ -10,31 +10,51 @@ func minimumSize(nums []int, maxOperations int) int {
 
 	// binary search for a result that is feasible with the given maxOperations (sum operations for every array value)
 	// runs in log(right - left)
-	result := right
+	//result := right
 
-	for left <= right { // yes, we have to check if left and right are the same
-		// mid is the expected max(all bags) after maxOperations
-		mid := left + ((right - left) / 2)
+	// todo: yes, it's working, but slower than the old version below
+	// rewrite with a normal binary search. We want to minimize the value, i.e. get the lowest value where feasible == true.
+	for left < right {
+		mid := (left + right) / 2
 
-		fmt.Printf("\n=========================\n")
-		fmt.Printf("left: %v, right: %v, mid: %v \n", left, right, mid)
-
-		// we need to minimize the mid
 		feasible := isFeasible(nums, maxOperations, mid)
 
-		if feasible { // mid ok -> try to lower the mid (target)
-			right = mid - 1
-			result = mid
-
-			fmt.Printf("Mid %v feasible -> moving right down: [%v, %v] \n", mid, left, right)
-		} else { // mid failed -> try the upper the mid (targe)
+		if feasible {
+			right = mid
+		} else {
 			left = mid + 1
-
-			fmt.Printf("Mid %v non-feasible -> moving left up: [%v, %v] \n", mid, left, right)
 		}
 	}
 
-	return result
+	return left
+
+	/*
+
+		for left <= right { // yes, we have to check if left and right are the same
+			// mid is the expected max(all bags) after maxOperations
+			mid := left + ((right - left) / 2)
+
+			fmt.Printf("\n=========================\n")
+			fmt.Printf("left: %v, right: %v, mid: %v \n", left, right, mid)
+
+			// we need to minimize the mid
+			feasible := isFeasible(nums, maxOperations, mid)
+
+			if feasible { // mid ok -> try to lower the mid (target)
+				right = mid - 1
+				result = mid
+
+				fmt.Printf("Mid %v feasible -> moving right down: [%v, %v] \n", mid, left, right)
+			} else { // mid failed -> try the upper the mid (target)
+				left = mid + 1
+
+				fmt.Printf("Mid %v non-feasible -> moving left up: [%v, %v] \n", mid, left, right)
+			}
+		}
+
+		return result
+
+	*/
 }
 
 func maxInArray(nums []int) int {
@@ -53,9 +73,9 @@ func maxInArray(nums []int) int {
 func isFeasible(nums []int, maxOperations int, bagSizeTarget int) bool {
 	totalOperations := 0
 
-	for i := 0; i < len(nums); i++ {
-		operationsForNum := calculate(nums[i], bagSizeTarget)
-		fmt.Printf("%v / %v -> %v \n", nums[i], bagSizeTarget, operationsForNum)
+	for _, v := range nums {
+		operationsForNum := calculate(v, bagSizeTarget)
+		fmt.Printf("%v / %v -> %v \n", v, bagSizeTarget, operationsForNum)
 
 		totalOperations += operationsForNum
 		if totalOperations > maxOperations {
@@ -71,6 +91,21 @@ func isFeasible(nums []int, maxOperations int, bagSizeTarget int) bool {
 }
 
 func calculate(n int, max int) int { // how many operations are required to split N balls into max of int bags
+	// todo: could it be solved with division and remainder check?
+	sum := n / max // clear bags to split, full amounts of max
+
+	if n%max != 0 { // if there are additional remainders to split -> + 1 bag
+		sum++
+	}
+
+	sum-- // remove 1 initial bag
+
+	if sum < 0 { // for 0, avoid returning -1
+		sum = 0
+	}
+
+	return sum
+
 	// todo: we can just return this (will be faster)
 	return (n - 1) / max
 
@@ -127,12 +162,11 @@ func test3() {
 
 func main() {
 	// 1760. Minimum Limit of Balls in a Bag
-	/*	max := 3
-		for i := 0; i < 20; i++ {
-			result := calculate(i, max)
-			fmt.Printf("%v / %v -> %v \n", i, max, result)
-		}
-	*/
+	maxBoxes := 3
+	for i := 0; i < 20; i++ {
+		result := calculate(i, maxBoxes)
+		fmt.Printf("%v / %v -> %v \n", i, maxBoxes, result)
+	}
 
 	//test1()
 	test2()

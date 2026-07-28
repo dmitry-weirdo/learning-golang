@@ -54,9 +54,9 @@ func wordPatternMatch(pattern string, s string) bool {
 		patternCharacter := pattern[i : i+1]
 		fmt.Printf("Pattern[%v] character = '%v' \n", i, patternCharacter)
 
-		// try all possible substrings from s[i; i+1) to s[i; n)
+		// try all possible substrings from s[j; j+1) to s[j; n)
 		for endIndex := j + 1; endIndex <= n; endIndex++ {
-			substring := s[j:endIndex]
+			substring := s[j:endIndex] // endIndex is non-inclusive, so we will pass endIndex to the next dfs iterations
 
 			fmt.Printf("Possible substring: %v \n", substring)
 
@@ -92,7 +92,7 @@ func wordPatternMatch(pattern string, s string) bool {
 					fmt.Printf("Substring \"%v\" is already mapped to pattern character '%v'. It cannot be mapped again to a different new pattern character = '%v'. Pruning handling of this substring. \n", substring, patternCharacterForThisSubstring, patternCharacterMappedTo)
 
 					continue
-				} else { // successful substring -> add new mapping, continue DFS
+				} else { // successful substring (not yet mapped to another pattern character) -> add new mapping, continue DFS
 					p[patternCharacter] = substring
 					substringToPatternCharacter[substring] = patternCharacter
 
