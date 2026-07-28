@@ -26,15 +26,19 @@ func kthSmallest(matrix [][]int, k int) int {
 
 		fmt.Printf("left: %v, right: %v, mid %v \n", left, right, mid)
 
-		// calculate the "from bottom-left" ladder matrix where the elements are >= mid
-		count = countValues(matrix, n, mid)
+		// calculate the "from bottom-left" ladder matrix where the elements are <= mid
+		count = countValuesLessThanOrEqual(matrix, n, mid)
 
+		// we're searching for the leftmost value where count >= k,
+		// i.e. the first element who has (k values) that are <= val (mid)
 		if count >= k {
+			// (there are enough elements that are <= mid) -> try to decrease mid to find element < mid that also satisfies this condition
 			// for mid limit, we have more or same elements than k -> we go to the left of the binary search
 			right = mid
 
 			fmt.Printf("(Count = %v) >= (k = %v). Updated right to %v. Left:Right: [%v, %v] \n", count, k, right, left, right)
 		} else {
+			// (not enough elements are <= mid) -> result > mid
 			// for mid limit, we have fewer elements than k -> we go to the right of the binary search
 			left = mid + 1
 
@@ -45,7 +49,7 @@ func kthSmallest(matrix [][]int, k int) int {
 	return left
 }
 
-func countValues(m [][]int, n int, mid int) int {
+func countValuesLessThanOrEqual(m [][]int, n int, mid int) int {
 	// we start from bottom left
 	i := n - 1
 	j := 0
@@ -60,7 +64,7 @@ func countValues(m [][]int, n int, mid int) int {
 		for (m[i][j] > mid) && (i > 0) {
 			// in the current column j, go up until we find a row where mid can be
 			// or until we reach the 0-th row
-			// I.e. we're skipping the values from the bottom of the current column that exceed the mid value
+			// I.e. we're skipping the values from the bottom of the current column that exceed the target value
 			i--
 
 			fmt.Printf("i, j: [%v, %v] \n", i, j)
@@ -84,7 +88,20 @@ func countValues(m [][]int, n int, mid int) int {
 	return count
 }
 
-func handleMatrix(mat [][]int, k int, expected int) {
+func printMatrix(mat [][]int) {
+	rows := len(mat)
+	columns := len(mat[0])
+
+	for i := range rows {
+		for j := range columns {
+			fmt.Printf("%v ", mat[i][j])
+		}
+
+		fmt.Println()
+	}
+}
+
+func test(mat [][]int, k int, expected int) {
 	fmt.Println()
 	fmt.Printf("======================== \n")
 	printMatrix(mat)
@@ -93,19 +110,6 @@ func handleMatrix(mat [][]int, k int, expected int) {
 
 	if kthSmallest != expected {
 		panic(fmt.Sprintf("Expected: %v, actual: %v", expected, kthSmallest))
-	}
-}
-
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
 	}
 }
 
@@ -126,7 +130,7 @@ func test1() {
 	k := 4
 	expected := 10
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func test2() { // with repeating values
@@ -143,7 +147,7 @@ func test2() { // with repeating values
 	k := 3
 	expected := 2
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func test3() {
@@ -165,7 +169,7 @@ func test3() {
 	k := 8
 	expected := 13
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func test4() {
@@ -181,7 +185,7 @@ func test4() {
 	k := 1
 	expected := -5
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func test5() { // with repeating values
@@ -199,7 +203,7 @@ func test5() { // with repeating values
 	k := 4
 	expected := 3
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func test6() { // with repeating values
@@ -217,7 +221,7 @@ func test6() { // with repeating values
 	k := 2
 	expected := -5 // -5, -5, -4, -4
 
-	handleMatrix(mat, k, expected)
+	test(mat, k, expected)
 }
 
 func main() {
@@ -228,4 +232,7 @@ func main() {
 	test4()
 	test5()
 	test6()
+
+	fmt.Printf("-7 / 2: %v \n", -7/2)
+	fmt.Printf("-7 >> 1: %v \n", -7>>1)
 }

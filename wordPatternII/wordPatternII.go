@@ -6,7 +6,7 @@ func wordPatternMatch(pattern string, s string) bool {
 	m := len(pattern)
 	n := len(s)
 
-	if n < m {
+	if n < m { // string shorter than pattern -> mapping impossible
 		return false
 	}
 
@@ -75,7 +75,7 @@ func wordPatternMatch(pattern string, s string) bool {
 					fmt.Printf("Substring \"%v\" correctly matches to pattern character '%v' = \"%v\". Continuing DFS with patternIndex = %v, stringIndex = %v. \n", substring, patternCharacter, patternCharacterMappedTo, i+1, endIndex)
 
 					nextDfsResult := dfsInner(i+1, endIndex) // endIndex is NOT inclusive, so do NOT pass endIndex + 1
-					if nextDfsResult == true {               // !!! we do NOT return false, we will just prune handling the current substring
+					if nextDfsResult {                       // !!! we do NOT return false, we will just prune handling the current substring
 						return true
 					} else {
 						continue
@@ -99,7 +99,7 @@ func wordPatternMatch(pattern string, s string) bool {
 					fmt.Printf("Pattern character '%v' mapped to \"%v\". Continuing DFS with patternIndex = %v, stringIndex = %v. \n", patternCharacter, substring, i+1, endIndex)
 
 					nextDfsResult := dfsInner(i+1, endIndex) // endIndex is NOT inclusive, so do NOT pass endIndex + 1
-					if nextDfsResult == true {               // !!! we do NOT return false, we will just prune handling the current substring
+					if nextDfsResult {                       // !!! we do NOT return false, we will just prune handling the current substring
 						return true
 					}
 
@@ -107,7 +107,7 @@ func wordPatternMatch(pattern string, s string) bool {
 					fmt.Printf("DFS(%v, %v). Returned from non-successful inner DFS(%v, %v). \n", i, j, i+1, endIndex)
 					fmt.Printf("Removing p[%v] = \"%v\" and s[%v] = \"%v\". \n", patternCharacter, p[patternCharacter], substring, substringToPatternCharacter[substring])
 
-					// remove the handled (and non-successful) mappings
+					// backtracking - remove the handled (and non-successful) mappings
 					delete(p, patternCharacter)
 					delete(substringToPatternCharacter, substring)
 				}

@@ -41,11 +41,9 @@ func rankTeams(votes []string) string {
 	printMatrix(m)
 
 	for _, vote := range votes {
-		for j := 0; j < totalTeams; j++ {
-			team := vote[j]
-
-			rowIndex := teamToRow[team]
-			columnIndex := 1 + j // skip the 0th with team name
+		for voteIndex, team := range vote {
+			rowIndex := teamToRow[byte(team)]
+			columnIndex := 1 + voteIndex // skip the 0th with team name
 
 			//fmt.Printf("Increasing team %v, vote %v \n", string(team), j)
 			m[rowIndex][columnIndex]++

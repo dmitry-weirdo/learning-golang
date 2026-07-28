@@ -22,13 +22,13 @@ func myAtoi(s string) int {
 	i := 0
 
 	// skip leading whitespaces
-	for s[i] == WHITESPACE {
+	for (i < len(s)) && s[i] == WHITESPACE {
 		i++
+	}
 
-		if i > (len(s) - 1) {
-			fmt.Printf("String \"%v\" contains only whitespaces. Returning 0.\n", s)
-			return 0
-		}
+	if i >= len(s) {
+		fmt.Printf("String \"%v\" contains only whitespaces. Returning 0.\n", s)
+		return 0
 	}
 
 	fmt.Printf("Skipped %v whitespace characters. First non-whitespace index: %v, First non-whitespace character: %c \n", i, i, s[i])
@@ -46,7 +46,7 @@ func myAtoi(s string) int {
 		sign = 1
 	}
 
-	if i > (len(s) - 1) {
+	if i >= len(s) {
 		fmt.Printf("String \"%v\" contains only whitespaces and sign. Returning 0.\n", s)
 		return 0
 	}
@@ -55,13 +55,13 @@ func myAtoi(s string) int {
 	fmt.Printf("Next index after sign: %v. Char: %c. \n", i, s[i])
 
 	// skip leading zeroes
-	for s[i] == ZERO {
+	for (i < len(s)) && s[i] == ZERO {
 		i++
+	}
 
-		if i > (len(s) - 1) {
-			fmt.Printf("String \"%v\" contains only zeroes. Returning 0.\n", s)
-			return 0
-		}
+	if i >= len(s) {
+		fmt.Printf("String \"%v\" contains only zeroes. Returning 0.\n", s)
+		return 0
 	}
 
 	fmt.Printf("Skipped leading zeroes after sign: %v \n", sign)
@@ -80,14 +80,15 @@ func myAtoi(s string) int {
 	// -2147483648; 2147483647
 	const overflowLimit = math.MaxInt32 / 10 // without the last digit
 
-	for isDigit(s[i]) { // proceed from current index until it's digit from 0 to 9. We already skipped the leading zeroes
+	for (i < len(s)) && isDigit(s[i]) { // proceed from current index until it's digit from 0 to 9. We already skipped the leading zeroes
 		// -2147483648; 2147483647
 
 		nextDigit := byteToInt(s[i])
 		fmt.Printf("Next digit: %v \n", nextDigit)
 
-		// handle potential overflow
-		// overflow limit is 214748364
+		// Handle potential overflow.
+		// Overflow limit is 214748364
+		// 2147483647 will be no overflow, but 2147483648 is already an overflow (will fail if positive)
 
 		if (v > overflowLimit) || ((v == overflowLimit) && (nextDigit > 7)) { // we reached the limit -> return the max value
 			if sign < 0 {
@@ -106,15 +107,6 @@ func myAtoi(s string) int {
 
 		// go next
 		i++
-
-		if i > (len(s) - 1) {
-			// todo: check this return
-
-			result := sign * v
-
-			fmt.Printf("String \"%v\" end reached while handling the digits. Returning %v.\n", s, result)
-			return int(result)
-		}
 	}
 
 	result := sign * v
@@ -148,6 +140,8 @@ func convert(s string) int {
 }
 
 func main() {
+	// 8. String to Integer (atoi)
+
 	// int16 = [-32768; 32767]
 	// int32 [-2147483648; 2147483647]
 	// int is signed int64 [-9223372036854775808; 9223372036854775807]

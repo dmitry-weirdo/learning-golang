@@ -39,9 +39,9 @@ func compress(chars []byte) int {
 
 				countBytes := []byte(countString)
 
-				for j := 0; j < len(countBytes); j++ {
+				for _, v := range countBytes {
 					writeIndex++
-					chars[writeIndex] = countBytes[j]
+					chars[writeIndex] = v
 				}
 			}
 
