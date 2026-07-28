@@ -3,9 +3,9 @@ package main
 import "fmt"
 
 func subarraysWithKDistinct(nums []int, k int) int {
-	return subarraysWithKDistinct_threePointerslidingWindow(nums, k)
+	//return subarraysWithKDistinct_threePointerslidingWindow(nums, k)
 	//return subarraysWithKDistinct_slidingWindow(nums, k)
-	//return subarraysWithKDistinct_kAndKMinusOne(nums, k)
+	return subarraysWithKDistinct_kAndKMinusOne(nums, k)
 }
 
 func subarraysWithKDistinct_threePointerslidingWindow(nums []int, k int) int {
@@ -22,9 +22,7 @@ func subarraysWithKDistinct_threePointerslidingWindow(nums []int, k int) int {
 
 	count := 0
 
-	for right := range nums {
-		numRight := nums[right]
-
+	for _, numRight := range nums {
 		freq[numRight]++
 
 		for len(freq) > k {
@@ -111,22 +109,51 @@ func subarraysWithKDistinct_slidingWindow(nums []int, k int) int {
 }
 
 func subarraysWithKDistinct_kAndKMinusOne(nums []int, k int) int {
-	l := len(nums)
-
 	// todo: we can just calculate for every pos and not store the complete arrays, but we need to store all variable from the function
-	kMinusOnePositions := getLeftPos(nums, k-1)
+	kMinusOnePositions := getLeftmostPositions(nums, k-1)
+	//kMinusOnePositions := getLeftPos(nums, k-1)
 	fmt.Printf("At most (k - 1) = %v distinct values - leftmost positions: %v \n", k-1, kMinusOnePositions)
 
-	kPositions := getLeftPos(nums, k)
+	kPositions := getLeftmostPositions(nums, k)
+	//kPositions := getLeftPos(nums, k)
 	fmt.Printf("At most (k) = %v distinct values - leftmost positions: %v \n", k, kPositions)
 
 	result := 0
 
-	for i := range l {
+	for i := range nums {
 		result += kMinusOnePositions[i] - kPositions[i]
 	}
 
 	return result
+}
+
+func getLeftmostPositions(nums []int, k int) []int {
+	freq := make(map[int]int)
+
+	leftPositions := make([]int, len(nums))
+	left := 0
+
+	for right, numRight := range nums {
+		freq[numRight]++
+
+		// !!! for starting indexes, len(freq) can be < k, we're still saving it to the "leftmost position" array
+		for len(freq) > k {
+			// if there are more than K characters in the window -> shrink left until there are K characters
+			numLeft := nums[left]
+
+			freq[numLeft]--
+
+			if freq[numLeft] <= 0 {
+				delete(freq, numLeft)
+			}
+
+			left++
+		}
+
+		leftPositions[right] = left
+	}
+
+	return leftPositions
 }
 
 func getLeftPos(nums []int, k int) []int {

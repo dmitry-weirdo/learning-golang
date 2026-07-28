@@ -82,7 +82,7 @@ func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // retu
 
 	// all values are indexes in the array
 	left := startIndex
-	right := len(jobs)
+	right := len(jobs) // return N if no job found, i.e. like insert position
 
 	for left < right {
 		mid := (left + right) / 2
@@ -101,29 +101,58 @@ func getNextJobIndex(jobs []Job, minStartTime int, startIndex int) int { // retu
 func convertToJobsArray(startTime []int, endTime []int, profit []int, n int) []Job {
 	a := make([]Job, n)
 
-	for i := 0; i < n; i++ {
-		job := Job{
+	for i := range n {
+		a[i] = Job{
 			start:  startTime[i],
 			end:    endTime[i],
 			profit: profit[i],
 		}
-
-		a[i] = job
 	}
 
 	return a
 }
 
-func test() {
+func test(startTime []int, endTime []int, profit []int, expectedResult int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Start time: %v \n", startTime)
+	fmt.Printf("End time: %v \n", endTime)
+	fmt.Printf("Profit: %v \n", profit)
+
+	jobs := convertToJobsArray(startTime, endTime, profit, len(startTime))
+	fmt.Printf("Jobs converted from 3 different arrays: \n%v", jobs)
+
+	result := jobScheduling(startTime, endTime, profit)
+
+	fmt.Printf("Max profit: %v \n", result)
+	fmt.Printf("Expected max profit: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func test1() {
 	startTime := []int{1, 2, 3, 4, 6}
 	endTime := []int{3, 5, 10, 6, 9}
 	profit := []int{20, 20, 100, 70, 60}
+	expected := 150
 
-	maxProfit := jobScheduling(startTime, endTime, profit)
-	fmt.Printf("Max profit: %v \n", maxProfit)
+	test(startTime, endTime, profit, expected)
+}
+
+func test2() {
+	startTime := []int{1, 1, 1}
+	endTime := []int{2, 3, 4}
+	profit := []int{5, 6, 4}
+	expected := 6
+
+	test(startTime, endTime, profit, expected)
 }
 
 func main() {
 	// 1235. Maximum Profit in Job Scheduling
-	test()
+	test1()
+	test2()
 }
