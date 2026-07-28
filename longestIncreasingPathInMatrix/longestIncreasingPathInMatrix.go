@@ -20,8 +20,8 @@ func printMatrix(mat [][]int) {
 	rows := len(mat)
 	columns := len(mat[0])
 
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
+	for i := range rows {
+		for j := range columns {
 			fmt.Printf("%v ", mat[i][j])
 		}
 
@@ -35,14 +35,14 @@ func longestIncreasingPath(matrix [][]int) int {
 
 	// create a memo matrix of the same size
 	memo := make([][]int, rows)
-	for i := 0; i < rows; i++ {
+	for i := range rows {
 		memo[i] = make([]int, columns)
 	}
 
 	maxPathLength := 0
 
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
+	for i := range rows {
+		for j := range columns {
 			pathLength := dfs(matrix, memo, rows, columns, i, j)
 
 			fmt.Println("========================")
@@ -51,9 +51,7 @@ func longestIncreasingPath(matrix [][]int) int {
 			fmt.Printf("Memo matrix: \n")
 			printMatrix(memo)
 
-			if pathLength > maxPathLength {
-				maxPathLength = pathLength
-			}
+			maxPathLength = max(maxPathLength, pathLength)
 		}
 	}
 
@@ -86,22 +84,26 @@ func dfs(m [][]int, memo [][]int, rows int, columns int, i int, j int) int {
 	}
 
 	// cell itself counts -> add 1 to the distance for the cell itself
-	memo[i][j] = memo[i][j] + 1
+	memo[i][j] += 1
 	return memo[i][j]
 }
 
-func test(m [][]int, expected int) {
+func test(m [][]int, expectedResult int) {
 	fmt.Println()
 	fmt.Println("========================")
 
 	fmt.Println("Matrix:")
 	printMatrix(m)
 
-	longestPathLength := longestIncreasingPath(m)
+	result := longestIncreasingPath(m)
 
 	fmt.Println()
-	fmt.Printf("Expected longest path length: %v \n", expected)
-	fmt.Printf("Calculated longest path length: %v \n", longestPathLength)
+	fmt.Printf("Expected longest path length: %v \n", expectedResult)
+	fmt.Printf("Calculated longest path length: %v \n", result)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
 }
 
 func test1() {

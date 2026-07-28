@@ -17,6 +17,8 @@ func isZeroArray_optimized(nums []int, queries [][]int) bool {
 	diff := make([]int, l+1) // can be + 1, after the last element
 
 	// fill the diff array ( +1 at [query start], - 1 at [query end + 1] )
+	// diff will affect +1 for all prefix sums of nums[left] to nums[right]
+	// and then we remove this effect starting from nums[right + 1]
 	for _, v := range queries {
 		left := v[0]
 		right := v[1]

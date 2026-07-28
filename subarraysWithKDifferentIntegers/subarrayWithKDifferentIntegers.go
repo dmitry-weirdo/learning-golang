@@ -3,6 +3,114 @@ package main
 import "fmt"
 
 func subarraysWithKDistinct(nums []int, k int) int {
+	return subarraysWithKDistinct_threePointerslidingWindow(nums, k)
+	//return subarraysWithKDistinct_slidingWindow(nums, k)
+	//return subarraysWithKDistinct_kAndKMinusOne(nums, k)
+}
+
+func subarraysWithKDistinct_threePointerslidingWindow(nums []int, k int) int {
+	// see https://www.youtube.com/watch?v=etI6HqWVa8U
+
+	// basically the same as (k-1) leftmost, k leftmost.
+	// leftFar is kLeftmost
+	// leftNear is kMinusOneLeftMost - 1 (i.e. the next element is already (k - 1) distinct elements from right
+
+	leftNear := 0 // moves to the last element before "k distinct from the current right" will become "k - 1 distinct from the current right)
+	leftFar := 0  // stays at the left where "k distinct for the current right" started
+
+	freq := make(map[int]int)
+
+	count := 0
+
+	for right := range nums {
+		numRight := nums[right]
+
+		freq[numRight]++
+
+		for len(freq) > k {
+			// too many chars ->  shrink from left, move leftFar also to the same pointer
+			numLeft := nums[leftNear]
+
+			freq[numLeft]--
+
+			if freq[numLeft] == 0 {
+				delete(freq, numLeft)
+			}
+
+			leftNear++
+			leftFar = leftNear
+		}
+
+		// most tricky thing -> move leftNear to right until it reaches a point
+		// where the frequency of that char is 1, i.e. the next element is "leftmost of k - 1"
+		numLeft := nums[leftNear]
+
+		for freq[numLeft] > 1 {
+			freq[numLeft]--
+
+			if freq[numLeft] == 0 { // this should not happen since we're only moving if freq[numLeft] > 1
+				delete(freq, numLeft)
+			}
+
+			leftNear++
+			numLeft = nums[leftNear]
+		}
+
+		if len(freq) == k {
+			// we're basically adding ("k - 1 leftmost" - "k leftmost")
+			count += leftNear - leftFar + 1
+		}
+	}
+
+	return count
+}
+
+func subarraysWithKDistinct_slidingWindow(nums []int, k int) int {
+	// no, this won't work - we cannot shrink from left since right can still expand without increasing distinct characters
+	left := 0
+
+	freq := make(map[int]int)
+
+	count := 0
+
+	for right := 0; right < len(nums); right++ {
+		numRight := nums[right]
+
+		freq[numRight]++
+
+		if len(freq) > k { // shrink from left
+			numLeft := nums[left]
+			freq[numLeft]--
+
+			if freq[numLeft] == 0 {
+				delete(freq, numLeft)
+			}
+		}
+
+		if len(freq) == k {
+			for len(freq) == k {
+				count++
+				fmt.Printf("Adding matching array [%v; %v] = %v. New count = %v. \n", left, right, nums[left:right+1], count)
+
+				numLeft := nums[left]
+				freq[numLeft]--
+
+				if freq[numLeft] == 0 {
+					delete(freq, numLeft)
+				}
+
+				left++
+			}
+
+			count++
+		}
+
+	}
+
+	return count
+}
+
+func subarraysWithKDistinct_kAndKMinusOne(nums []int, k int) int {
 	l := len(nums)
 
 	// todo: we can just calculate for every pos and not store the complete arrays, but we need to store all variable from the function
@@ -14,7 +122,7 @@ func subarraysWithKDistinct(nums []int, k int) int {
 
 	result := 0
 
-	for i := 0; i < l; i++ {
+	for i := range l {
 		result += kMinusOnePositions[i] - kPositions[i]
 	}
 
@@ -87,7 +195,7 @@ func getLeftPos(nums []int, k int) []int {
 	return leftPositions
 }
 
-func test(nums []int, k int, expected int) {
+func test(nums []int, k int, expectedResult int) {
 	fmt.Println()
 	fmt.Println("====================")
 
@@ -96,8 +204,12 @@ func test(nums []int, k int, expected int) {
 
 	result := subarraysWithKDistinct(nums, k)
 
-	fmt.Printf("Expected count of subarrays: %v \n", expected)
+	fmt.Printf("Expected count of subarrays: %v \n", expectedResult)
 	fmt.Printf("Result count of subarrays: %v \n", result)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
 }
 
 func test1() {
@@ -129,7 +241,7 @@ func test3() {
 
 func main() {
 	// 992. Subarrays with K Different Integers
-	//test1()
-	//test2()
+	test1()
+	test2()
 	test3()
 }
