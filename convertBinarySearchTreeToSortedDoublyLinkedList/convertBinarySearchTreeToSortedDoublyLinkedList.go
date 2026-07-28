@@ -10,7 +10,7 @@ var globalHead *Node
 var prev *Node // previous node
 
 func treeToDoublyList(root *Node) *Node {
-	if root == nil {
+	if root == nil { // tree can be empty (0 nodes)
 		return nil
 	}
 

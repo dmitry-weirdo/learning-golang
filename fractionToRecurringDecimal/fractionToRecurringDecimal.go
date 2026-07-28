@@ -25,8 +25,8 @@ func fractionToDecimal(numerator int, denominator int) string {
 		return strconv.Itoa(numerator / denominator)
 	}
 
-	var n = abs(numerator)
-	var d = abs(denominator)
+	n := abs(numerator)
+	d := abs(denominator)
 
 	integerPart := n / d
 	remainder = n % d

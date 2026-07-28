@@ -58,7 +58,7 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 				//fmt.Printf("\n")
 				//fmt.Printf("Character position: %v \n", i)
 
-				originalChar := chars[i]
+				originalCharAtPositionI := chars[i]
 
 				for c := byte('a'); c <= byte('z'); c++ { // iterate all the 26 letters
 					chars[i] = c
@@ -67,7 +67,7 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 					//fmt.Printf("Potential word: \"%v\" \n", potentialWord)
 
 					// if we already found this word with the same distance
-					// it was already removed from the map of words (as already visited), but we need to add another predecessor
+					// it was already removed from the map of words m (as already visited), but we need to add another predecessor
 					if v, distanceExists := distances[potentialWord]; distanceExists {
 						if v == distance {
 							addToMap(previousNodes, potentialWord, word)
@@ -76,7 +76,7 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 						}
 					}
 
-					if _, ok := m[potentialWord]; ok { // only proceed if potential char-generated word is in wordList
+					if _, ok := m[potentialWord]; ok { // only proceed if potential char-generated word is still in wordList
 						fmt.Printf("From word \"%v\", potential word found: \"%v\" \n", word, potentialWord)
 
 						addToMap(previousNodes, potentialWord, word)
@@ -103,15 +103,15 @@ func findLadders(beginWord string, endWord string, wordList []string) [][]string
 
 						if potentialWord == endWord {
 							fmt.Printf("End word \"%v\" found! \n", endWord)
-							endWordFound = true
+							endWordFound = true // !!! we do not return here, since we need to proceed all elements of the current level
 						}
 					}
-				}
+				} // ended iteration of all characters in position i
 
 				// restore to the original word
-				chars[i] = originalChar
-			}
-		}
+				chars[i] = originalCharAtPositionI
+			} // ended iteration every position i in the current word from the queue
+		} // ended iterating all words on the current BFS level
 	}
 
 	fmt.Printf("End word \"%v\" found: %v \n", endWord, endWordFound)
@@ -145,7 +145,7 @@ func buildPaths(
 	if currentWord == beginWord { // reached the beginWord
 		fmt.Printf("beginWord \"%v\" reached. \n", beginWord)
 
-		resultPath := queueToArray(path)
+		resultPath := queueToArrayBackwards(path)
 
 		fmt.Printf("Adding path %v to result. \n", resultPath)
 		*result = append(*result, resultPath)
@@ -177,17 +177,13 @@ func addToMap(m map[string][]string, word string, previousWord string) {
 	}
 }
 
-func queueToArray(queue *list.List) []string {
+func queueToArrayBackwards(queue *list.List) []string {
 	// we need to iterate backwards from queue.Back() -> to queue.Front
 	// since we first add endWord and add then add predecessors up to beginWord to the end (back) of the queue
-	var array = make([]string, 0)
+	array := make([]string, 0)
 
-	element := queue.Back()
-
-	for element != nil {
-		array = append(array, element.Value.(string))
-
-		element = element.Prev()
+	for e := queue.Back(); e != nil; e = e.Prev() {
+		array = append(array, e.Value.(string))
 	}
 
 	return array

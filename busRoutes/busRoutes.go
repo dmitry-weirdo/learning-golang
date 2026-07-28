@@ -11,6 +11,82 @@ type RouteStop struct {
 }
 
 func numBusesToDestination(routes [][]int, source int, target int) int {
+	// BFS on stops, but we track visitedRoutes and visitedStops
+
+	// store just stop, distance used is the BFS level
+	return numBusesToDestination_new(routes, source, target)
+
+	// store RouteStop pair of stop + dist
+	//return numBusesToDestination_old(routes, source, target)
+}
+
+func numBusesToDestination_new(routes [][]int, source int, target int) int {
+	if source == target {
+		return 0
+	}
+
+	stopsToRoutes := fillMapsToRoutes(routes)
+
+	if _, ok := stopsToRoutes[source]; !ok {
+		return -1
+	}
+
+	if _, ok := stopsToRoutes[target]; !ok {
+		return -1
+	}
+
+	visitedRoutes := make(map[int]bool) // map to have O(1) access, there is no Set in Go
+	visitedStops := make(map[int]bool)  // map to have O(1) access, there is no Set in Go
+
+	queue := list.New()
+	queue.PushBack(source) // just push stops
+
+	distance := 0
+
+	for queue.Len() > 0 {
+		currentLevelElements := queue.Len()
+
+		for range currentLevelElements {
+			stop := queue.Remove(queue.Front()).(int)
+
+			if stop == target {
+				return distance
+			}
+
+			stopRoutes := stopsToRoutes[stop]
+
+			for _, route := range stopRoutes {
+				if _, ok := visitedRoutes[route]; ok { // route already visited -> skip
+					continue
+				}
+
+				visitedRoutes[route] = true
+
+				routeStops := routes[route]
+
+				for _, routeStop := range routeStops {
+					if _, ok := visitedStops[routeStop]; ok { // stop already visited -> skip
+						continue
+					}
+
+					if routeStop == target {
+						return distance + 1
+					}
+
+					visitedStops[routeStop] = true
+
+					queue.PushBack(routeStop)
+				}
+			}
+		}
+
+		distance++
+	}
+
+	return -1
+}
+
+func numBusesToDestination_old(routes [][]int, source int, target int) int {
 	// bus number = bus index = route number = index in routes[]
 	// map every stop to list of routes
 
@@ -21,19 +97,7 @@ func numBusesToDestination(routes [][]int, source int, target int) int {
 	}
 
 	// fill a map stop -> routes[]
-	stopsToRoutes := make(map[int][]int)
-
-	for busNumber, routeStops := range routes {
-		for _, routeStop := range routeStops {
-			if stopRoutes, ok := stopsToRoutes[routeStop]; !ok {
-				// no route yet in this stop -> set an array of just the current route
-				stopsToRoutes[routeStop] = []int{busNumber}
-			} else {
-				// there is already a routes array for this stop -> append current route to it
-				stopsToRoutes[routeStop] = append(stopRoutes, busNumber)
-			}
-		}
-	}
+	stopsToRoutes := fillMapsToRoutes(routes)
 
 	fmt.Printf("Filled map stop -> routes: \n%v \n", stopsToRoutes)
 
@@ -51,7 +115,7 @@ func numBusesToDestination(routes [][]int, source int, target int) int {
 	visitedRoutes := make(map[int]bool) // map to have O(1) access, there is no Set in Go
 	visitedStops := make(map[int]bool)  // map to have O(1) access, there is no Set in Go
 
-	// start with the st with bus distance 0
+	// start with the source with bus distance 0
 	sourceStop := RouteStop{source, 0}
 
 	queue.PushBack(sourceStop)
@@ -123,13 +187,27 @@ func numBusesToDestination(routes [][]int, source int, target int) int {
 	return -1
 }
 
+func fillMapsToRoutes(routes [][]int) map[int][]int {
+	stopsToRoutes := make(map[int][]int)
+
+	for busNumber, routeStops := range routes {
+		for _, routeStop := range routeStops {
+			if stopRoutes, ok := stopsToRoutes[routeStop]; !ok {
+				// no route yet in this stop -> set an array of just the current route
+				stopsToRoutes[routeStop] = []int{busNumber}
+			} else {
+				// there is already a routes array for this stop -> append current route to it
+				stopsToRoutes[routeStop] = append(stopRoutes, busNumber)
+			}
+		}
+	}
+
+	return stopsToRoutes
+}
+
 func printQueue(queue *list.List) {
-	v := queue.Front()
-
-	for v != nil {
+	for v := queue.Front(); v != nil; v = v.Next() {
 		fmt.Printf("%v -> %v, ", v.Value.(RouteStop).stop, v.Value.(RouteStop).busCount)
-
-		v = v.Next()
 	}
 
 	fmt.Println()
@@ -195,7 +273,7 @@ func test3() {
 
 func main() {
 	// 815. Bus Routes
-	//test1()
+	test1()
 	test2()
-	//test3()
+	test3()
 }
