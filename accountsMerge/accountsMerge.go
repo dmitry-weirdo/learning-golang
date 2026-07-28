@@ -14,7 +14,7 @@ func newUnionFind(n int) UnionFind {
 	parents := make([]int, n)
 	sizes := make([]int, n)
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		// every group is just a root
 		parents[i] = i
 
@@ -145,28 +145,27 @@ func accountsMerge(accounts [][]string) [][]string {
 	totalRootAccounts := len(accountToEmail)
 	fmt.Printf("Total root accounts: %v \n", totalRootAccounts)
 
+	// todo: extract result collection to a separate function
 	// collect the result - rootAccountName
 	var result = make([][]string, totalRootAccounts)
 
 	resultIndex := 0
 	for accountIndex, emails := range accountToEmail {
+		// emails is map[string]bool, so that it is a set with non-repeating emails
 		accountName := getAccountName(accounts, accountIndex)
 
-		emailStrings := make([]string, len(emails))
+		accountArray := make([]string, len(emails)+1) // 0-th will be account name
+		accountArray[0] = accountName
 
-		emailIndex := 0
-		for k := range emails {
-			emailStrings[emailIndex] = k
+		emailIndex := 1
+		for email := range emails { // emails is a email->bool map
+			accountArray[emailIndex] = email
 
 			emailIndex++
 		}
 
-		// sort email strings
-		slices.Sort(emailStrings)
-
-		accountArray := make([]string, len(emailStrings)+1)
-		accountArray[0] = accountName
-		copy(accountArray[1:], emailStrings)
+		// we can sort just the part of the array with emails!
+		slices.Sort(accountArray[1:])
 
 		result[resultIndex] = accountArray
 
