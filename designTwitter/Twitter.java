@@ -6,6 +6,7 @@ import java.util.*;
 
 class Twitter {
     record Tweet(int tweetId, int authorId, int order) {}
+    record TweetAndNextTweet(Tweet tweet, Iterator<Tweet> iterator) {}
 
     private static final int COUNT = 10;
     private int order = 0;
@@ -41,6 +42,9 @@ class Twitter {
     }
 
     public List<Integer> getNewsFeed(int userId) {
+        return getNewsFeedByTopUsers(userId);
+
+/*
         PriorityQueue<Tweet> pq = new PriorityQueue<>(
                 Comparator.comparingInt(t -> t.order)
         );
@@ -69,6 +73,53 @@ class Twitter {
 
         // pq was min-heap "from oldest to newest", feed must be "from newest to oldest".
         Collections.reverse(result);
+
+        return result;
+*/
+    }
+
+    private List<Integer> getNewsFeedByTopUsers(int userId) {
+        Comparator<TweetAndNextTweet> comparator = Comparator.comparingInt((TweetAndNextTweet tn) -> tn.tweet().order()).reversed();
+        PriorityQueue<TweetAndNextTweet> pqFirstTweetsByUser = new PriorityQueue<>(comparator);
+
+        // add users with top 10 first tweets. These 10 tweets will be better than any of the tweets of the remaining followees.
+        // If there are less than 10 tweets (i.e. less than 10 followee users with tweets), fewer elements will be collected,
+        // but we will still collect the following tweets by getting next tweets of these users.
+        var followees = getFolloweesByUser(userId); // will include the user himself
+
+        for (var followee : followees) {
+            Deque<Tweet> tweets = getTweetsByUser(followee);
+            Iterator<Tweet> iterator = tweets.iterator();
+
+            if (iterator.hasNext()) { // followee can have no tweets
+                TweetAndNextTweet tweetAndNextTweet = new TweetAndNextTweet(iterator.next(), iterator);
+                pqFirstTweetsByUser.add(tweetAndNextTweet);
+            }
+        }
+
+        // take just the top 10 (or fewer) followees from the pq (10 best users by their latest tweets)
+        PriorityQueue<TweetAndNextTweet> pq = new PriorityQueue<>(comparator);
+
+        while ((pq.size() < COUNT) && !pqFirstTweetsByUser.isEmpty()) {
+            pq.add(pqFirstTweetsByUser.poll());
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        while ((result.size() < COUNT) && (!pq.isEmpty())) {
+            TweetAndNextTweet tn = pq.poll();
+
+            result.add(tn.tweet.tweetId);
+
+            if (tn.iterator.hasNext()) {
+                // if exists -> add the next tweet from this followee
+                // it will take its place in the heap
+                Tweet nextTweet = tn.iterator.next();
+                TweetAndNextTweet tweetAndNextTweet = new TweetAndNextTweet(nextTweet, tn.iterator);
+
+                pq.add(tweetAndNextTweet);
+            }
+        }
 
         return result;
     }
