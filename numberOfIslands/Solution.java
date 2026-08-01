@@ -1,3 +1,5 @@
+package numberOfIslands;
+
 class Solution {
     // Instance variables to store grid and its dimensions
     private char[][] grid;
