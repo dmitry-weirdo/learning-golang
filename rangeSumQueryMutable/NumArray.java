@@ -17,7 +17,7 @@ class NumArray {
         // see https://neetcode.io/courses/advanced-algorithms/8
 
         // since we need non-final fields (we change values of nodes) -> we cannot use record
-        private class TreeNode {
+        private static class TreeNode {
             TreeNode leftChild;
             TreeNode rightChild;
             int left; // left range, inclusive
@@ -259,7 +259,7 @@ class NumArray {
         }
     }
 
-    private SegmentTree implementation;
+    private final SegmentTree implementation;
 
     public NumArray(int[] nums) {
         boolean tree = false;
