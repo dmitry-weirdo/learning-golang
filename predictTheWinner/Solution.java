@@ -6,8 +6,9 @@ class Solution {
     private int[] a;
     private int[][] dp;
 
-
-    public boolean predictTheWinner(int[] nums) {
+    // For 877. Stone Game, just use a different function name.
+    // public boolean stoneGame(int[] nums) { // 877. Stone Game
+    public boolean predictTheWinner(int[] nums) { // 486. Predict the Winner
         a = nums;
 
         // optimal difference in score when playing in the array range of [left; right]
@@ -74,6 +75,7 @@ class Solution {
 
     static void main() {
         // 486. Predict the Winner
+        // 877. Stone Game - exactly same solution is working
         test1();
         test2();
     }
