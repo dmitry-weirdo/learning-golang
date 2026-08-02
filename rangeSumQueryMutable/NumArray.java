@@ -152,7 +152,10 @@ class NumArray {
             // left child will be 2 * i = 24,
             // right child will be 2 * i + 1 = 25
             // This will be out of range of 2 * n - 1 = 19.
-            a = new int[4 * n];
+//            a = new int[4 * n];
+
+            // for modified getLeftChildIndex, getRightChildIndex, we can allocate just 2 * n - 1 elements (element a[0] is not used).
+            a = new int[2 * n];
 
             rootRightRange = n - 1;
 
@@ -181,11 +184,11 @@ class NumArray {
             int mid = (left + right) / 2;
 
             // leftChild is sum [left; mid]
-            int leftChildIndex = 2 * i;
+            int leftChildIndex = getLeftChildIndex(i);
             buildArray(nums, leftChildIndex, left, mid);
 
             // rightChild is sum[mid + 1; right]
-            int rightChildIndex = 2 * i + 1;
+            int rightChildIndex = getRightChildIndex(i, mid, left);
             buildArray(nums, rightChildIndex, mid + 1, right);
 
             // root is sum of leftChild and rightChild
@@ -211,8 +214,8 @@ class NumArray {
 
             var midRange = (leftRange + rightRange) / 2;
 
-            int leftChildIndex = 2 * i;
-            int rightChildIndex = 2 * i + 1;
+            int leftChildIndex = getLeftChildIndex(i);
+            int rightChildIndex = getRightChildIndex(i, midRange, leftRange);
 
             if (index > midRange) { // go right, right is [midRange+1, rightRange]
                 updateArray(rightChildIndex, midRange + 1, rightRange, index, value);
@@ -240,8 +243,8 @@ class NumArray {
 
             var midRange = (leftRange + rightRange) / 2;
 
-            int leftChildIndex = 2 * i;
-            int rightChildIndex = 2 * i + 1;
+            int leftChildIndex = getLeftChildIndex(i);
+            int rightChildIndex = getRightChildIndex(i, midRange, leftRange);
 
             if (left > midRange) {
                 // both left and right are > than midRange -> go to the right subtree that is [midRange + 1; rightRange]
@@ -256,6 +259,31 @@ class NumArray {
                 return sumRangeInArray(leftChildIndex, leftRange, midRange, left, midRange) +
                         sumRangeInArray(rightChildIndex, midRange + 1, rightRange, midRange + 1, right);
             }
+        }
+
+        private static int getLeftChildIndex(int i) {
+            // see https://cp-algorithms.com/data_structures/segment_tree.html#memory-efficient-implementation
+
+            // We post the left part for array range [left; mid] right after the parent index [i],
+            // i.e. left of parent [i] starts at [i + 1]
+            // This part will serve for (mid - left + 1) array elements.
+            // It will use 2 * (mid - left + 1) - 1 nodes.
+
+            return i + 1; // this requires an array of size 2 * n
+
+//            return 2 * i; // this requires an array of size 4 * n
+        }
+
+        private static int getRightChildIndex(int i, int midRange, int leftRange) {
+            // see https://cp-algorithms.com/data_structures/segment_tree.html#memory-efficient-implementation
+
+            // We post the right part for array range [mid + 1; right] right after the left part.
+            // left start = i + 1
+            // elements in left part = 2 * (mid - left + 1) - 1
+            // i.e. right start = i + 1 + 2 * (mid - left + 1) - 1 = i + 2 * (mid - left + 1)
+            return i + 2 * (midRange - leftRange + 1); // this requires an array of size 2 * n
+
+//            return 2 * i + 1; // this requires an array of size 4 * n
         }
     }
 
@@ -293,6 +321,9 @@ class NumArray {
     }
 
     static void test1() {
+        System.out.println();
+        System.out.println("========================");
+
         int[] nums = {1, 3, 5};
         NumArray na = new NumArray(nums);
 
@@ -302,6 +333,9 @@ class NumArray {
     }
 
     static void test2() {
+        System.out.println();
+        System.out.println("========================");
+
         // array of size 10 will NOT fit into 2 * n array if using the standard indexing
         int[] nums = {-28, -39, 53, 65, 11, -56, -65, -39, -43, 97};
 
