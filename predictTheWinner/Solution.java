@@ -9,6 +9,21 @@ class Solution {
     // For 877. Stone Game, just use a different function name.
     // public boolean stoneGame(int[] nums) { // 877. Stone Game
     public boolean predictTheWinner(int[] nums) { // 486. Predict the Winner
+        if (nums.length % 2 == 0) {
+            // If the number of piles is even, we can always select "only odd-position"
+            // or "only even-position" numbers.
+            // By selecting odd or even that has bigger sum of "all odd-position" and "all even-position" elements,
+            // the first player can always win.
+
+            // [a1, b1, a2, b2]
+            // let's say a1 + a2 >= b1 + b2.
+            // Then we select a1, player 2 is left with [b1, a2, b2], and can only select b1 or b2.
+            // Then we take a2 and win, since a1 + a2 >= b1 + b2.
+
+            // This is always the case for "877. Stone Game".
+            return true;
+        }
+
         a = nums;
 
         // optimal difference in score when playing in the array range of [left; right]
