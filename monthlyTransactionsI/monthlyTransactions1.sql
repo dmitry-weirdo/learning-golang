@@ -1,4 +1,6 @@
 -- Q3. Monthly Transactions I
+-- 1193. Monthly Transactions I
+
 -- Write your PostgreSQL query statement below
 
 -- nicer solution if we know that sum can take arguments
