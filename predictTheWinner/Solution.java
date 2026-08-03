@@ -12,7 +12,7 @@ class Solution {
         if (nums.length % 2 == 0) {
             // If the number of piles is even, we can always select "only odd-position"
             // or "only even-position" numbers.
-            // By selecting odd or even that has bigger sum of "all odd-position" and "all even-position" elements,
+            // By selecting odd or even that has a bigger sum of "all odd-position" and "all even-position" elements,
             // the first player can always win.
 
             // [a1, b1, a2, b2]
