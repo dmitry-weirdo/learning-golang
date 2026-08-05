@@ -14,11 +14,11 @@ func nextGreaterElement(nums1 []int, nums2 []int) []int {
 	// monotonic stack - top is less than next etc.
 	stack := list.New()
 
-	for j := len(nums2) - 1; j >= 0; j-- {
-		v := nums2[j]
+	for i := len(nums2) - 1; i >= 0; i-- {
+		v := nums2[i]
 
 		fmt.Println()
-		fmt.Printf("nums2[%v] = %v \n", j, v)
+		fmt.Printf("nums2[%v] = %v \n", i, v)
 
 		fmt.Println("Stack: ")
 		printStack(stack)
