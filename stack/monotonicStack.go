@@ -33,8 +33,6 @@ Push current value to stack:
 // todo: !!! we can always collect values with indexes, and just add 2 converting methods that will return only values or only indexes
 // todo: we can also pass noElementIndex to "get with indexes" methods, but -1 is ok since it's obviously out of array range - yes, it's required. It can default to -1.
 // todo: we may also for "next" search, set the default noElementIndex = len(nums)
-// todo: create stack must also be extracted to method, so that we can change the implementation e.g. to slices instead of LinkedList
-// todo: try to implement stack as a slice (append to end to make no shifts) -> will be much faster
 */
 
 type MatchingElement struct {
@@ -97,7 +95,7 @@ func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
 	// stack: increasing from top to bottom
 	// removal from stack: < current value
 	// select top as result: if >= current value
-	// push current value to stack: if top of the stack != current value
+	// push current value to stack: if top of the stack == current value, replace it with the current element to update the index
 	stack := createStack()
 
 	n := len(a)
@@ -116,9 +114,13 @@ func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
 			result[i] = noElementValue // should default to -1
 		}
 
-		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
-			pushToStack(stack, v)
+		// if current == stack.top, we replace stack.top with the current element since current element has the new correct index
+		if stackIsNotEmpty(stack) && (getStackTop(stack) == v) {
+			removeFromStack(stack)
 		}
+
+		// we always push the current element since it has the updated index
+		pushToStack(stack, v)
 	}
 
 	return result
@@ -191,7 +193,7 @@ func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
 	// stack: decreasing from top to bottom
 	// removal from stack: > current value
 	// select top as result: if <= current value
-	// push current value to stack: if top of the stack != current value
+	// push current value to stack: if top of the stack == current value, replace it with the current element to update the index
 	stack := createStack()
 
 	n := len(a)
@@ -210,9 +212,13 @@ func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
 			result[i] = noElementValue // should default to -1
 		}
 
-		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
-			pushToStack(stack, v)
+		// if current == stack.top, we replace stack.top with the current element since current element has the new correct index
+		if stackIsNotEmpty(stack) && (getStackTop(stack) == v) {
+			removeFromStack(stack)
 		}
+
+		// we always push the current element since it has the updated index
+		pushToStack(stack, v)
 	}
 
 	return result
@@ -253,7 +259,7 @@ func GetPrevGreaterOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	// stack: increasing from top to bottom
 	// removal from stack: < current value
 	// select top as result: if >= current value
-	// push current value to stack: if top of the stack != current value
+	// push current value to stack: if top of the stack == current value, replace it with the current element to update the index
 	stack := createStack()
 
 	n := len(a)
@@ -272,9 +278,13 @@ func GetPrevGreaterOrEqual(a []int, noElementValue int) []int { // same as GetNe
 			result[i] = noElementValue // should default to -1
 		}
 
-		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
-			pushToStack(stack, v)
+		// if current == stack.top, we replace stack.top with the current element since current element has the new correct index
+		if stackIsNotEmpty(stack) && (getStackTop(stack) == v) {
+			removeFromStack(stack)
 		}
+
+		// we always push the current element since it has the updated index
+		pushToStack(stack, v)
 	}
 
 	return result
@@ -347,7 +357,7 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	// stack: decreasing from top to bottom
 	// removal from stack: > current value
 	// select top as result: if <= current value
-	// push current value to stack: if top of the stack != current value
+	// push current value to stack: if top of the stack == current value, replace it with the current element to update the index
 	stack := createStack()
 
 	n := len(a)
@@ -366,9 +376,13 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 			result[i] = noElementValue // should default to -1
 		}
 
-		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
-			pushToStack(stack, v)
+		// if current == stack.top, we replace stack.top with the current element since current element has the new correct index
+		if stackIsNotEmpty(stack) && (getStackTop(stack) == v) {
+			removeFromStack(stack)
 		}
+
+		// we always push the current element since it has the updated index
+		pushToStack(stack, v)
 	}
 
 	return result
