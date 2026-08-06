@@ -30,7 +30,34 @@ We're selecting exactly by our search clause
 Push current value to stack:
 - If we're searching non-inclusive (> or <): always
 - If we're searching non-inclusive (>= or <=): if top of the stack != current value (to not push duplicates to the stack)
+// todo: !!! if we want to save indexes, we need to update the equal element here with a new index!!!
+// todo: !!! we can always collect values with indexes, and just add 2 converting methods that will return only values or only indexes
 */
+
+type MatchingElement struct {
+	value int
+	index int // index of value in the array
+}
+
+func OnlyIndexes(a []MatchingElement) []int {
+	result := make([]int, len(a))
+
+	for i := range a {
+		result[i] = a[i].index
+	}
+
+	return result
+}
+
+func OnlyValues(a []MatchingElement) []int {
+	result := make([]int, len(a))
+
+	for i := range a {
+		result[i] = a[i].value
+	}
+
+	return result
+}
 
 func GetNextGreater(a []int, noElementValue int) []int {
 	// direction: right -> left
@@ -119,6 +146,38 @@ func GetNextSmaller(a []int, noElementValue int) []int {
 		}
 
 		pushToStack(stack, v)
+	}
+
+	return result
+}
+
+// todo: we can also pass noElementIndex, but -1 is ok since it's obviously out of array range
+func GetNextSmallerWithIndexes(a []int, noElementValue int) []MatchingElement {
+	// direction: right -> left
+	// stack: decreasing from top to bottom
+	// removal from stack: >= current value
+	// select top as result: if < current value
+	// push current value to stack: always
+	stack := list.New()
+
+	n := len(a)
+	result := make([]MatchingElement, n)
+
+	for i := n - 1; i >= 0; i-- {
+		v := a[i]
+
+		for (stack.Len() > 0) && (getStackTopWithIndex(stack).value >= v) {
+			removeFromStackWithIndex(stack)
+		}
+
+		if (stack.Len() > 0) && (getStackTopWithIndex(stack).value < v) {
+			result[i] = getStackTopWithIndex(stack)
+		} else { // no next smaller element
+			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
+		}
+
+		currentElement := MatchingElement{value: v, index: i}
+		pushToStackWithIndex(stack, currentElement)
 	}
 
 	return result
@@ -293,6 +352,18 @@ func getStackTop(stack *list.List) int { // only called when stack is not empty
 	return stack.Front().Value.(int)
 }
 
+func pushToStackWithIndex(stack *list.List, v MatchingElement) { // pushes to the end of the stack
+	stack.PushFront(v)
+}
+
+func removeFromStackWithIndex(stack *list.List) MatchingElement { // removes from the top of the stack, only called when stack is not empty
+	return stack.Remove(stack.Front()).(MatchingElement)
+}
+
+func getStackTopWithIndex(stack *list.List) MatchingElement { // only called when stack is not empty
+	return stack.Front().Value.(MatchingElement)
+}
+
 func printStack(l *list.List) {
 	fmt.Printf("[ ")
 
@@ -339,6 +410,39 @@ func testGeneric(
 	}
 }
 
+func testGenericWithIndexes(
+	methodName string,
+	f func([]int, int) []MatchingElement,
+	a []int,
+	noElementValue int,
+	expectedResult []MatchingElement,
+) {
+	fmt.Println()
+	fmt.Println("========================")
+	fmt.Printf("Testing method \"%v\"... \n", methodName)
+
+	fmt.Printf("Array: %v \n", a)
+	fmt.Printf("No element value: %v \n", noElementValue)
+
+	result := f(a, noElementValue)
+
+	fmt.Printf("Result: %v \n", result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	// todo: probably we need to compare v.index and v.value separately
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func testGetNextGreater(a []int, noElementValue int, expectedResult []int) {
 	testGeneric("GetNextGreater", GetNextGreater, a, noElementValue, expectedResult)
 }
@@ -365,6 +469,10 @@ func testGetPrevGreaterOrEqual(a []int, noElementValue int, expectedResult []int
 
 func testGetPrevSmaller(a []int, noElementValue int, expectedResult []int) {
 	testGeneric("GetPrevSmaller", GetPrevSmaller, a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes(a []int, noElementValue int, expectedResult []MatchingElement) {
+	testGenericWithIndexes("GetNextSmallerWithIndexes", GetNextSmallerWithIndexes, a, noElementValue, expectedResult)
 }
 
 func testGetPrevSmallerOrEqual(a []int, noElementValue int, expectedResult []int) {
@@ -525,6 +633,101 @@ func testGetNextSmallerSuite() {
 	testGetNextSmaller4()
 	testGetNextSmaller5()
 	testGetNextSmaller6()
+}
+
+// ======== testGetNextSmallerWithIndexes ====== //
+func testGetNextSmallerWithIndexes1() {
+	a := []int{1, 2, 3, 4, 5}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes2() {
+	a := []int{1}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes3() {
+	a := []int{10, 1, 1, 6}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{1, 1},
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes4() {
+	a := []int{1, 1, 1, 1}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes5() {
+	a := []int{5, 4, 3, 2, 1}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{4, 1},
+		{3, 2},
+		{2, 3},
+		{1, 4},
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexes6() {
+	a := []int{5, 5, 4, 6, 9, 1}
+	noElementValue := -1
+
+	expectedResult := []MatchingElement{
+		{4, 2},
+		{4, 2},
+		{1, 5},
+		{1, 5},
+		{1, 5},
+		{-1, -1},
+	}
+
+	testGetNextSmallerWithIndexes(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerWithIndexesSuite() {
+	testGetNextSmallerWithIndexes1()
+	testGetNextSmallerWithIndexes2()
+	testGetNextSmallerWithIndexes3()
+	testGetNextSmallerWithIndexes4()
+	testGetNextSmallerWithIndexes5()
+	testGetNextSmallerWithIndexes6()
 }
 
 // ======== testGetNextSmallerOrEqual ====== //
