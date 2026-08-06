@@ -37,7 +37,7 @@ func GetNextGreater(a []int, noElementValue int) []int {
 	return result
 }
 
-func GetNextGreaterOrEqual(a []int) []int {
+func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
 	// todo: implement method
 	return nil
 }
@@ -72,9 +72,36 @@ func GetNextSmaller(a []int, noElementValue int) []int {
 	return result
 }
 
-func GetNextSmallerOrEqual(a []int) []int {
-	// todo: implement method
-	return nil
+func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
+	// direction: right -> left
+	// stack: decreasing from top to bottom
+	// removal from stack: > current value
+	// select top as result: if <= current value
+	// push current value to stack: if top of the stack != current value
+	stack := list.New()
+
+	n := len(a)
+	result := make([]int, n)
+
+	for i := n - 1; i >= 0; i-- {
+		v := a[i]
+
+		for (stack.Len() > 0) && (getStackTop(stack) > v) {
+			removeFromStack(stack)
+		}
+
+		if (stack.Len() > 0) && (getStackTop(stack) <= v) {
+			result[i] = getStackTop(stack)
+		} else { // no next smaller element
+			result[i] = noElementValue // should default to -1
+		}
+
+		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+			pushToStack(stack, v)
+		}
+	}
+
+	return result
 }
 
 func pushToStack(stack *list.List, v int) { // pushes to the end of the stack
@@ -139,8 +166,16 @@ func testGetNextGreater(a []int, noElementValue int, expectedResult []int) {
 	testGeneric("GetNextGreater", GetNextGreater, a, noElementValue, expectedResult)
 }
 
+func testGetNextGreaterOrEqual(a []int, noElementValue int, expectedResult []int) {
+	testGeneric("GetNextGreaterOrEqual", GetNextGreaterOrEqual, a, noElementValue, expectedResult)
+}
+
 func testGetNextSmaller(a []int, noElementValue int, expectedResult []int) {
 	testGeneric("GetNextSmaller", GetNextSmaller, a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual(a []int, noElementValue int, expectedResult []int) {
+	testGeneric("GetNextSmallerOrEqual", GetNextSmallerOrEqual, a, noElementValue, expectedResult)
 }
 
 func testGetNextGreater1() {
@@ -214,14 +249,90 @@ func testGetNextSmaller4() {
 	testGetNextSmaller(a, noElementValue, expectedResult)
 }
 
+func testGetNextSmaller5() {
+	a := []int{5, 4, 3, 2, 1}
+	noElementValue := -1
+	expectedResult := []int{4, 3, 2, 1, -1}
+
+	testGetNextSmaller(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmaller6() {
+	a := []int{5, 5, 4, 6, 9, 1}
+	noElementValue := -1
+	expectedResult := []int{4, 4, 1, 1, 1, -1}
+
+	testGetNextSmaller(a, noElementValue, expectedResult)
+}
+
 func testGetNextSmallerSuite() {
 	testGetNextSmaller1()
 	testGetNextSmaller2()
 	testGetNextSmaller3()
 	testGetNextSmaller4()
+	testGetNextSmaller5()
+	testGetNextSmaller6()
+}
+
+func testGetNextSmallerOrEqual1() {
+	a := []int{1, 2, 3, 4, 5}
+	noElementValue := -1
+	expectedResult := []int{-1, -1, -1, -1, -1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual2() {
+	a := []int{1}
+	noElementValue := -1
+	expectedResult := []int{-1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual3() {
+	a := []int{10, 1, 1, 6}
+	noElementValue := -1
+	expectedResult := []int{1, 1, -1, -1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual4() {
+	a := []int{1, 1, 1, 1}
+	noElementValue := -1
+	expectedResult := []int{1, 1, 1, -1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual5() {
+	a := []int{5, 4, 3, 2, 1}
+	noElementValue := -1
+	expectedResult := []int{4, 3, 2, 1, -1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqual6() {
+	a := []int{5, 5, 4, 6, 9, 1}
+	noElementValue := -1
+	expectedResult := []int{5, 4, 1, 1, 1, -1}
+
+	testGetNextSmallerOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextSmallerOrEqualSuite() {
+	testGetNextSmallerOrEqual1()
+	testGetNextSmallerOrEqual2()
+	testGetNextSmallerOrEqual3()
+	testGetNextSmallerOrEqual4()
+	testGetNextSmallerOrEqual5()
+	testGetNextSmallerOrEqual6()
 }
 
 func main() {
 	testGetNextGreaterSuite()
 	testGetNextSmallerSuite()
+	testGetNextSmallerOrEqualSuite()
 }
