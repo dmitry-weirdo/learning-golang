@@ -376,6 +376,7 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 }
 
 // ======== helper stack functions ====== //
+// ======== stack of int values ====== //
 func createStack() *list.List {
 	return list.New()
 }
@@ -400,28 +401,35 @@ func getStackTop(stack *list.List) int { // only called when stack is not empty
 	return stack.Front().Value.(int)
 }
 
-func createStackWithIndex() *list.List {
-	return list.New()
+// ======== stack of MatchingElement values ====== //
+func createStackWithIndex() *[]MatchingElement {
+	stack := make([]MatchingElement, 0)
+	return &stack
 }
 
-func stackIsNotEmptyWithIndex(stack *list.List) bool {
-	return stack.Len() > 0
+func stackIsNotEmptyWithIndex(stack *[]MatchingElement) bool {
+	return len(*stack) > 0
 }
 
-func stackIsEmptyWithIndex(stack *list.List) bool {
-	return stack.Len() == 0
+func stackIsEmptyWithIndex(stack *[]MatchingElement) bool {
+	return len(*stack) == 0
 }
 
-func pushToStackWithIndex(stack *list.List, v MatchingElement) { // pushes to the end of the stack
-	stack.PushFront(v)
+func pushToStackWithIndex(stack *[]MatchingElement, v MatchingElement) { // pushes to the end of the stack
+	// we push to the end of the slice = top of the stack
+	*stack = append(*stack, v)
 }
 
-func removeFromStackWithIndex(stack *list.List) MatchingElement { // removes from the top of the stack, only called when stack is not empty
-	return stack.Remove(stack.Front()).(MatchingElement)
+func removeFromStackWithIndex(stack *[]MatchingElement) MatchingElement { // removes from the top of the stack, only called when stack is not empty
+	lastElement := (*stack)[len(*stack)-1]
+
+	*stack = (*stack)[:len(*stack)-1] // remove the last element
+
+	return lastElement
 }
 
-func getStackTopWithIndex(stack *list.List) MatchingElement { // only called when stack is not empty
-	return stack.Front().Value.(MatchingElement)
+func getStackTopWithIndex(stack *[]MatchingElement) MatchingElement { // only called when stack is not empty
+	return (*stack)[len(*stack)-1]
 }
 
 func printStack(l *list.List) {
