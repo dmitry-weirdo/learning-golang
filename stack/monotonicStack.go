@@ -32,7 +32,8 @@ Push current value to stack:
 - If we're searching non-inclusive (>= or <=): if top of the stack != current value (to not push duplicates to the stack)
 // todo: !!! if we want to save indexes, we need to update the equal element here with a new index!!!
 // todo: !!! we can always collect values with indexes, and just add 2 converting methods that will return only values or only indexes
-// todo: we can also pass noElementIndex to "get with indexes" methods, but -1 is ok since it's obviously out of array range
+// todo: we can also pass noElementIndex to "get with indexes" methods, but -1 is ok since it's obviously out of array range - yes, it's required. It can default to -1.
+// todo: we may also for "next" search, set the default noElementIndex = len(nums)
 */
 
 type MatchingElement struct {
@@ -1169,7 +1170,7 @@ func main() {
 
 	testGetNextSmallerOrEqualSuite()
 
-	// next
+	// prev
 	testGetPrevGreaterSuite()
 	testGetPrevGreaterOrEqualSuite()
 
