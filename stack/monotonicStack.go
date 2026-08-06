@@ -69,7 +69,7 @@ func GetNextGreater(a []int, noElementValue int) []int {
 	// removal from stack: <= current value
 	// select top as result: if > current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -77,11 +77,11 @@ func GetNextGreater(a []int, noElementValue int) []int {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) <= v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) <= v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) > v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) > v) {
 			result[i] = getStackTop(stack)
 		} else { // no next greater element
 			result[i] = noElementValue // should default to -1
@@ -99,7 +99,7 @@ func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
 	// removal from stack: < current value
 	// select top as result: if >= current value
 	// push current value to stack: if top of the stack != current value
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -107,17 +107,17 @@ func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) < v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) < v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) >= v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) >= v) {
 			result[i] = getStackTop(stack)
 		} else { // no next greater element
 			result[i] = noElementValue // should default to -1
 		}
 
-		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
 			pushToStack(stack, v)
 		}
 	}
@@ -131,7 +131,7 @@ func GetNextSmaller(a []int, noElementValue int) []int {
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -139,11 +139,11 @@ func GetNextSmaller(a []int, noElementValue int) []int {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) >= v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) >= v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) < v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) < v) {
 			result[i] = getStackTop(stack)
 		} else { // no next smaller element
 			result[i] = noElementValue // should default to -1
@@ -162,7 +162,7 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int) []MatchingElement {
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]MatchingElement, n)
@@ -170,11 +170,11 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int) []MatchingElement {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTopWithIndex(stack).value >= v) {
+		for stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value >= v) {
 			removeFromStackWithIndex(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTopWithIndex(stack).value < v) {
+		if stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value < v) {
 			result[i] = getStackTopWithIndex(stack)
 		} else { // no next smaller element
 			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
@@ -193,7 +193,7 @@ func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
 	// removal from stack: > current value
 	// select top as result: if <= current value
 	// push current value to stack: if top of the stack != current value
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -201,17 +201,17 @@ func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) > v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) > v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) <= v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) <= v) {
 			result[i] = getStackTop(stack)
 		} else { // no next smaller element
 			result[i] = noElementValue // should default to -1
 		}
 
-		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
 			pushToStack(stack, v)
 		}
 	}
@@ -225,7 +225,7 @@ func GetPrevGreater(a []int, noElementValue int) []int { // same as GetNextGreat
 	// removal from stack: <= current value
 	// select top as result: if > current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -233,11 +233,11 @@ func GetPrevGreater(a []int, noElementValue int) []int { // same as GetNextGreat
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) <= v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) <= v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) > v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) > v) {
 			result[i] = getStackTop(stack)
 		} else { // no next greater element
 			result[i] = noElementValue // should default to -1
@@ -255,7 +255,7 @@ func GetPrevGreaterOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	// removal from stack: < current value
 	// select top as result: if >= current value
 	// push current value to stack: if top of the stack != current value
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -263,17 +263,17 @@ func GetPrevGreaterOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) < v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) < v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) >= v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) >= v) {
 			result[i] = getStackTop(stack)
 		} else { // no next greater element
 			result[i] = noElementValue // should default to -1
 		}
 
-		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
 			pushToStack(stack, v)
 		}
 	}
@@ -287,7 +287,7 @@ func GetPrevSmaller(a []int, noElementValue int) []int { // same as GetNextSmall
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -295,11 +295,11 @@ func GetPrevSmaller(a []int, noElementValue int) []int { // same as GetNextSmall
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) >= v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) >= v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) < v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) < v) {
 			result[i] = getStackTop(stack)
 		} else { // no next smaller element
 			result[i] = noElementValue // should default to -1
@@ -318,7 +318,7 @@ func GetPrevSmallerWithIndexes(a []int, noElementValue int) []MatchingElement { 
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]MatchingElement, n)
@@ -326,11 +326,11 @@ func GetPrevSmallerWithIndexes(a []int, noElementValue int) []MatchingElement { 
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTopWithIndex(stack).value >= v) {
+		for stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value >= v) {
 			removeFromStackWithIndex(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTopWithIndex(stack).value < v) {
+		if stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value < v) {
 			result[i] = getStackTopWithIndex(stack)
 		} else { // no next smaller element
 			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
@@ -349,7 +349,7 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	// removal from stack: > current value
 	// select top as result: if <= current value
 	// push current value to stack: if top of the stack != current value
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]int, n)
@@ -357,17 +357,17 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTop(stack) > v) {
+		for stackIsNotEmpty(stack) && (getStackTop(stack) > v) {
 			removeFromStack(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTop(stack) <= v) {
+		if stackIsNotEmpty(stack) && (getStackTop(stack) <= v) {
 			result[i] = getStackTop(stack)
 		} else { // no next smaller element
 			result[i] = noElementValue // should default to -1
 		}
 
-		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+		if stackIsEmpty(stack) || (getStackTop(stack) != v) {
 			pushToStack(stack, v)
 		}
 	}
@@ -376,6 +376,18 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 }
 
 // ======== helper stack functions ====== //
+func createStack() *list.List {
+	return list.New()
+}
+
+func stackIsNotEmpty(stack *list.List) bool {
+	return stack.Len() > 0
+}
+
+func stackIsEmpty(stack *list.List) bool {
+	return stack.Len() == 0
+}
+
 func pushToStack(stack *list.List, v int) { // pushes to the end of the stack
 	stack.PushFront(v)
 }
