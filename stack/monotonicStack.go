@@ -35,6 +35,7 @@ Push current value to stack:
 // todo: we can also pass noElementIndex to "get with indexes" methods, but -1 is ok since it's obviously out of array range - yes, it's required. It can default to -1.
 // todo: we may also for "next" search, set the default noElementIndex = len(nums)
 // todo: create stack must also be extracted to method, so that we can change the implementation e.g. to slices instead of LinkedList
+// todo: try to implement stack as a slice (append to end to make no shifts) -> will be much faster
 */
 
 type MatchingElement struct {

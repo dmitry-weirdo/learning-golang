@@ -1,7 +1,6 @@
 package main
 
 import (
-	"container/list"
 	"fmt"
 )
 
@@ -27,6 +26,7 @@ func validSubarrays(nums []int) int {
 
 	// Then we just sum up values for all the starting positions in the array
 
+	// todo: try to implement with stack as a slice (append to end to make no shifts) -> should be much faster
 	nextSmallerElements := GetNextSmallerWithIndexes(nums, -1, len(nums))
 	fmt.Printf("Next smaller elements: %v \n", nextSmallerElements)
 
@@ -63,7 +63,7 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int, noElementIndex int) 
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := list.New()
+	stack := createStack()
 
 	n := len(a)
 	result := make([]MatchingElement, n)
@@ -71,11 +71,11 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int, noElementIndex int) 
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for (stack.Len() > 0) && (getStackTopWithIndex(stack).value >= v) {
+		for stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value >= v) {
 			removeFromStackWithIndex(stack)
 		}
 
-		if (stack.Len() > 0) && (getStackTopWithIndex(stack).value < v) {
+		if stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value < v) {
 			result[i] = getStackTopWithIndex(stack)
 		} else { // no next smaller element
 			result[i] = MatchingElement{value: noElementValue, index: noElementIndex} // should default to len(nums) + 1
@@ -88,16 +88,30 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int, noElementIndex int) 
 	return result
 }
 
-func pushToStackWithIndex(stack *list.List, v MatchingElement) { // pushes to the end of the stack
-	stack.PushFront(v)
+func createStack() *[]MatchingElement {
+	stack := make([]MatchingElement, 0)
+	return &stack
 }
 
-func removeFromStackWithIndex(stack *list.List) MatchingElement { // removes from the top of the stack, only called when stack is not empty
-	return stack.Remove(stack.Front()).(MatchingElement)
+func stackIsNotEmpty(stack *[]MatchingElement) bool {
+	return len(*stack) > 0
 }
 
-func getStackTopWithIndex(stack *list.List) MatchingElement { // only called when stack is not empty
-	return stack.Front().Value.(MatchingElement)
+func pushToStackWithIndex(stack *[]MatchingElement, v MatchingElement) { // pushes to the end of the stack
+	// we push to the end of the slice = top of the stack
+	*stack = append(*stack, v)
+}
+
+func removeFromStackWithIndex(stack *[]MatchingElement) MatchingElement { // removes from the top of the stack, only called when stack is not empty
+	lastElement := (*stack)[len(*stack)-1]
+
+	*stack = (*stack)[:len(*stack)-1] // remove the last element
+
+	return lastElement
+}
+
+func getStackTopWithIndex(stack *[]MatchingElement) MatchingElement { // only called when stack is not empty
+	return (*stack)[len(*stack)-1]
 }
 
 func test(arr []int, expectedResult int) {
