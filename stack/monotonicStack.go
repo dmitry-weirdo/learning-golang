@@ -6,6 +6,32 @@ import (
 	"fmt"
 )
 
+/*
+Common logic:
+
+Direction:
+- If we're searching for next: right -> left
+- If we're searching for previous: left -> right
+
+Stack:
+- If we're searching for > or >=: increasing from top to bottom
+- If we're searching for < or <=: decreasing from top to bottom
+
+Removal from stack:
+We're removing the opposite of what we're searching for:
+- If we're searching for greater: <= current value
+- If we're searching for greater or equal: < current value
+- If we're searching for smaller: >= current value
+- If we're searching for smaller or equal: > current value
+
+Select top of stack into result if:
+We're selecting exactly by our search clause
+
+Push current value to stack:
+- If we're searching non-inclusive (> or <): always
+- If we're searching non-inclusive (>= or <=): if top of the stack != current value (to not push duplicates to the stack)
+*/
+
 func GetNextGreater(a []int, noElementValue int) []int {
 	// direction: right -> left
 	// stack: increasing from top to bottom
@@ -130,6 +156,37 @@ func GetNextSmallerOrEqual(a []int, noElementValue int) []int {
 	return result
 }
 
+func GetPrevGreater(a []int, noElementValue int) []int { // same as GetNextGreater, but left-to-right
+	// direction: left -> right
+	// stack: increasing from top to bottom
+	// removal from stack: <= current value
+	// select top as result: if > current value
+	// push current value to stack: always
+	stack := list.New()
+
+	n := len(a)
+	result := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		v := a[i]
+
+		for (stack.Len() > 0) && (getStackTop(stack) <= v) {
+			removeFromStack(stack)
+		}
+
+		if (stack.Len() > 0) && (getStackTop(stack) > v) {
+			result[i] = getStackTop(stack)
+		} else { // no next greater element
+			result[i] = noElementValue // should default to -1
+		}
+
+		pushToStack(stack, v)
+	}
+
+	return result
+}
+
+// ======== helper stack functions ====== //
 func pushToStack(stack *list.List, v int) { // pushes to the end of the stack
 	stack.PushFront(v)
 }
@@ -154,8 +211,8 @@ func printStack(l *list.List) {
 	fmt.Println()
 }
 
+// ======== generic test functions ====== //
 // todo: it's better to rewrite the tests as valid tests, see stack_test.go
-
 func testGeneric(
 	methodName string,
 	f func([]int, int) []int,
@@ -202,6 +259,10 @@ func testGetNextSmaller(a []int, noElementValue int, expectedResult []int) {
 
 func testGetNextSmallerOrEqual(a []int, noElementValue int, expectedResult []int) {
 	testGeneric("GetNextSmallerOrEqual", GetNextSmallerOrEqual, a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater(a []int, noElementValue int, expectedResult []int) {
+	testGeneric("GetPrevGreater", GetPrevGreater, a, noElementValue, expectedResult)
 }
 
 // ======== testGetNextGreater ====== //
@@ -418,9 +479,69 @@ func testGetNextSmallerOrEqualSuite() {
 	testGetNextSmallerOrEqual6()
 }
 
+// ======== testGetPrevGreater ====== //
+func testGetPrevGreater1() {
+	a := []int{1, 2, 3, 4, 5}
+	noElementValue := -1
+	expectedResult := []int{-1, -1, -1, -1, -1}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater2() {
+	a := []int{1}
+	noElementValue := -1
+	expectedResult := []int{-1}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater3() {
+	a := []int{10, 1, 1, 6}
+	noElementValue := -1
+	expectedResult := []int{-1, 10, 10, 10}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater4() {
+	a := []int{1, 1, 1, 1}
+	noElementValue := -1
+	expectedResult := []int{-1, -1, -1, -1}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater5() {
+	a := []int{5, 4, 3, 2, 1}
+	noElementValue := -1
+	expectedResult := []int{-1, 5, 4, 3, 2}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreater6() {
+	a := []int{5, 5, 4, 6, 9, 1}
+	noElementValue := -1
+	expectedResult := []int{-1, -1, 5, -1, -1, 9}
+
+	testGetPrevGreater(a, noElementValue, expectedResult)
+}
+
+func testGetPrevGreaterSuite() {
+	testGetPrevGreater1()
+	testGetPrevGreater2()
+	testGetPrevGreater3()
+	testGetPrevGreater4()
+	testGetPrevGreater5()
+	testGetPrevGreater6()
+}
+
 func main() {
 	testGetNextGreaterSuite()
 	testGetNextGreaterOrEqualSuite()
 	testGetNextSmallerSuite()
 	testGetNextSmallerOrEqualSuite()
+
+	testGetPrevGreaterSuite()
 }
