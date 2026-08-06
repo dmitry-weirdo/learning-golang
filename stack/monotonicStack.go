@@ -162,7 +162,7 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int) []MatchingElement {
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := createStack()
+	stack := createStackWithIndex()
 
 	n := len(a)
 	result := make([]MatchingElement, n)
@@ -170,11 +170,11 @@ func GetNextSmallerWithIndexes(a []int, noElementValue int) []MatchingElement {
 	for i := n - 1; i >= 0; i-- {
 		v := a[i]
 
-		for stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value >= v) {
+		for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value >= v) {
 			removeFromStackWithIndex(stack)
 		}
 
-		if stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value < v) {
+		if stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value < v) {
 			result[i] = getStackTopWithIndex(stack)
 		} else { // no next smaller element
 			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
@@ -318,7 +318,7 @@ func GetPrevSmallerWithIndexes(a []int, noElementValue int) []MatchingElement { 
 	// removal from stack: >= current value
 	// select top as result: if < current value
 	// push current value to stack: always
-	stack := createStack()
+	stack := createStackWithIndex()
 
 	n := len(a)
 	result := make([]MatchingElement, n)
@@ -326,11 +326,11 @@ func GetPrevSmallerWithIndexes(a []int, noElementValue int) []MatchingElement { 
 	for i := 0; i < n; i++ {
 		v := a[i]
 
-		for stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value >= v) {
+		for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value >= v) {
 			removeFromStackWithIndex(stack)
 		}
 
-		if stackIsNotEmpty(stack) && (getStackTopWithIndex(stack).value < v) {
+		if stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value < v) {
 			result[i] = getStackTopWithIndex(stack)
 		} else { // no next smaller element
 			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
@@ -398,6 +398,18 @@ func removeFromStack(stack *list.List) int { // removes from the top of the stac
 
 func getStackTop(stack *list.List) int { // only called when stack is not empty
 	return stack.Front().Value.(int)
+}
+
+func createStackWithIndex() *list.List {
+	return list.New()
+}
+
+func stackIsNotEmptyWithIndex(stack *list.List) bool {
+	return stack.Len() > 0
+}
+
+func stackIsEmptyWithIndex(stack *list.List) bool {
+	return stack.Len() == 0
 }
 
 func pushToStackWithIndex(stack *list.List, v MatchingElement) { // pushes to the end of the stack
