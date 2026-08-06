@@ -2,7 +2,6 @@
 package main
 
 import (
-	"container/list"
 	"fmt"
 )
 
@@ -377,28 +376,34 @@ func GetPrevSmallerOrEqual(a []int, noElementValue int) []int { // same as GetNe
 
 // ======== helper stack functions ====== //
 // ======== stack of int values ====== //
-func createStack() *list.List {
-	return list.New()
+func createStack() *[]int {
+	stack := make([]int, 0)
+	return &stack
 }
 
-func stackIsNotEmpty(stack *list.List) bool {
-	return stack.Len() > 0
+func stackIsNotEmpty(stack *[]int) bool {
+	return len(*stack) > 0
 }
 
-func stackIsEmpty(stack *list.List) bool {
-	return stack.Len() == 0
+func stackIsEmpty(stack *[]int) bool {
+	return len(*stack) == 0
 }
 
-func pushToStack(stack *list.List, v int) { // pushes to the end of the stack
-	stack.PushFront(v)
+func pushToStack(stack *[]int, v int) { // pushes to the end of the stack
+	// we push to the end of the slice = top of the stack
+	*stack = append(*stack, v)
 }
 
-func removeFromStack(stack *list.List) int { // removes from the top of the stack, only called when stack is not empty
-	return stack.Remove(stack.Front()).(int)
+func removeFromStack(stack *[]int) int { // removes from the top of the stack, only called when stack is not empty
+	lastElement := (*stack)[len(*stack)-1]
+
+	*stack = (*stack)[:len(*stack)-1] // remove the last element
+
+	return lastElement
 }
 
-func getStackTop(stack *list.List) int { // only called when stack is not empty
-	return stack.Front().Value.(int)
+func getStackTop(stack *[]int) int { // only called when stack is not empty
+	return (*stack)[len(*stack)-1]
 }
 
 // ======== stack of MatchingElement values ====== //
@@ -430,18 +435,6 @@ func removeFromStackWithIndex(stack *[]MatchingElement) MatchingElement { // rem
 
 func getStackTopWithIndex(stack *[]MatchingElement) MatchingElement { // only called when stack is not empty
 	return (*stack)[len(*stack)-1]
-}
-
-func printStack(l *list.List) {
-	fmt.Printf("[ ")
-
-	for e := l.Front(); e != nil; e = e.Next() {
-		fmt.Printf("%v ", e.Value)
-	}
-
-	fmt.Printf("]")
-
-	fmt.Println()
 }
 
 // ======== generic test functions ====== //
