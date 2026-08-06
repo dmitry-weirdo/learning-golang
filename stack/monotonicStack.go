@@ -6,7 +6,6 @@ import (
 	"fmt"
 )
 
-// todo: we may need to pass the default value
 func GetNextGreater(a []int, noElementValue int) []int {
 	// direction: right -> left
 	// stack: increasing from top to bottom
@@ -38,8 +37,35 @@ func GetNextGreater(a []int, noElementValue int) []int {
 }
 
 func GetNextGreaterOrEqual(a []int, noElementValue int) []int {
-	// todo: implement method
-	return nil
+	// direction: right -> left
+	// stack: increasing from top to bottom
+	// removal from stack: < current value
+	// select top as result: if >= current value
+	// push current value to stack: if top of the stack != current value
+	stack := list.New()
+
+	n := len(a)
+	result := make([]int, n)
+
+	for i := n - 1; i >= 0; i-- {
+		v := a[i]
+
+		for (stack.Len() > 0) && (getStackTop(stack) < v) {
+			removeFromStack(stack)
+		}
+
+		if (stack.Len() > 0) && (getStackTop(stack) >= v) {
+			result[i] = getStackTop(stack)
+		} else { // no next greater element
+			result[i] = noElementValue // should default to -1
+		}
+
+		if (stack.Len() == 0) || (getStackTop(stack) != v) {
+			pushToStack(stack, v)
+		}
+	}
+
+	return result
 }
 
 func GetNextSmaller(a []int, noElementValue int) []int {
@@ -178,6 +204,7 @@ func testGetNextSmallerOrEqual(a []int, noElementValue int, expectedResult []int
 	testGeneric("GetNextSmallerOrEqual", GetNextSmallerOrEqual, a, noElementValue, expectedResult)
 }
 
+// ======== testGetNextGreater ====== //
 func testGetNextGreater1() {
 	a := []int{1, 2, 3, 4, 5}
 	noElementValue := -1
@@ -217,6 +244,65 @@ func testGetNextGreaterSuite() {
 	testGetNextGreater4()
 }
 
+// ======== testGetNextGreaterOrEqual ====== //
+func testGetNextGreaterOrEqual1() {
+	a := []int{1, 2, 3, 4, 5}
+	noElementValue := -1
+	expectedResult := []int{2, 3, 4, 5, -1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqual2() {
+	a := []int{1}
+	noElementValue := -1
+	expectedResult := []int{-1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqual3() {
+	a := []int{10, 1, 1, 6}
+	noElementValue := -1
+	expectedResult := []int{-1, 1, 6, -1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqual4() {
+	a := []int{1, 1, 1, 1}
+	noElementValue := -1
+	expectedResult := []int{1, 1, 1, -1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqual5() {
+	a := []int{5, 4, 3, 2, 1}
+	noElementValue := -1
+	expectedResult := []int{-1, -1, -1, -1, -1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqual6() {
+	a := []int{5, 5, 4, 6, 9, 1}
+	noElementValue := -1
+	expectedResult := []int{5, 6, 6, 9, -1, -1}
+
+	testGetNextGreaterOrEqual(a, noElementValue, expectedResult)
+}
+
+func testGetNextGreaterOrEqualSuite() {
+	testGetNextGreaterOrEqual1()
+	testGetNextGreaterOrEqual2()
+	testGetNextGreaterOrEqual3()
+	testGetNextGreaterOrEqual4()
+	testGetNextGreaterOrEqual5()
+	testGetNextGreaterOrEqual6()
+}
+
+// ======== testGetNextSmaller ====== //
 func testGetNextSmaller1() {
 	a := []int{1, 2, 3, 4, 5}
 	noElementValue := -1
@@ -274,6 +360,7 @@ func testGetNextSmallerSuite() {
 	testGetNextSmaller6()
 }
 
+// ======== testGetNextSmallerOrEqual ====== //
 func testGetNextSmallerOrEqual1() {
 	a := []int{1, 2, 3, 4, 5}
 	noElementValue := -1
@@ -333,6 +420,7 @@ func testGetNextSmallerOrEqualSuite() {
 
 func main() {
 	testGetNextGreaterSuite()
+	testGetNextGreaterOrEqualSuite()
 	testGetNextSmallerSuite()
 	testGetNextSmallerOrEqualSuite()
 }
