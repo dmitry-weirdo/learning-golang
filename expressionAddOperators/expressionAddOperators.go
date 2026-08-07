@@ -38,8 +38,9 @@ func dfs(pos int, previousOperand int, currentValue int, expression string) {
 	}
 
 	// try all possible lengths of the string starting with the current pos
+	// i.e. from [pos:pos-1) to [pos:len)
 	for endIndex := pos + 1; endIndex <= len(s); endIndex++ {
-		operandString := s[pos:endIndex]
+		operandString := s[pos:endIndex] // endIndex is non-inclusive
 
 		fmt.Printf("Pos %v, possible operand starting with this pos: %v \n", pos, operandString)
 
@@ -48,7 +49,7 @@ func dfs(pos int, previousOperand int, currentValue int, expression string) {
 			break
 		}
 
-		// this is O(n), we need to procceed the complete string
+		// this is O(n), we need to proceed the complete string
 		operandInt, _ := strconv.Atoi(operandString) // error should never happen
 
 		// todo: exclude handing for pos == 0?
