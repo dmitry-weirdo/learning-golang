@@ -36,7 +36,7 @@ func longestDupSubstring_RabinKarp_Optimized(s string) string {
 		}
 	}
 
-	if left == 1 { // no repeating substrings even with length 1, i.e.
+	if left == 1 { // no repeating substrings even with length 1, i.e. all the characters in the string are different
 		return ""
 	}
 
@@ -69,7 +69,7 @@ func longestDupSubstring_RabinKarp(s string) string {
 		}
 	}
 
-	if left == 1 { // no repeating substrings even with length 1, i.e.
+	if left == 1 { // no repeating substrings even with length 1, i.e. all the characters in the string are different
 		return ""
 	}
 
@@ -102,7 +102,7 @@ func longestDupSubstring_BruteForce(s string) string {
 		}
 	}
 
-	if left == 1 { // no repeating substrings even with length 1, i.e.
+	if left == 1 { // no repeating substrings even with length 1, i.e. all the characters in the string are different
 		return ""
 	}
 
