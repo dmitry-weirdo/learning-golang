@@ -1,11 +1,10 @@
 package main
 
-import "fmt"
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
+import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	"fmt"
+)
 
 func reverseKGroup(head *ListNode, k int) *ListNode {
 	// use dummy node to have prev even for the old head
@@ -23,7 +22,7 @@ func reverseKGroup(head *ListNode, k int) *ListNode {
 		fmt.Printf("Previous = %v, node = %v. Searching for the next %v elements... \n", previous.Val, node.Val, k)
 
 		// count K elements
-		for i := 0; i < k; i++ {
+		for range k {
 			if node.Next == nil {
 				fmt.Printf("Node %v. No next node and not enough for %v nodes in the next group after the node %v. Do nothing for this remaining part of the list. \n", node.Val, k, previous.Val)
 				endedBeforeKElements = true
@@ -60,7 +59,7 @@ func reverseKGroup(head *ListNode, k int) *ListNode {
 			firstElementInTheGroup.Next = next
 
 			fmt.Printf("Reversed a group of %v elements: \n", k)
-			printList(dummyHead)
+			listsCommon.PrintList(dummyHead)
 
 			// jump to the next group
 			previous = firstElementInTheGroup
@@ -87,96 +86,93 @@ func reverse(head *ListNode) *ListNode {
 	return prev
 }
 
-func printList(head *ListNode) {
-	n := head
-
-	for n != nil {
-		fmt.Printf("%v ", n.Val)
-
-		n = n.Next
-	}
-
-	fmt.Println()
-}
-
-func generateLinkedList(values []int) *ListNode {
-	head := &ListNode{Val: values[0]}
-
-	n := head
-
-	for i := 1; i < len(values); i++ {
-		newNode := &ListNode{Val: values[i]}
-
-		n.Next = newNode
-		n = n.Next
-	}
-
-	return head
-}
-
-func test(arr []int, k int) {
+func test(arr []int, k int, expectedResult []int) {
 	fmt.Println("")
 	fmt.Println("=============================")
 
-	list := generateLinkedList(arr)
+	list := listsCommon.ArrayToList(arr)
 
 	fmt.Println("Original list:")
-	printList(list)
+	listsCommon.PrintList(list)
 
-	reversedList := reverseKGroup(list, k)
+	fmt.Printf("K (k-group size): %v \n", k)
+
+	result := reverseKGroup(list, k)
+	resultAsArray := listsCommon.ListToArray(result)
 
 	fmt.Printf("Reversed by %v-groups list: \n", k)
-	printList(reversedList)
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
 }
 
 func test1() {
 	arr := []int{1, 2, 3, 4, 5}
 	k := 2
+	expected := []int{2, 1, 4, 3, 5}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func test2() {
 	arr := []int{1, 2, 3, 4, 5}
 	k := 3
+	expected := []int{3, 2, 1, 4, 5}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func test3() {
 	arr := []int{1, 2, 3, 4}
 	k := 2
+	expected := []int{2, 1, 4, 3}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func test4() {
 	arr := []int{1}
 	k := 2
+	expected := []int{1}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func test5() {
 	arr := []int{1}
 	k := 1
+	expected := []int{1}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func test6() {
 	arr := []int{1, 2, 3}
 	k := 3
+	expected := []int{3, 2, 1}
 
-	test(arr, k)
+	test(arr, k, expected)
 }
 
 func main() {
 	// 25. Reverse Nodes in k-Group
-	//test1()
-	//test2()
-	//test3()
-	//test4()
-	//test5()
+	test1()
+	test2()
+	test3()
+	test4()
+	test5()
 	test6()
 }
