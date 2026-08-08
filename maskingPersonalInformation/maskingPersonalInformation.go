@@ -28,13 +28,13 @@ func handleEmail(s string) string {
 }
 
 func handlePhone(s string) string {
-	// strings.Map
+	// strings.Map can replace multiple characters in one run
 	numbersOnly := strings.Map(func(r rune) rune {
 		if ('0' <= r) && (r <= '9') {
 			return r
 		}
 
-		return -1
+		return -1 // skip character
 	}, s)
 
 	lastFourDigits := numbersOnly[len(numbersOnly)-4:]
@@ -55,6 +55,7 @@ func handlePhone(s string) string {
 		return "+***-***-***-" + lastFourDigits
 	}
 
+	// this must never happen, phone string (numbers only) should always have a length in [10; 13] range
 	panic(fmt.Sprintf("Illegal country code length: %v", countryCodeLen))
 }
 
