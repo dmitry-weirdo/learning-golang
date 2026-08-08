@@ -102,7 +102,7 @@ func isPossible_optimized(target []int) bool {
 
 		rest := sum - biggest
 
-		if rest == 1 { // reached 1, this will only happen if rest is 1 element, i.e. there are n = 2 elements in the array
+		if rest == 1 { // reached 1 as the remaining elements sum, this will only happen if rest is 1 element, i.e. there are n = 2 elements in the array
 			return true
 		}
 
@@ -111,7 +111,7 @@ func isPossible_optimized(target []int) bool {
 		oldValueOfBiggest := biggest % rest // !!! optimization for the quick decrease of oldBiggest
 
 		if (oldValueOfBiggest < 1) || // we decreased to less than 1 -> fail, impossible to deconstruct
-			(oldValueOfBiggest == biggest) { // biggest is replaced with the same modulus infinitely -> impossible to decrease -> return
+			(oldValueOfBiggest == biggest) { // biggest is replaced with the same modulus infinitely -> impossible to decrease -> return false
 			return false
 		}
 
