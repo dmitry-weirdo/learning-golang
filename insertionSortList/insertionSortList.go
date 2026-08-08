@@ -1,13 +1,10 @@
 package main
 
 import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
 	"fmt"
 )
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
 
 func insertionSortList(head *ListNode) *ListNode {
 	if head == nil {
@@ -29,7 +26,7 @@ func insertionSortList(head *ListNode) *ListNode {
 		fmt.Println("============================")
 		fmt.Printf("Handling next node %v \n", node.Val)
 		fmt.Printf("Previous of node: %v \n", previousOfNode.Val)
-		printList(start)
+		listsCommon.PrintList(start)
 
 		// up to what node we go on insertion
 		next := node.Next
@@ -99,65 +96,63 @@ func insertionSortList(head *ListNode) *ListNode {
 	return start
 }
 
-func printList(head *ListNode) {
-	var node = head
+func test(arr []int, expectedResult []int) { // linked list to linked list
+	fmt.Println()
+	fmt.Println("========================")
 
-	for node != nil {
-		fmt.Printf("%d ", node.Val)
+	list := listsCommon.ArrayToList(arr)
 
-		node = node.Next
+	fmt.Printf("Array: %v \n", arr)
+	fmt.Printf("Unsorted list from array: \n")
+	listsCommon.PrintList(list)
+
+	result := insertionSortList(list)
+	resultAsArray := listsCommon.ListToArray(result)
+
+	fmt.Printf("Sorted list: \n")
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
 	}
 
-	fmt.Println()
-}
-
-func arrayToList(arr []int) *ListNode {
-	var node *ListNode = nil
-
-	for i := len(arr) - 1; i >= 0; i-- {
-		nextNode := &ListNode{arr[i], node}
-
-		node = nextNode
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
 	}
-	return node
-}
-
-func test(arr []int) {
-	node := arrayToList(arr)
-
-	// node will be the head
-	fmt.Println("Unsorted list:")
-	printList(node)
-
-	sortedHead := insertionSortList(node)
-
-	fmt.Println()
-	fmt.Println("============================")
-	fmt.Println("Sorted list:")
-	printList(sortedHead)
 }
 
 func test1() {
 	arr := []int{4, 2, 1, 3}
+	expected := []int{1, 2, 3, 4}
 
-	test(arr)
+	test(arr, expected)
 }
 
 func test2() {
 	arr := []int{-1, 5, 3, 4, 0}
+	expected := []int{-1, 0, 3, 4, 5}
 
-	test(arr)
+	test(arr, expected)
 }
 
 func test3() {
 	//arr := []int{4, 3, 2, 1}
 	arr := []int{4, 2, 2, 1}
+	expected := []int{1, 2, 2, 4}
 
-	test(arr)
+	test(arr, expected)
 }
 
 func main() {
-	//test1()
-	//test2()
+	// 147. Insertion Sort List
+	test1()
+	test2()
 	test3()
 }

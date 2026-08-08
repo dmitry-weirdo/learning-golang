@@ -1,0 +1,93 @@
+package testsCommon
+
+import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	"fmt"
+)
+
+// common test formats to copy-paste just from this file instead of searching by many files
+
+func ListToListFunction(head *ListNode) *ListNode {
+	return head
+}
+
+func testListToList(arr []int, expectedResult []int) { // linked list to linked list
+	fmt.Println()
+	fmt.Println("========================")
+
+	list := listsCommon.ArrayToList(arr)
+
+	fmt.Printf("Array: %v \n", arr)
+	fmt.Printf("List from array: \n")
+	listsCommon.PrintList(list)
+
+	result := ListToListFunction(list) // todo: replace with your function
+	resultAsArray := listsCommon.ListToArray(result)
+
+	fmt.Printf("List with removed duplicates: \n") // todo: replace with your text
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
+func IntArrayToIntArrayFunction(arr []int) []int {
+	return arr
+}
+
+func testIntArrayToIntArray(arr []int, expectedResult []int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Array of building heights: %v \n", arr) // todo: replace with your text
+
+	result := IntArrayToIntArrayFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Indexes of building who have no next buildings with >= height: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
+func IntArrayToIntFunction(arr []int) int {
+	return len(arr)
+}
+
+func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
+
+	result := IntArrayToIntFunction(arr)
+
+	fmt.Printf("Last stone weight: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected last stone weight: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
