@@ -30,3 +30,17 @@ func ArrayToList(arr []int) *ListNode {
 
 	return node
 }
+
+func ListToArray(head *ListNode) []int {
+	n := head
+
+	result := make([]int, 0)
+
+	for n != nil {
+		result = append(result, n.Val)
+
+		n = n.Next
+	}
+
+	return result
+}
