@@ -3,6 +3,49 @@ package main
 import "fmt"
 
 func longestDupSubstring(s string) string {
+	return longestDupSubstring_RabinKarp_Optimized(s) // small optimization for powers pre-computation
+	//return longestDupSubstring_RabinKarp(s) // is some % faster than brute-force, I went like to 430 ms
+	//return longestDupSubstring_BruteForce(s) // brute-force passes but is slow, like 700+ms
+}
+
+func longestDupSubstring_RabinKarp_Optimized(s string) string {
+	// precalc powers of a for Rabin-Karp
+	a := 26              // base of power - 26 since we have just lowercase English characters
+	mod := 1_000_000_007 // all hashes (and big power calculations) are % mod. This should be a big prime number, to minimize the hash collisions
+	powers := precalculatePowers(a, mod, len(s)-1)
+
+	// Binary search for length of the substring
+	// since we're searching for "minimum value satisfying the condition",
+	// left will be "minimum length where repeating substring does NOT exist"
+
+	left := 1       // even substrings of length 1 can be non-repeating, if all chars in the string are unique
+	right := len(s) // Since we're searching for "minimum NOT repeating", we add 1. The sliding window for the repeating substring can have the size up to len(s) - 1.
+
+	for left < right {
+		mid := (left + right) / 2
+		//fmt.Printf("left: %v, right: %v, mid: %v \n", left, right, mid)
+
+		repeatingSubstringIndex := getRepeatingSubstringIndex_RabinKarp_optimized(s, mid, a, mod, powers) // Rabin-Karp
+
+		//fmt.Printf("Index of longest repeating substring of len %v: %v \n", mid, repeatingSubstringIndex)
+
+		if repeatingSubstringIndex == -1 { // target condition
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	if left == 1 { // no repeating substrings even with length 1, i.e.
+		return ""
+	}
+
+	firstIndex := getRepeatingSubstringIndex_RabinKarp_optimized(s, left-1, a, mod, powers) // Rabin-Karp
+
+	return s[firstIndex : firstIndex+left-1]
+}
+
+func longestDupSubstring_RabinKarp(s string) string {
 	// Binary search for length of the substring
 	// since we're searching for "minimum value satisfying the condition",
 	// left will be "minimum length where repeating substring does NOT exist"
@@ -36,8 +79,39 @@ func longestDupSubstring(s string) string {
 	return s[firstIndex : firstIndex+left-1]
 }
 
-// todo: implement this method using the Rabin-Karp algorithm
-func getRepeatingSubstringIndex(s string, substringLen int) int { // returns first index of repeating substring or -1
+func longestDupSubstring_BruteForce(s string) string {
+	// Binary search for length of the substring
+	// since we're searching for "minimum value satisfying the condition",
+	// left will be "minimum length where repeating substring does NOT exist"
+
+	left := 1       // even substrings of length 1 can be non-repeating, if all chars in the string are unique
+	right := len(s) // Since we're searching for "minimum NOT repeating", we add 1. The sliding window for the repeating substring can have the size up to len(s) - 1.
+
+	for left < right {
+		mid := (left + right) / 2
+		//fmt.Printf("left: %v, right: %v, mid: %v \n", left, right, mid)
+
+		repeatingSubstringIndex := getRepeatingSubstringIndex_BruteForce(s, mid) // brute-force
+
+		//fmt.Printf("Index of longest repeating substring of len %v: %v \n", mid, repeatingSubstringIndex)
+
+		if repeatingSubstringIndex == -1 { // target condition
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	if left == 1 { // no repeating substrings even with length 1, i.e.
+		return ""
+	}
+
+	firstIndex := getRepeatingSubstringIndex_BruteForce(s, left-1) // brute-force
+
+	return s[firstIndex : firstIndex+left-1]
+}
+
+func getRepeatingSubstringIndex_BruteForce(s string, substringLen int) int { // returns first index of repeating substring or -1
 	// this is brute-force
 
 	// substring to first index
@@ -57,12 +131,8 @@ func getRepeatingSubstringIndex(s string, substringLen int) int { // returns fir
 	return -1
 }
 
-func getRepeatingSubstringIndex_RabinKarp(s string, substringLen int) int { // returns first index of repeating substring or -1
+func getRepeatingSubstringIndex_RabinKarp_optimized(s string, substringLen int, a int, mod int, powers []int) int { // returns first index of repeating substring or -1
 	// Rabin-Karp algorithm - sliding window adopted to check whether there are substrings with the same hash.
-
-	// todo: power pre-calculations can be done once for all the lengths up to ( len(s) - 1 ) and then re-used
-	a := 26              // base of power - 26 since we have just lowercase English characters
-	mod := 1_000_000_007 // all hashes (and big power calculations) are % mod. This should be a big prime number, to minimize the hash collisions
 
 	// c[i] - characters of the substring
 
@@ -74,13 +144,7 @@ func getRepeatingSubstringIndex_RabinKarp(s string, substringLen int) int { // r
 	hash := 0
 
 	// precalc a^n powers for [0..l-1], every value % mod
-	powers := make([]int, substringLen)
-
 	aPower := 1
-	for i := range substringLen {
-		powers[i] = aPower
-		aPower = (aPower * a) % mod
-	}
 
 	//fmt.Printf("Powers of %v mod %v: %v \n", a, mod, powers)
 
@@ -117,20 +181,121 @@ func getRepeatingSubstringIndex_RabinKarp(s string, substringLen int) int { // r
 
 		// !!! + mod is to avoid negative values when (hash < toSubtract)
 		hash = (hash - toSubtract + mod) % mod // oldHash - ( c[oldFirst] * a^(n-1) )
-		if hash < 0 {
-			fmt.Printf("!!! Hash is negative (1): %v \n", hash)
-		}
-
+		/*		if hash < 0 {
+					fmt.Printf("!!! Hash is negative (1): %v \n", hash)
+				}
+		*/
 		hash = (a * hash) % mod // a * ( oldHash - ( c[oldFirst] * a^(n-1) ) )
-		if hash < 0 {
-			fmt.Printf("!!! Hash is negative (2): %v \n", hash)
-		}
-
+		/*		if hash < 0 {
+					fmt.Printf("!!! Hash is negative (2): %v \n", hash)
+				}
+		*/
 		hash = (hash + charToInt(lastChar)*powers[0]) % mod // a * ( oldHash - ( c[oldFirst] * a^(n-1) ) ) + c[newLastChar] * a^0, a^0 = 1
-		if hash < 0 {
-			fmt.Printf("Hash is negative (3): %v \n", hash)
-		}
+		/*		if hash < 0 {
+					fmt.Printf("Hash is negative (3): %v \n", hash)
+				}
+		*/
+		//fmt.Printf("Hash for substring[%v:%v] = \"%v\": %v \n", i, i+substringLen-1, s[i:i+substringLen], hash)
 
+		if (m[hash] != nil) && (len(m[hash]) > 0) { // hash is already present
+			//fmt.Printf("Hash %v is already present in the map: m[%v] = %v \n", hash, hash, m[hash])
+
+			// for every starting index for this hash, check whether this is the same substring as the current substring.
+			// we're doing these checks to avoid different substrings with the same hash
+			for _, startIndex := range m[hash] {
+				// todo: maybe comparison char-by-char is more effective?
+				existingSubstring := s[startIndex : startIndex+substringLen]
+				currentSubstring := s[i : i+substringLen]
+
+				if existingSubstring == currentSubstring {
+					//fmt.Printf("Substring [%v:%v] = \"%v\" is the same as the current substring [%v:%v] = \"%v\". Returning startIndex = %v. \n", startIndex, startIndex+substringLen, existingSubstring, i, i+substringLen, currentSubstring, startIndex)
+					return startIndex
+				}
+			}
+
+			//panic(fmt.Sprintf("Hash collision for hash %v: old indexes = %v, current index = %v \n", hash, m[hash], i))
+
+			// no same substring found -> add the current index to the list of strings with the same hash
+			m[hash] = append(m[hash], i)
+
+		} else { // hash is not yet present -> add index i for this  hash
+			m[hash] = []int{i}
+		}
+	}
+
+	return -1
+}
+
+func getRepeatingSubstringIndex_RabinKarp(s string, substringLen int) int { // returns first index of repeating substring or -1
+	// Rabin-Karp algorithm - sliding window adopted to check whether there are substrings with the same hash.
+
+	// todo: power pre-calculations can be done once for all the lengths up to ( len(s) - 1 ) and then re-used
+	a := 26              // base of power - 26 since we have just lowercase English characters
+	mod := 1_000_000_007 // all hashes (and big power calculations) are % mod. This should be a big prime number, to minimize the hash collisions
+
+	// c[i] - characters of the substring
+
+	// n - string length
+	// hash = c[0] * a^(n-1) + c[1] * a^(n-2) + ... + c[l-2]*a^1 + c[l-1]*a^0
+	// !!! to avoid epic overflows on a^x, we always mod the intermediate results by mod
+
+	// first, we calculate the hash for the substring starting with s[0]
+	hash := 0
+
+	// precalc a^n powers for [0..l-1], every value % mod
+	powers := precalculatePowers(a, mod, substringLen)
+
+	aPower := 1
+
+	//fmt.Printf("Powers of %v mod %v: %v \n", a, mod, powers)
+
+	for i := range substringLen {
+		ch := charToInt(s[i])
+
+		n := substringLen - i - 1 // power of A. Len = 4, i = 0, c[0]*a^3, 3 = (len - i - 1)
+
+		aPower = powers[n]
+		//fmt.Printf("%v^%v mod %v = %v \n", a, n, mod, aPower)
+
+		hash += (ch * aPower % mod) % mod
+		hash = hash % mod // !!! += operation is adding a small value, but the sum should also be modded!
+	}
+
+	//fmt.Printf("Hash for first substring [%v:%v] = \"%v\" of length %v = %v \n", 0, substringLen, s[0:substringLen], substringLen, hash)
+
+	// map of hashes to index start
+	// !!! Since we expect that collisions can happen, we put multiple indexes for the same hash
+	m := make(map[int][]int)
+	m[hash] = []int{0} // first hash is for substring starting at index 0
+
+	for i := 1; i <= len(s)-substringLen; i++ {
+		// we calculate the next hash from previous hash
+
+		// we subtract c[oldFirst]*a^(n-1) from oldHash
+		// then all the values should be multiplied by a (because of their powers should now be increased)
+		// and then we add the last element (for last character of the new substring) that is c[l-1]*a^0
+		prevFirstChar := s[i-1]
+		lastChar := s[i+substringLen-1]
+		//fmt.Printf("Prev first char: %c, next last char: %c \n", prevFirstChar, lastChar)
+
+		toSubtract := (charToInt(prevFirstChar) * powers[substringLen-1]) % mod // c[oldFirst}*a^(n-1)
+
+		// !!! + mod is to avoid negative values when (hash < toSubtract)
+		hash = (hash - toSubtract + mod) % mod // oldHash - ( c[oldFirst] * a^(n-1) )
+		/*		if hash < 0 {
+					fmt.Printf("!!! Hash is negative (1): %v \n", hash)
+				}
+		*/
+		hash = (a * hash) % mod // a * ( oldHash - ( c[oldFirst] * a^(n-1) ) )
+		/*		if hash < 0 {
+					fmt.Printf("!!! Hash is negative (2): %v \n", hash)
+				}
+		*/
+		hash = (hash + charToInt(lastChar)*powers[0]) % mod // a * ( oldHash - ( c[oldFirst] * a^(n-1) ) ) + c[newLastChar] * a^0, a^0 = 1
+		/*		if hash < 0 {
+					fmt.Printf("Hash is negative (3): %v \n", hash)
+				}
+		*/
 		//fmt.Printf("Hash for substring[%v:%v] = \"%v\": %v \n", i, i+substringLen-1, s[i:i+substringLen], hash)
 
 		if (m[hash] != nil) && (len(m[hash]) > 0) { // hash is already present
@@ -162,6 +327,18 @@ func getRepeatingSubstringIndex_RabinKarp(s string, substringLen int) int { // r
 
 func charToInt(r byte) int {
 	return int(r - 'a') // convert to values 0-25
+}
+
+func precalculatePowers(a, mod, n int) []int {
+	powers := make([]int, n)
+
+	aPower := 1
+	for i := range n {
+		powers[i] = aPower
+		aPower = (aPower * a) % mod
+	}
+
+	return powers
 }
 
 func test(s string, expectedResult string) { // nodes can be null
@@ -203,11 +380,20 @@ func test4() {
 }
 
 func test5() {
-	// test-case 63/69, failing my Rabin-Karp implementation
-
+	// test-case 63 / 69, failing my Rabin-Karp implementation
+	// fixed: overflow because I skipped % mod in a couple of calculation places, notably when summing up the starting hash
 	test(
 		"okmzpmxzwjbfssktjtebhhxfphcxefhonkncnrumgduoaeltjvwqwydpdsrbxsgmcdxrthilniqxkqzuuqzqhlccmqcmccfqddncchadnthtxjruvwsmazlzhijygmtabbzelslebyrfpyyvcwnaiqkkzlyillxmkfggyfwgzhhvyzfvnltjfxskdarvugagmnrzomkhldgqtqnghsddgrjmuhpgkfcjkkkaywkzsikptkrvbnvuyamegwempuwfpaypmuhhpuqrufsgpiojhblbihbrpwxdxzolgqmzoyeblpvvrnbnsdnonhpmbrqissifpdavvscezqzclvukfgmrmbmmwvzfpxcgecyxneipexrzqgfwzdqeeqrugeiupukpveufmnceetilfsqjprcygitjefwgcvqlsxrasvxkifeasofcdvhvrpmxvjevupqtgqfgkqjmhtkyfsjkrdczmnettzdxcqexenpxbsharuapjmdvmfygeytyqfcqigrovhzbxqxidjzxfbrlpjxibtbndgubwgihdzwoywqxegvxvdgaoarlauurxpwmxqjkidwmfuuhcqtljsvruinflvkyiiuwiiveplnxlviszwkjrvyxijqrulchzkerbdyrdhecyhscuojbecgokythwwdulgnfwvdptzdvgamoublzxdxsogqpunbtoixfnkgbdrgknvcydmphuaxqpsofmylyijpzhbqsxryqusjnqfikvoikwthrmdwrwqzrdmlugfglmlngjhpspvnfddqsvrajvielokmzpmxzwjbfssktjtebhhxfphcxefhonkncnrumgduoaeltjvwqwydpdsrbxsgmcdxrthilniqxkqzuuqzqhlccmqcmccfqddncchadnthtxjruvwsmazlzhijygmtabbzelslebyrfpyyvcwnaiqkkzlyillxmkfggyfwgzhhvyzfvnltjfxskdarvugagmnrzomkhldgqtqnghsddgrjmuhpgkfcjkkkaywkzsikptkrvbnvuyamegwempuwfpaypmuhhpuqrufsgpiojhblbihbrpwxdxzolgqmzoyeblpvvrnbnsdnonhpmbrqissifpdavvscezqzclvukfgmrmbmmwvzfpxcgecyxneipexrzqgfwzdqeeqrugeiupukpveufmnceetilfsqjprcygitjefwgcvqlsxrasvxkifeasofcdvhvrpmxvjevupqtgqfgkqjmhtkyfsjkrdczmnettzdxcqexenpxbsharuapjmdvmfygeytyqfcqigrovhzbxqxidjzxfbrlpjxibtbndgubwgihdzwoywqxegvxvdgaoarlauurxpwmxqjkidwmfuuhcqtljsvruinflvkyiiuwiiveplnxlviszwkjrvyxijqrulchzkerbdyrdhecyhscuojbecgokythwwdulgnfwvdptzdvgamoublzxdxsogqpunbtoixfnkgbdrgknvcydmphuaxqpsofmylyijpzhbqsxryqusjnqfikvoikwthrmdwrwqzrdmlugfglmlngjhpspvnfddqsvrajviel",
 		"okmzpmxzwjbfssktjtebhhxfphcxefhonkncnrumgduoaeltjvwqwydpdsrbxsgmcdxrthilniqxkqzuuqzqhlccmqcmccfqddncchadnthtxjruvwsmazlzhijygmtabbzelslebyrfpyyvcwnaiqkkzlyillxmkfggyfwgzhhvyzfvnltjfxskdarvugagmnrzomkhldgqtqnghsddgrjmuhpgkfcjkkkaywkzsikptkrvbnvuyamegwempuwfpaypmuhhpuqrufsgpiojhblbihbrpwxdxzolgqmzoyeblpvvrnbnsdnonhpmbrqissifpdavvscezqzclvukfgmrmbmmwvzfpxcgecyxneipexrzqgfwzdqeeqrugeiupukpveufmnceetilfsqjprcygitjefwgcvqlsxrasvxkifeasofcdvhvrpmxvjevupqtgqfgkqjmhtkyfsjkrdczmnettzdxcqexenpxbsharuapjmdvmfygeytyqfcqigrovhzbxqxidjzxfbrlpjxibtbndgubwgihdzwoywqxegvxvdgaoarlauurxpwmxqjkidwmfuuhcqtljsvruinflvkyiiuwiiveplnxlviszwkjrvyxijqrulchzkerbdyrdhecyhscuojbecgokythwwdulgnfwvdptzdvgamoublzxdxsogqpunbtoixfnkgbdrgknvcydmphuaxqpsofmylyijpzhbqsxryqusjnqfikvoikwthrmdwrwqzrdmlugfglmlngjhpspvnfddqsvrajviel",
+	)
+}
+
+func test6() {
+	// testcase 30 / 69
+	// !!! hash-collision, wow, string of len 85 for start indexes 2685 and 3776
+	test(
+		"dcecccaedebdcedcbaaddbbdbccbcbdcecbddaaedecbeccdeabdceebcaaeccbbcdcdaceceeacedadcdddbbbaedeaebbbecbeebdcdebadabaecacdeeeabeaaaeacbdacedabbadcbeddebbbcebedeecdbebbdbcebacebdaaceabdbdcaebddeaeccaccbcebdacddbdddbadecbadaacaadcdececadeebbacedebeddcaacedacbcaadecdeecddbdbbbcccedeaaeecededdaccddbdccdcdddddcdacceabbcebdebddbcbbaaababceebdaaeababeacaeddccecadebeceeddaddbdbdebcbceceeacedcaedcebeeeadbbecdecaeabaeedbdddaececeebcaddbcaaeebcbeccbedcdeccebeebdbaceddebddabebbabbcedbbedacecbaebaaedbeaeaebbaaeeeebbbbeecdecdcedbcdbbbdcaecdbbcadbeebaebcaebccadecdccabbddbddeaeeaecccbeacdcbeadadadacbceaaeceebcdcddceeebebedececacadbedeeebdecadbebebebecaeeecbdceecdcacadceadcceaebcbaceeceeaaedecaddbaacacdbedebeeccadbccdeccdcadcdaadbabddbbdaacbaaaceeecaadcabadbeecadeebbdcebabedcddbebdcbaccdaabebcbacbedadeacbbcacadbdabbaccadadddeabdcbbdeacdbeededdecebceacabdceaeaaeaacbbbacabccedddeceadceedacccedaaceadeabccbdaeadcabbccadaecddebbadeecadccbacebdaabbeacdccaedeeeaaadaaaddebeadcbbdcebeeaebecdbacccbaeadcbacabbbeedeaaccaebddaaceadebeedebabdbbecebeabddeeecaeedddabacbbdbddebbadadcbeacecdaabcaeddceebceebaecccadeecbbdbeaeedcdeaabadcdeaebaaaadbdadeeaadadcabeceadbbdedadaaaecdacdbcedbeabcbeaeacaecebdeaedacbcbeaebcabdaabaddecadbeaecdcbebbbccbbddbccdebaaeecccddaaeccedebabacdeecbbbbccdedcbcebeceedcaacbeaacabdbbeeebdcddbceebdaddacadadceaaeecabaecadcdabbccaabcdbeededadcbecbebcdceabccecbebbbccbcddccebdeacbebabeecbebacceecbdddeeeeabeaabcdbecbbdacdccadbeeaccecdbcddcdacbaddcacdacdbebeaabdadeaadcacedcccdcdbddaaebacecbdccdbaabdecadddedcbbaaacdeaddcdcebcaeccbcbcdaaeceabaedeeeadebcaadbbedbccbaabdbdccbabceabeeccbbadbaecedddccedaeaabcbaaeabcdbdbdaabcedbbbdbeabaedcbdabeeabbadecadeadabcbdaebdbcbecccaaeadcaaebcccdacabdbecebbedaaeebcadbeeeebebccdaceedecdedceaceaeabccbebaccebdceabbdadcdccbeeebbbbaedebecbbbeabebdabdcdcbcbedaedcbcaebbccdbacdccbbcbadcbbaccbebaaabaaaedccdceecababeacddacceeabeaabaaeccceccecddeecdadedeaadabaccabbadaaecbebccbabaadcbecebedbaececeabdebcadaddcaebeeabbebedeadcdccbadabcecbacecbdbccebcbbaadceadbacadeeebcddcdddccaeaababdcddeebaaddcbcaaddceedacdaaeaadcedeeaeaddebdabaddddbadccbdbebcecdccebeebdcccbeedbcceebbadcdebaeedbecccdbaedcdbcbbaaaaabbbdaddabdbbeebdeabedededbdbcecedadbaebddcabbbabecacdedccbeaacaeaccadcbeebaadceddbdacbbadccacbadcdddabcccaababebdceeddcaebbaebeeedabdbcacabdcbaceabcccdcacacbbaeeaaddedaabccaabbeaccaceecbaacbeebcbeaecdbcaeaaaedcdbebcaaaaacaabbbbccbceebbbaaaceccabdeceeeddbabadddeeaaebbabbeaadaacacdebbaadbaeebbdebbabbbbbeadbebadacdcdbaccaebaadccbabcadccbeaacadeabcadebbcadabaaaaeccaddbbebcdabdededddeadcbceacebaeeddeaebedbebaeabebcadcdbccdbdbdeccaebddeaabccdaecebdededddcbbcacdcbaedcebdedaaceebccbcdababaeaacabcddaadacaadbadcdbbedaebddebedceddddceadeaebbebbaabdeabdcdabccdcedaddeaeddecdecbeebeedaadbcbbebcbeecedaabcacaabdbaecaeebeaedadbabecbaabbebadaccadeebeeebbecdcaecaeacadeabbadceaeccbcdbebaaabebaacdebbcaaeadccbebcebebebbedddacbbccbedbecbeaebecedacdcdbbebdaedeabcabaaaeebbdbbaddadcebbacecbaacddecbddeecbbedecedbbaebddeeacbcdedbdaddbbaecdccaedcebeeebaacaaabcbddccacbccbacdbebaeadbeaacacbceddbaeabaaaadaabbcddaabcabeeccabcebacdacbadbdebddaddeaabeebbbbbbacbdddecbaddcdeaaaeecbbcedcbecddbebeccaacaedabdacabdaabdbadccddedecdebadcdcadbedeecbdddaacdbdcadddacaedceacaecaebcecedeaeadbabccdbdeacebaccaabccccdcecaecadeaddeaeddabcbadedceebdaacdadebbeebdeedcecebdeecaaeccbcdddddadbbbcbaabccabebabdcdcaacadaaeebbbedbdecabcceeccabadbbaddcdbeaaeeadaddeebaecaedecccaadbdeddbbbeeceeaaccaedadddbaecacccadaeecdecabccabbebcacedbeadccddeaadacdcbeedeaeabcbccbbdcdaeedbcabaaccaccbdaacebacaecdacbebddbbbdddebacadaaadbdcbcaccdddeedbecbcdcbaeaacbabbeaeebbadadaebbccaebebdeeceecbabdebcebeaadebdbbddcaeddbcadeadaabdccdecdcaccaecccdeaaacdbdccadacbdbaaccdbddbecaacbcbbdbedecedecbaacadccaedbacabddaeccdecaaeeecadddeaaadcdaedeadedbeeccccabeadaebcaaecacebdcdaaadedccacdceaeededcaaedceccedccebdacbececeeaebaecbdeecdbaeeeeeadececcdcabbddadecdddabdeeedccabbaebddedecccacdbdcbbcddcaecbdaddcadacbbccceccecacddcbaedcbbeecedbeecdeaaeeeecdcabcebecbcebbceabaddeacaedaabadebcecdadbebcbbeeaceaacbdcaabacadaebebcdceeeacaacaddeaadabaceeecbccbecbdabebebccdadeedaadaecceacaabeacdaebeecbdcbbdeddbeebdadbabbeaddbcdccdbcebddaebeddcaecdededebebdaabdddaecedddabbeeebadbbbdebeeecbbebaebdeebceaeaedbecbbcadadbeacceeecbabaeadbdedccbbbbaabeabbbdadceedaaddcbbceadbbaebebebbdeadcaabdeebaaebbeecaddecccbddcdebadcebbaacddbbeecadbcaebdebaaeeaadbaeeeedbcabebceccebabbeebcddebcdbdabcbcbbcadecbdacedadacdbbebeebaddecbccaeaeccedbcddededdecbcecdeaabeceeadbcbeaaccaeccceadecaaacbaaccaccbeeeceddadaabdeeaedbcceabeabbbcaeededdcdcbdbbedecbbdbeeeccadcadedeacbbcdbebcbeaedbcbdbdabbdcacacadeedbebddeddccaeebceddeeebdbbabcaebdbdbedeeadbabaadddcaabbbbcabeeddbbadabacceabcbceddeceadcdbaeadaedebecdecbdbabdcacddbccbaedcceabbecabdacbdcbaeaeccceecabbaeaecdeadabaeeedeeadeebbacdaceadedecedebbbcbaccaacebbebadaeaecbeebadaaceaabebdbddeecedcbcbcdbcdaccacbbbdaddacbcaaaebdcadbcaeeaacacebeebaeeecbdeedddcebcbeaabdedbaddabcadbbaeadccdbcebddadebaaabcaeadcedaadcaeedcbbcdbcdbcdcbdcebaaadededdccebebbedcadeadeeadeebbdceebdddacebdedbbcdabbcdacbbdcccacdbacbbaeeeacbedceaedebbacdbeebaebbaeacaccaecdeacbbaacaceebedaacdcebaaacadcdeceaeeadcadceaeeabeecaabbabbebdecdcadadebabddbabebdbadeabcdadbbcaadcdbdbabddebcbcbeddabbcabaebcbccddbbbbebdbdabcdcddbdbceecadbadadbdcbadedecdcbaebcaaddbeebceaceeaacceabcacaccddcebcabbebddecddbedbddaeadebbcdccddeebebbaceaaeeebcdceeebdccbaababcdcbdcebbbbcaeccecaadcaeabababbcdaeaecdcbaddbacbaeecdcdecccabcddbbbcdcadadabcbcedaadaacceaededbaecaeadabdcd",
+		"dccdbcebdda",
 	)
 }
 
@@ -220,4 +406,5 @@ func main() {
 	test3()
 	test4()
 	test5()
+	test6()
 }
