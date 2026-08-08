@@ -44,6 +44,40 @@ func testListToList(arr []int, expectedResult []int) { // linked list to linked 
 	}
 }
 
+func TwoListsToListFunction(l1, l2 *ListNode) *ListNode {
+	return l1
+}
+
+func testTwoListsToList(a1 []int, a2 []int, expectedResult []int) {
+	fmt.Println()
+	fmt.Println("===========================")
+
+	l1 := listsCommon.ArrayToList(a1)
+	l2 := listsCommon.ArrayToList(a2)
+
+	fmt.Println("List 1:")
+	listsCommon.PrintList(l1)
+
+	fmt.Println("List 2:")
+	listsCommon.PrintList(l2)
+
+	result := TwoListsToListFunction(l1, l2) // todo: replace with your function
+	resultAsArray := listsCommon.ListToArray(result)
+
+	fmt.Println("Sum list:") // todo: replace with your text
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func IntArrayToIntArrayFunction(arr []int) []int {
 	return arr
 }

@@ -1,11 +1,10 @@
 package main
 
-import "fmt"
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
+import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	"fmt"
+)
 
 func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
 	dummyHead := &ListNode{Val: -1}
@@ -73,64 +72,63 @@ func mergeTwoLists(list1 *ListNode, list2 *ListNode) *ListNode {
 	return dummyHead.Next
 }
 
-func arrayToList(arr []int) *ListNode {
-	var node *ListNode = nil
-
-	for i := len(arr) - 1; i >= 0; i-- {
-		nextNode := &ListNode{arr[i], node}
-
-		node = nextNode
-	}
-
-	return node
-}
-
-func printList(head *ListNode) {
-	var node = head
-
-	for node != nil {
-		fmt.Printf("%d ", node.Val)
-
-		node = node.Next
-	}
-
+func test(a1 []int, a2 []int, expectedResult []int) {
 	fmt.Println()
-}
+	fmt.Println("===========================")
 
-func test(a1, a2 []int) {
-	fmt.Println()
-	fmt.Println("=======================")
-
-	l1 := arrayToList(a1)
-	l2 := arrayToList(a2)
+	l1 := listsCommon.ArrayToList(a1)
+	l2 := listsCommon.ArrayToList(a2)
 
 	fmt.Println("Sorted list 1:")
-	printList(l1)
+	listsCommon.PrintList(l1)
 
 	fmt.Println("Sorted list 2:")
-	printList(l2)
+	listsCommon.PrintList(l2)
 
-	mergedList := mergeTwoLists(l1, l2)
+	result := mergeTwoLists(l1, l2) // todo: replace with your function
+	resultAsArray := listsCommon.ListToArray(result)
 
-	fmt.Println("Merged list:")
-	printList(mergedList)
+	fmt.Println("Merged sorted list:")
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
 }
 
 func test1() {
 	a1 := []int{1, 2, 4}
 	a2 := []int{1, 3, 5}
+	expected := []int{1, 1, 2, 3, 4, 5}
 
-	test(a1, a2)
+	test(a1, a2, expected)
 }
 
 func test2() {
 	a1 := []int{}
 	a2 := []int{}
+	expected := []int{}
 
-	test(a1, a2)
+	test(a1, a2, expected)
+}
+
+func test3() {
+	a1 := []int{1, 2, 4}
+	a2 := []int{1, 3, 4}
+	expected := []int{1, 1, 2, 3, 4, 4}
+
+	test(a1, a2, expected)
 }
 
 func main() {
+	// 21. Merge Two Sorted Lists
 	test1()
 	test2()
+	test3()
 }
