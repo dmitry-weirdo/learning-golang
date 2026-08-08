@@ -1,13 +1,10 @@
 package main
 
 import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
 	"fmt"
 )
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
 
 func isPalindrome(head *ListNode) bool {
 	// find the middle of the list
@@ -28,7 +25,7 @@ func isPalindrome(head *ListNode) bool {
 	slow.Next = nil
 
 	fmt.Println("Disconnected the 2nd half, 1st half is: ")
-	printList(head)
+	listsCommon.PrintList(head)
 
 	// reverse the 2nd path
 	// middle itself must not be reversed? At least in case of odd count
@@ -46,7 +43,7 @@ func isPalindrome(head *ListNode) bool {
 	secondHalfHead = previous
 
 	fmt.Println("2nd half of the list, reversed:")
-	printList(secondHalfHead)
+	listsCommon.PrintList(secondHalfHead)
 
 	// compare 1st and 2nd half (reversed), up to minimal length (1st half may be +1 length for odd number of initial nodes)
 	n1 := head
@@ -64,21 +61,9 @@ func isPalindrome(head *ListNode) bool {
 	return true
 }
 
-func printList(head *ListNode) {
-	n := head
-
-	for n != nil {
-		fmt.Printf("%v ", n.Val)
-
-		n = n.Next
-	}
-
-	fmt.Println()
-}
-
 func reverseList(head *ListNode) *ListNode { // returns the new head (was tail)
 	fmt.Println("Original list:")
-	printList(head)
+	listsCommon.PrintList(head)
 
 	var previous *ListNode = nil
 	current := head
@@ -94,7 +79,7 @@ func reverseList(head *ListNode) *ListNode { // returns the new head (was tail)
 	head = previous
 
 	fmt.Println("Reversed list:")
-	printList(head)
+	listsCommon.PrintList(head)
 
 	return head
 }
@@ -113,47 +98,40 @@ func reverseListRecursive(node *ListNode) *ListNode {
 	return nextHead
 }
 
-func generateLinkedList(values []int) *ListNode {
-	head := &ListNode{Val: values[0]}
+func test(values []int, expectedResult bool) {
+	fmt.Println()
+	fmt.Println("===========================")
 
-	n := head
-
-	for i := 1; i < len(values); i++ {
-		newNode := &ListNode{Val: values[i]}
-
-		n.Next = newNode
-		n = n.Next
-	}
-
-	return head
-}
-
-func runTest(values []int) {
-	list := generateLinkedList(values)
+	list := listsCommon.ArrayToList(values)
 
 	fmt.Println()
 	fmt.Println("========================")
 	fmt.Printf("List: ")
-	printList(list)
+	listsCommon.PrintList(list)
 
-	palindrome := isPalindrome(list)
-	fmt.Printf("List of %v is a palindrome: %v \n", values, palindrome)
+	result := isPalindrome(list)
+	fmt.Printf("List of %v is a palindrome: %v \n", values, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
 }
 
 func test1() {
-	runTest([]int{1, 2, 3, 2, 1})
+	test([]int{1, 2, 3, 2, 1}, true)
 }
 
 func test2() {
-	runTest([]int{1, 2, 2, 1})
+	test([]int{1, 2, 2, 1}, true)
 }
 
 func test3() {
-	runTest([]int{1, 2, 300, 200, 100})
+	test([]int{1, 2, 300, 200, 100}, false)
 }
 
 func test4() {
-	runTest([]int{1})
+	test([]int{1}, true)
 }
 
 func main() {
@@ -168,7 +146,7 @@ func main() {
 	fmt.Println("========================")
 
 	values := []int{10, 20, 30, 40, 50}
-	list := generateLinkedList(values)
+	list := listsCommon.ArrayToList(values)
 	//reversedList := reverseList(list)
 	reversedList := reverseListRecursive(list)
 	reverseList(reversedList)

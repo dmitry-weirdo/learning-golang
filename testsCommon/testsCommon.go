@@ -8,6 +8,7 @@ import (
 
 // common test formats to copy-paste just from this file instead of searching by many files
 
+// ==================== Linked List functions ==================== //
 func ListToListFunction(head *ListNode) *ListNode {
 	return head
 }
@@ -78,6 +79,32 @@ func testTwoListsToList(a1 []int, a2 []int, expectedResult []int) {
 	}
 }
 
+func ListToBooleanFunction(head *ListNode) bool {
+	return false
+}
+
+func testListToBoolean(values []int, expectedResult bool) {
+	fmt.Println()
+	fmt.Println("===========================")
+
+	list := listsCommon.ArrayToList(values)
+
+	fmt.Println()
+	fmt.Println("========================")
+	fmt.Printf("List: ")
+	listsCommon.PrintList(list)
+
+	result := ListToBooleanFunction(list) // todo: replace with your function
+
+	fmt.Printf("List of %v is a palindrome: %v \n", values, result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+// ==================== []int int arrays functions ==================== //
 func IntArrayToIntArrayFunction(arr []int) []int {
 	return arr
 }
