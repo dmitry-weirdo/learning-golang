@@ -2,13 +2,10 @@ package main
 
 import (
 	"container/heap"
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
 	"fmt"
 )
-
-type ListNode struct { // this is provided by LeetCode precompiled classes -> do not copy it into the solution
-	Val  int
-	Next *ListNode
-}
 
 // we implement heap.Interface that extends sort.Interface with Push() and Pop() methods
 
@@ -107,55 +104,21 @@ func testPriorityQueue() {
 	}
 }
 
-func printList(head *ListNode) {
-	var node = head
-
-	for node != nil {
-		fmt.Printf("%d ", node.Val)
-
-		node = node.Next
-	}
-
-	fmt.Println()
-}
-
-func arrayToList(arr []int) *ListNode {
-	var node *ListNode = nil
-
-	for i := len(arr) - 1; i >= 0; i-- {
-		nextNode := &ListNode{arr[i], node}
-
-		node = nextNode
-	}
-	return node
-}
-
-func arraysToLists(arrays ...[]int) []*ListNode {
-	lists := make([]*ListNode, len(arrays))
-
-	for i, arr := range arrays {
-		list := arrayToList(arr)
-		lists[i] = list
-	}
-
-	return lists
-}
-
 func test(arrays ...[]int) {
 	fmt.Println()
 	fmt.Println("===================")
 
-	lists := arraysToLists(arrays...) // note the ... trick, without it arrays will have type [][]int
+	lists := listsCommon.ArraysToLists(arrays...) // note the ... trick, without it arrays will have type [][]int
 
 	fmt.Println("Initial lists:")
 	for _, list := range lists {
-		printList(list)
+		listsCommon.PrintList(list)
 	}
 
 	mergedList := mergeKLists(lists)
 
 	fmt.Println("Merged list: ")
-	printList(mergedList)
+	listsCommon.PrintList(mergedList)
 }
 
 func test1() {

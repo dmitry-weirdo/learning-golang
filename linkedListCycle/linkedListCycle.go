@@ -1,11 +1,9 @@
 package main
 
-import "fmt"
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
+import (
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	"fmt"
+)
 
 func hasCycle(head *ListNode) bool {
 	if (head == nil) || (head.Next == nil) || (head.Next.Next == nil) {
@@ -20,7 +18,7 @@ func hasCycle(head *ListNode) bool {
 	//slow := head
 	//fast := head.Next
 
-	// this is also working and is the fastest based on the test-set on Leetcode
+	// this is also working and is the fastest based on the test-set on LeetCode
 	slow := head.Next
 	fast := head.Next.Next
 
@@ -36,13 +34,17 @@ func hasCycle(head *ListNode) bool {
 	return false
 }
 
-func test(head *ListNode, expected bool) {
-	listHasCycle := hasCycle(head)
+func test(head *ListNode, expectedResult bool) {
+	result := hasCycle(head)
 
 	fmt.Println()
 	fmt.Println("============================")
-	fmt.Printf("Expected has cycle: %v \n", expected)
-	fmt.Printf("Detected has cycle: %v \n", listHasCycle)
+	fmt.Printf("Expected has cycle: %v \n", expectedResult)
+	fmt.Printf("Detected has cycle: %v \n", result)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
 }
 
 func test1() {
@@ -70,7 +72,7 @@ func test2() {
 
 	node3.Next = node2
 	node2.Next = node0
-	node0.Next = node2
+	node0.Next = node2 // cycle!
 
 	head := node3
 
@@ -84,7 +86,7 @@ func test3() {
 	node2 := &ListNode{2, nil}
 
 	node1.Next = node2
-	node2.Next = node1
+	node2.Next = node1 // cycle!
 
 	head := node1
 
@@ -111,8 +113,8 @@ func test4() {
 }
 
 func main() {
-	//test1()
-	//test2()
-	//test3()
+	test1()
+	test2()
+	test3()
 	test4()
 }

@@ -1,11 +1,10 @@
 package main
 
-import "fmt"
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
+import (
+	"demo/listsCommon"
+	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
+	"fmt"
+)
 
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	d1 := 0
@@ -60,70 +59,62 @@ func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
 	return dummyHead.Next
 }
 
-func printList(head *ListNode) {
-	var node = head
-
-	for node != nil {
-		fmt.Printf("%d ", node.Val)
-
-		node = node.Next
-	}
-
-	fmt.Println()
-}
-
-func arrayToList(arr []int) *ListNode {
-	var node *ListNode = nil
-
-	for i := len(arr) - 1; i >= 0; i-- {
-		nextNode := &ListNode{arr[i], node}
-
-		node = nextNode
-	}
-	return node
-}
-
-func test(a1 []int, a2 []int) {
+func test(a1 []int, a2 []int, expectedResult []int) {
 	fmt.Println()
 	fmt.Println("===========================")
 
-	l1 := arrayToList(a1)
-	l2 := arrayToList(a2)
+	l1 := listsCommon.ArrayToList(a1)
+	l2 := listsCommon.ArrayToList(a2)
 
 	fmt.Println("List 1:")
-	printList(l1)
+	listsCommon.PrintList(l1)
 
 	fmt.Println("List 2:")
-	printList(l2)
+	listsCommon.PrintList(l2)
 
-	sumList := addTwoNumbers(l1, l2)
+	result := addTwoNumbers(l1, l2)
+	resultAsArray := listsCommon.ListToArray(result)
 
 	fmt.Println("Sum list:")
-	printList(sumList)
+	listsCommon.PrintList(result)
+
+	fmt.Printf("Result as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
 }
 
 func test1() {
 	a1 := []int{2, 4, 3}
 	a2 := []int{5, 6, 4}
+	expected := []int{7, 0, 8}
 
-	test(a1, a2)
+	test(a1, a2, expected)
 }
 
 func test2() {
 	a1 := []int{9, 9, 9, 9, 9, 9, 9}
 	a2 := []int{9, 9, 9, 9}
+	expected := []int{8, 9, 9, 9, 0, 0, 0, 1}
 
-	test(a1, a2)
+	test(a1, a2, expected)
 }
 
 func test3() {
 	a1 := []int{}
 	a2 := []int{3, 2, 1}
+	expected := []int{3, 2, 1}
 
-	test(a1, a2)
+	test(a1, a2, expected)
 }
 
 func main() {
+	// 2. Add Two Numbers
 	test1()
 	test2()
 	test3()

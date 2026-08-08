@@ -31,6 +31,17 @@ func ArrayToList(arr []int) *ListNode {
 	return node
 }
 
+func ArraysToLists(arrays ...[]int) []*ListNode {
+	lists := make([]*ListNode, len(arrays))
+
+	for i, arr := range arrays {
+		list := ArrayToList(arr)
+		lists[i] = list
+	}
+
+	return lists
+}
+
 func ListToArray(head *ListNode) []int {
 	n := head
 
