@@ -34,7 +34,7 @@ func lowestCommonAncestor(p *Node, q *Node) *Node {
 		current = current.Parent
 	}
 
-	// this must never happen, at least the root should be the LCAS
+	// this must never happen, at least the root should be the LCA
 	return nil
 }
 
