@@ -21,7 +21,14 @@ func repeatedStringMatch_trivial(a string, b string) int {
 	}
 
 	// b should be contained in max (ac + ac) -> check up to it
-	limit := 2 * len(ac)
+	//limit := 2 * len(ac)
+
+	// !!! Actually, we only need to check one more repetition from this point.
+	// Since the first character of B should already be present in the first repeat of A,
+	// its max index is len(a), i.e. it can start within [0; len(a) -1] range.
+	// Even if it starts at [len(a)-1], the remaining part of B will be within len[a],
+	// so we should only append A once again to check if B is there.
+	limit := len(ac) + len(a)
 
 	//for len(ac) <= limit { // exactly 2 repeats should also be checked
 	for len(ac) < limit { // exactly 2 repeats should also be checked
