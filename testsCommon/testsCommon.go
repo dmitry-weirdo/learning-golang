@@ -244,7 +244,7 @@ func TwoIntArraysToTreeFunction(a1 []int, a2 []int) *TreeNode { // typically use
 	return nil
 }
 
-func test(preorder []int, inorder []int, expectedResult []any) { // nodes can be null
+func testTwoIntArraysToTree(preorder []int, inorder []int, expectedResult []any) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
@@ -254,6 +254,38 @@ func test(preorder []int, inorder []int, expectedResult []any) { // nodes can be
 	result := TwoIntArraysToTreeFunction(preorder, inorder) // todo: replace with your function
 
 	fmt.Printf("Built tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(result)
+
+	resultAsArray := trees.TreeToArray(result)
+	fmt.Printf("Tree as array:   %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
+func IntArrayToTreeFunction(arr []int) *TreeNode { // typically used to build a tree from 2 order of traversals
+	return nil
+}
+
+func testIntArrayToTree(arr []int, expectedResult []any) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Sorted array: %v \n", arr) // todo: replace with your text if required
+
+	result := IntArrayToTreeFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Built balanced BST: \n") // todo: replace with your text if required
 	trees.PrintTreeTopDown(result)
 
 	resultAsArray := trees.TreeToArray(result)
