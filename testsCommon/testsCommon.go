@@ -146,7 +146,7 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 	result := IntArrayToIntFunction(arr)
 
 	fmt.Printf("Last stone weight: %v \n", result) // todo: replace with your text
-	fmt.Printf("Expected last stone weight: %v \n", expectedResult)
+	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if result != expectedResult {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
