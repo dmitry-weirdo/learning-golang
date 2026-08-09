@@ -43,7 +43,7 @@ func dfs(preorder []int, inorder []int, preorderIndex, inorderIndex, subtreeSize
 	fmt.Printf("Left subtree size is rootInorderIndex - inorderIndex = %v - %v = %v \n", rootInorderIndex, inorderIndex, leftSubtreeSize)
 
 	// subtree in the inorder array looks like:
-	// [ leftSubtree, root, rightSubtree]
+	// [ leftSubtree, root, rightSubtree ]
 	// subtreeSize = leftSubtreeSize + rootSize + rightSubtreeSize, root size = 1
 	rightSubtreeSize := subtreeSize - leftSubtreeSize - 1
 	fmt.Printf("Right subtree size is subtreeSize - leftSubtreeSize - rootSize = %v - %v - 1 = %v \n", subtreeSize, leftSubtreeSize, rightSubtreeSize)
@@ -91,31 +91,49 @@ func dfs(preorder []int, inorder []int, preorderIndex, inorderIndex, subtreeSize
 	}
 }
 
-func test(preorder []int, inorder []int) { // nodes can be null
+func test(preorder []int, inorder []int, expectedResult []any) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
-	fmt.Printf("preorder: %v \n", preorder)
-	fmt.Printf("inorder: %v \n", inorder)
+	fmt.Printf("Preorder traversal: %v \n", preorder)
+	fmt.Printf("Inorder traversal: %v \n", inorder)
 
 	result := buildTree(preorder, inorder) // iterative
 
-	fmt.Printf("Tree built: \n")
+	fmt.Printf("Built tree: \n")
 	trees.PrintTreeTopDown(result)
+
+	resultAsArray := trees.TreeToArray(result)
+	fmt.Printf("Tree as array:   %v \n", resultAsArray)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
 }
 
 func test1() {
 	preorder := []int{3, 9, 20, 15, 7}
 	inorder := []int{9, 3, 15, 20, 7}
+	expected := []any{3, 9, 20, nil, nil, 15, 7}
 
-	test(preorder, inorder)
+	test(preorder, inorder, expected)
 }
 
 func test2() {
 	preorder := []int{-1}
 	inorder := []int{-1}
+	expected := []any{-1}
 
-	test(preorder, inorder)
+	test(preorder, inorder, expected)
 }
 
 func main() {

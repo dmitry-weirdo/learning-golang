@@ -11,7 +11,7 @@ func buildTree(inorder []int, postorder []int) *TreeNode {
 	var dfs func(inorderLeft, inorderRight, postorderLeft, postorderRight int) *TreeNode
 
 	dfs = func(inorderLeft, inorderRight, postorderLeft, postorderRight int) *TreeNode {
-		// base case, no elements
+		// base case, no elements -> return nil
 		if inorderLeft > inorderRight {
 			//fmt.Printf("Reached nil node, returning it. \n")
 			return nil
@@ -118,8 +118,17 @@ func test2() {
 	test(inorder, postorder, expected)
 }
 
+func test3() {
+	inorder := []int{-1}
+	postorder := []int{-1}
+	expected := []any{-1}
+
+	test(inorder, postorder, expected)
+}
+
 func main() {
 	// 106. Construct Binary Tree from Inorder and Postorder Traversal
 	test1()
 	test2()
+	test3()
 }
