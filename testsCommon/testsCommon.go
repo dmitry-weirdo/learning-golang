@@ -173,7 +173,7 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
-	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
 
 	result := IntArrayToIntFunction(arr)
 
@@ -182,5 +182,35 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 
 	if result != expectedResult {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func IntArrayToPairsArrayFunction(arr []int) [][]int {
+	return nil
+}
+
+func testIntArrayToPairsArrayFunction(arr []int, expectedResult [][]int) {
+	fmt.Println()
+	fmt.Println("=================================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := IntArrayToPairsArrayFunction(arr)
+
+	fmt.Printf("Pairs array:   %v \n", result) // todo: replace with your text if required
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i := 0; i < len(expectedResult); i++ {
+		r := result[i]
+		er := expectedResult[i]
+
+		if r[0] != er[0] || r[1] != er[1] { // we only compare pairs, i.e. [0] and [1] elements
+			fmt.Printf("FAILURE: expected result[%v] = [%v; %v], actual result[%v] = [%v; %v] \n", i, er[0], er[1], i, r[0], r[1])
+		}
 	}
 }
