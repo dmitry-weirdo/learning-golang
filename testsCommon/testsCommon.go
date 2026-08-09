@@ -214,3 +214,25 @@ func testIntArrayToPairsArrayFunction(arr []int, expectedResult [][]int) {
 		}
 	}
 }
+
+// ==================== Int functions ==================== //
+
+func IntToBoolFunction(x int) bool {
+	return true
+}
+
+func testIntToBool(x int, expectedResult bool) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+
+	result := IntToBoolFunction(x)
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
