@@ -104,6 +104,38 @@ func testListToBoolean(values []int, expectedResult bool) {
 	}
 }
 
+func ListToIntArrayFunction(head *ListNode) []int {
+	return nil
+}
+
+func testListToIntArray(arr []int, expectedResult []int) { // linked list to linked list
+	fmt.Println()
+	fmt.Println("========================")
+
+	list := listsCommon.ArrayToList(arr)
+
+	fmt.Printf("Array: %v \n", arr)
+	fmt.Printf("List from array: \n") // todo: replace with your text if required
+	listsCommon.PrintList(list)
+
+	result := ListToIntArrayFunction(list) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 // ==================== []int int arrays functions ==================== //
 func IntArrayToIntArrayFunction(arr []int) []int {
 	return arr
@@ -113,11 +145,11 @@ func testIntArrayToIntArray(arr []int, expectedResult []int) {
 	fmt.Println()
 	fmt.Println("========================")
 
-	fmt.Printf("Array of building heights: %v \n", arr) // todo: replace with your text
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
 
 	result := IntArrayToIntArrayFunction(arr) // todo: replace with your function
 
-	fmt.Printf("Indexes of building who have no next buildings with >= height: %v \n", result) // todo: replace with your text
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if len(result) != len(expectedResult) {
