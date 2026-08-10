@@ -57,14 +57,14 @@ func stringBuilder() {
 	fmt.Println("==================== StringBuilder functions ====================")
 
 	var r rune = 'a'
-	var ch byte = 'b'
+	var ch byte = 'b' // 1-byte character is of type byte
 
 	var intValue = 666
 
 	var sb = strings.Builder{}
 
 	sb.WriteRune(r)
-	sb.WriteByte(ch)                       // one-byte byte
+	sb.WriteByte(ch)                       // one-byte character
 	sb.WriteString(strconv.Itoa(intValue)) // there is no WriteInt
 
 	s := sb.String() // toString
