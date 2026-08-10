@@ -177,7 +177,27 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 
 	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
 
-	result := IntArrayToIntFunction(arr)
+	result := IntArrayToIntFunction(arr) // todo: update to your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func IntArrayToBoolFunction(arr []int) bool {
+	return true
+}
+
+func testIntArrayToBool(arr []int, expectedResult bool) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := IntArrayToBoolFunction(arr) // todo: update to your function
 
 	fmt.Printf("Result: %v \n", result) // todo: replace with your text
 	fmt.Printf("Expected result: %v \n", expectedResult)
