@@ -48,7 +48,11 @@ func testListToList(arr []int, expectedResult []int) { // linked list to linked 
 }
 
 func TwoListsToListFunction(l1, l2 *ListNode) *ListNode {
-	return l1
+	if l1 != nil {
+		return l1
+	}
+
+	return l2
 }
 
 func testTwoListsToList(a1 []int, a2 []int, expectedResult []int) {
@@ -82,7 +86,7 @@ func testTwoListsToList(a1 []int, a2 []int, expectedResult []int) {
 }
 
 func ListToBooleanFunction(head *ListNode) bool {
-	return false
+	return head != nil
 }
 
 func testListToBoolean(values []int, expectedResult bool) {
@@ -107,7 +111,7 @@ func testListToBoolean(values []int, expectedResult bool) {
 }
 
 func ListToIntArrayFunction(head *ListNode) []int {
-	return nil
+	return []int{head.Val}
 }
 
 func testListToIntArray(arr []int, expectedResult []int) { // linked list to linked list
@@ -188,7 +192,7 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 }
 
 func IntArrayToBoolFunction(arr []int) bool {
-	return true
+	return len(arr) > 0
 }
 
 func testIntArrayToBool(arr []int, expectedResult bool) { // nodes can be null
@@ -208,7 +212,7 @@ func testIntArrayToBool(arr []int, expectedResult bool) { // nodes can be null
 }
 
 func IntArrayToPairsArrayFunction(arr []int) [][]int {
-	return nil
+	return [][]int{{len(arr), 1}}
 }
 
 func testIntArrayToPairsArrayFunction(arr []int, expectedResult [][]int) {
@@ -240,7 +244,7 @@ func testIntArrayToPairsArrayFunction(arr []int, expectedResult [][]int) {
 // ==================== Int functions ==================== //
 
 func IntToBoolFunction(x int) bool {
-	return true
+	return x > 666
 }
 
 func testIntToBool(x int, expectedResult bool) { // nodes can be null
@@ -261,7 +265,7 @@ func testIntToBool(x int, expectedResult bool) { // nodes can be null
 
 // ==================== Tree functions ==================== //
 func TwoIntArraysToTreeFunction(a1 []int, a2 []int) *TreeNode { // typically used to build a tree from 2 order of traversals
-	return nil
+	return &TreeNode{a1[0] + a2[0], nil, nil}
 }
 
 func testTwoIntArraysToTree(preorder []int, inorder []int, expectedResult []any) { // nodes can be null
@@ -294,7 +298,7 @@ func testTwoIntArraysToTree(preorder []int, inorder []int, expectedResult []any)
 }
 
 func IntArrayToTreeFunction(arr []int) *TreeNode { // typically used to build a tree from 2 order of traversals
-	return nil
+	return &TreeNode{len(arr), nil, nil}
 }
 
 func testIntArrayToTree(arr []int, expectedResult []any) { // nodes can be null
