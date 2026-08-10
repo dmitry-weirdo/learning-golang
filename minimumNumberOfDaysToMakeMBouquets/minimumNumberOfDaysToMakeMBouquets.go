@@ -22,7 +22,7 @@ func minDays(bloomDay []int, requiredBouquetsCount int, flowersInBouquet int) in
 	left := 1
 	right := maxDays // we should find the solution since (m * k <= n)
 
-	// we search for minimum day where getBouquetsCount(day) >= k
+	// we search for minimum day when getBouquetsCount(day) >= k
 	for left < right {
 		midDay := (left + right) / 2
 
