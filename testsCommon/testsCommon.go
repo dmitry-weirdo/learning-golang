@@ -263,6 +263,26 @@ func testIntToBool(x int, expectedResult bool) { // nodes can be null
 	}
 }
 
+func IntToIntFunction(x int) int {
+	return x + 1
+}
+
+func testIntToInt(x int, expectedResult int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+
+	result := IntToIntFunction(x) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 // ==================== Tree functions ==================== //
 func TwoIntArraysToTreeFunction(a1 []int, a2 []int) *TreeNode { // typically used to build a tree from 2 order of traversals
 	return &TreeNode{a1[0] + a2[0], nil, nil}

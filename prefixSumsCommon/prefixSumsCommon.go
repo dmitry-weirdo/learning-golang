@@ -13,3 +13,13 @@ func getPrefixSums(a []int) []int {
 
 	return prefixSums
 }
+
+func getTotalSum(a []int) int {
+	sum := 0
+
+	for _, v := range a {
+		sum += v
+	}
+
+	return sum
+}
