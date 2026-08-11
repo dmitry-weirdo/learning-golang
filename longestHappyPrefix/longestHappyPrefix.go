@@ -5,7 +5,7 @@ import "fmt"
 func longestPrefix(s string) string {
 	// todo: we should comparing using a rolling hash or a KMP algorithm
 
-	// working solutions by comparing substrings.
+	// Working solution by comparing substrings.
 	// Same brute-force O(n^2) solution as in "214. Shortest Palindrome".
 	// It still passes the tests in around 180+ ms
 	return longestPrefix_bruteForce(s)
