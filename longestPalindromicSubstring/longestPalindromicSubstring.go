@@ -22,7 +22,7 @@ func longestPalindrome(s string) string {
 	maxPalindromeStart := 0
 	maxPalindromeLength := 1
 
-	// we skip i = n - 1, it's just the last string that is already true
+	// we skip i = n - 1, it's just the last character that is already true
 	for i := n - 2; i >= 0; i-- {
 		// go from smaller intervals to bigger since we need the values of [i + 1; j - 1]
 		for j := i + 1; j <= n-1; j++ {
