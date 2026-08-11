@@ -11,6 +11,14 @@ func shortestPalindrome(s string) string {
 	// Rolling hash - hash algorithm is like in Rabin-Karp's algorithm
 	// Manacher's algorithm - O(n) to find the longest palindromic substring -> // todo: also apply to "5. Longest Palindromic Substring" to reduce the time!
 
+	// ===================================================================================== //
+	// Try to match the prefix(originalString) and suffix(reversedString)
+	// Still O(n^2), but I hope that substrings will be just pointers and don't require memory copying as for string reversing.
+	// Why O(n^2) - for every length from (n-1) down to 2, we're comparing the strings of this length.
+	// !!! It passes in 6-7 ms!
+	return longestStartingPalindrome_bruteForce_comparePrefixesWithReverseSuffixes(s)
+
+	// ===================================================================================== //
 	// Super-stupid finding of the starting palindrome, just by comparing the strings [0:i] and its reverse.
 	// Should be O(n^2), but no matrix required.
 	// Fails on TLE on Test-case 123 / 126, string length 50000
@@ -18,8 +26,9 @@ func shortestPalindrome(s string) string {
 	// If we iterate from longest starting substring to shortest (to break fast),
 	// it fails on TLE on 125 / 126, string length 42000
 	// Although, with this variation, a couple of times I passed the tests in the measly 2043ms and 2123ms!
-	return longestStartingPalindrome_bruteForce(s)
+	//return longestStartingPalindrome_bruteForce(s)
 
+	// ===================================================================================== //
 	// Using my solution for "5. Longest Palindromic Substring"
 	// with O(n^2) and collectin a dp for s[i:j] is palindrome or not.
 	// Basically, we need to find the longest palindrome from the start of the string s[0:j]
@@ -28,6 +37,37 @@ func shortestPalindrome(s string) string {
 	// And the N limit is [0:50_000], while in "5. Longest Palindromic Substring", it's just [1:1000]
 	// Test-case 121/ 126, string length 40002
 	//return longestPalindrome_dp(s)
+}
+
+func longestStartingPalindrome_bruteForce_comparePrefixesWithReverseSuffixes(s string) string {
+	if s == "" { // corner-case
+		return ""
+	}
+
+	n := len(s)
+	fmt.Printf("String length: %v \n", n)
+
+	// todo: the substrings can be calculated with 2 opposite growing hashes (see Solution.java), then it will be O(n) and will pass!
+
+	// super stupid finding of the longest starting palindrome
+	longestPalindromeEndIndex := 0 // start with just 1 character
+
+	reversed := reverseString(s)
+
+	for i := n - 1; i >= 0; i-- {
+		// this should not require copying of the substrings, so probably should be faster as reversing every prefix?
+		prefixOfOriginal := s[0 : i+1]
+		suffixOfReversed := reversed[n-i-1 : n]
+
+		substringIsPalindrome := prefixOfOriginal == suffixOfReversed
+
+		if substringIsPalindrome {
+			longestPalindromeEndIndex = i
+			break
+		}
+	}
+
+	return getPalindromeByLongestStartingPalindrome(s, longestPalindromeEndIndex)
 }
 
 func longestStartingPalindrome_bruteForce(s string) string {
