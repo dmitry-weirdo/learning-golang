@@ -8,7 +8,6 @@ import (
 func strStr(haystack string, needle string) int {
 	// todo: implement Z-algorithm
 	// todo: implement Boyer-Moore
-	// todo: implement KMP algorithm
 
 	// KMP algorithm - O(m + n)
 	// O(m) - to build a LPS array on the pattern
