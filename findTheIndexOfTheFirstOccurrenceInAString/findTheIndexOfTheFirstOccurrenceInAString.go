@@ -29,9 +29,32 @@ func indexOf_kmp(s, p string) int {
 	lps := calculateLPS(p) // we're calculating lps on pattern
 	fmt.Printf("LPS for substring pattern \"%v\": \n%v \n", p, lps)
 
-	// todo: implement KMP
+	i := 0 // index in string
+	j := 0 // index in pattern (substring), also applies as index in LPS
 
-	return len(s) + 1
+	for i < len(s) {
+		// !! j means that we've already matched characters [0 : j-1] to the substring before s[i]
+
+		// characters match -> go to the next characters in both of the strings.
+		if s[i] == p[j] {
+			i++
+			j++
+		} else if j == 0 { // characters do not match
+			// no pattern characters matched yet before s[i]
+			// and as checked above, the current character does not match -> not a single character matches to pattern prefix
+			// -> continues to the next s[i], we will still search from the p[0], 0-th character in the pattern
+			i++
+		} else {
+			// similar to LPS calculation -> how many prefix characters we still have matched with the string before s[i]
+			j = lps[j-1]
+		}
+
+		if j == len(p) { // we went over the last character in the pattern -> complete match found
+			return i - len(p)
+		}
+	}
+
+	return -1 // no match found -> -1
 }
 
 func calculateLPS(s string) []int {
@@ -175,7 +198,6 @@ func printLPSState(s string, lps []int, i int, pl int) {
 		fmt.Printf("  ")
 	}
 	fmt.Printf(" | current LPS \n")
-
 }
 
 func testCalculateLPS(s string, expectedResult []int) {
@@ -246,11 +268,11 @@ func testLPS6() {
 
 func testLPSSuite() {
 	testLPS1()
-	//testLPS2()
-	//testLPS3()
-	//testLPS4()
-	//testLPS5()
-	//testLPS6()
+	testLPS2()
+	testLPS3()
+	testLPS4()
+	testLPS5()
+	testLPS6()
 }
 
 func test(s, p string, expectedResult int) { // nodes can be null
@@ -279,10 +301,10 @@ func test2() {
 }
 
 func main() {
-	/*	// 28. Find the Index of the First Occurrence in a String
-		test1()
-		test2()
-	*/
+	// 28. Find the Index of the First Occurrence in a String
+	test1()
+	test2()
+
 	// KMP algorithm test
-	testLPSSuite()
+	//testLPSSuite()
 }
