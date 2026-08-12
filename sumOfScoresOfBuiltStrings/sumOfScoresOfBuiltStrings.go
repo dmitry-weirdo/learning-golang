@@ -44,6 +44,241 @@ func sumScores_bruteForce(s string) int64 {
 	return result
 }
 
+func allIndexesOf_zAlgorithm(s, p string, separatorChar string) []int { // separatorChar must be the char that is not present neither in string S nor in pattern P
+	// Concat to "<pattern><separatorChar><string>",
+	// So that the <pattern> string works as the prefix.
+
+	// Then we calculate Z-indexes for this concatenated string.
+	// Positions in the s[j] in the <string> part where z[j] = len(pattern)
+	// will be the positions where the <pattern> is found.
+
+	// To get the indexes in the original string (not the combined),
+	// we have to subtract j - len(pattern) - len(separatorChar)
+
+	combined := p + separatorChar + s
+
+	z := calculateZArray(combined)
+
+	fmt.Printf("Z-array of combined string \"%v\": \n%v \n", combined, z)
+
+	matchIndexes := make([]int, 0)
+
+	patternLength := len(p)
+	subtractedLength := patternLength + len(separatorChar)
+
+	for i := subtractedLength; i < len(combined); i++ { // we only need matches in the <string> part (although in pattern there will be no match with the complete length)
+		if z[i] == patternLength {
+			matchIndexes = append(matchIndexes, i-subtractedLength)
+		}
+	}
+
+	return matchIndexes
+}
+
+func calculateZArray(s string) []int {
+	// see https://www.youtube.com/watch?v=CpZh4eF8QBw
+
+	// For every s[i], we calculate z[i] = the length of the longest string starting at s[i]
+	// that coincides with the prefix s[0:j] of s.
+
+	// s[0] is not important and set to 0.
+
+	// basically we calculate with a sliding window
+
+	n := len(s)
+
+	z := make([]int, n)
+	z[0] = 0
+
+	// i - index in the string for that we're calculating z[i]
+
+	// sliding window borders
+	left := 0
+	right := 0
+
+	for i := 1; i < n; i++ { // we calculate from [1] since z[0] is not important (it will be the whole string match) and set to 0
+		if i > right { // [i] not within the window -> start to expand window from [i] with the start of the string
+			left = i
+			right = i
+
+			// s[right - left] is the character of the prefix
+			for (right < n) && (s[right] == s[right-left]) {
+				right++
+			}
+
+			// right is now the first non-matching character
+			right--
+			z[i] = right - left + 1 // size of the matched window
+		} else {
+			// [i] is within the window
+
+			// how many prefix characters we currently matched at the [i] position
+			prefixCharactersCount := i - left
+
+			// Since the current window has matches with prefix,
+			// we're trying to copy z[j] from the prefix if possible.
+			// It is possible to copy if adding characters up to the matched z[j]
+			// are smaller than the end of the window (right).
+
+			// So we're trying to append z[j] characters starting from s[i], s[i] inclusive.
+			zOfPrefixCharacter := z[prefixCharactersCount]
+
+			if (i + zOfPrefixCharacter - 1) < right {
+				// we can just copy z[i] = z[j] from the prefix
+				z[i] = zOfPrefixCharacter
+			} else {
+				// We CANNOT copy from the prefix character, since the match touches or overflows the right border.
+				// It means that we should try to match further after the right,
+				// since this part can (is?) different from the furrther prefix characters.
+
+				// try to expand the window starting from s[i]
+				left = i
+
+				// s[right - left] is the character of the prefix
+				for (right < n) && (s[right] == s[right-left]) {
+					right++
+				}
+
+				right--
+				z[i] = right - left + 1 // size of the matched window
+			}
+		}
+	}
+
+	return z
+}
+
+func testCalculateZArray(s string, expectedResult []int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("String: %v \n", s)
+
+	result := calculateZArray(s) // todo: replace with your function
+
+	fmt.Printf("Z-array of \"%v\": \n%v \n", s, result)
+	fmt.Printf("Expected result: \n%v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
+func testZArray1() {
+	s := "babab"
+	expected := []int{0, 0, 3, 0, 1}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray2() {
+	s := "abaxabab"
+	expected := []int{0, 0, 1, 0, 3, 0, 2, 0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray3() {
+	s := "azbazbzaz"
+	expected := []int{0, 0, 0, 3, 0, 0, 0, 2, 0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray4() {
+	s := "aabxaabxcaabxaabxay"
+	expected := []int{0, 1, 0, 0, 4, 1, 0, 0, 0, 8, 1, 0, 0, 5, 1, 0, 0, 1, 0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray5() {
+	s := "abc$xabcabzabc"
+	expected := []int{0, 0, 0, 0, 0, 3, 0, 0, 2, 0, 0, 3, 0, 0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray6() {
+	s := "aabxaayaab"
+	expected := []int{0, 1, 0, 0, 2, 1, 0, 3, 1, 0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArray7() {
+	s := "a"
+	expected := []int{0}
+
+	testCalculateZArray(s, expected)
+}
+
+func testZArraySuite() {
+	testZArray1()
+	testZArray2()
+	testZArray3()
+	testZArray4()
+	testZArray5()
+	testZArray6()
+	testZArray7()
+}
+
+func testGetAllIndexes_zAlgorithm(s, p string, expectedResult []int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("String: %v \n", s)
+	fmt.Printf("Pattern to find in the string: %v \n", p)
+
+	separatorChar := "#"
+	result := allIndexesOf_zAlgorithm(s, p, separatorChar)
+
+	fmt.Printf("All indexes of \"%v\" in \"%v\": %v \n", p, s, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
+func testZAlgorithm1() {
+	//    012345678901
+	s := "aabxaabaaaab"
+	p := "aab"
+	expected := []int{0, 4, 9}
+
+	testGetAllIndexes_zAlgorithm(s, p, expected)
+}
+
+func testZAlgorithm2() {
+	s := "aaa"
+	p := "a"
+	expected := []int{0, 1, 2}
+
+	testGetAllIndexes_zAlgorithm(s, p, expected)
+}
+
+func testZAlgorithmSuite() {
+	testZAlgorithm1()
+	testZAlgorithm2()
+}
+
 func test(s string, expectedResult int64) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
@@ -76,6 +311,9 @@ func test2() {
 
 func main() {
 	// 2223. Sum of Scores of Built Strings
-	test1()
-	test2()
+	//test1()
+	//test2()
+
+	//testZArraySuite()
+	testZAlgorithmSuite()
 }

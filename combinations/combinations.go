@@ -4,10 +4,12 @@ import "fmt"
 
 func combine(n int, k int) [][]int {
 	// iterative, filing digit-by-digit, always increasing
+	// O(2^n) - at every position of N numbers we either select or not select it
 	// works in around the same 30 ms range
 	return combine_iterative(n, k)
 
 	// backtracking, has a lot of recursion
+	// O(2^n) - at every position of N numbers we either select or not select it
 	// works in 29+ ms
 	//return combine_backtracking(n, k)
 }
