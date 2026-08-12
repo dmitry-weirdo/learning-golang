@@ -3,14 +3,41 @@ package main
 import "fmt"
 
 func sumScores(s string) int64 {
-	// todo: write an O(n) solution using Z-algorithm and KMP-algorithm
+	// todo: we can calculate the sums in the same iteration as calculating the Z-array, but it will require modification of the standard Z-algorithm
+	// O(2*n) time - O(n) to calculate the z-array and O(n) to sum the sums
+	// It passed in 5-6 ms
+	return sumScores_zArray(s)
 
 	// Brute-force O(n^2) like in "214. Shortest Palindrome".
 	// However, since we don't break fast on finding 1 solution,
 	// it's falling on TLE.
 	// Test-case 43 / 150 testcases passed
 	// String length: 39239
-	return sumScores_bruteForce(s)
+	//return sumScores_bruteForce(s)
+}
+
+func sumScores_zArray(s string) int64 {
+	if s == "" { // corner-case
+		return 0
+	}
+
+	n := len(s)
+	fmt.Printf("String length: %v \n", n)
+
+	// todo: we can calculate the sums in the same iteration as calculating the Z-array, but it will require modification of the standard Z-algorithm
+	z := calculateZArray(s)
+	fmt.Printf("Z-array for string \"%v\": \n%v \n", s, z)
+
+	result := int64(len(s)) // complete string is always a match in this problem, but it is not calculated within the Z-array
+
+	// We're summing up the Z-array values, since for every position, this is a start of a suffix string,
+	// and we're searching for longest prefix length for every starting position.
+	// This is exactly what is stored in the Z-array.
+	for _, v := range z {
+		result += int64(v)
+	}
+
+	return result
 }
 
 func sumScores_bruteForce(s string) int64 {
@@ -93,11 +120,12 @@ func calculateZArray(s string) []int {
 	// i - index in the string for that we're calculating z[i]
 
 	// sliding window borders
+	// window can be called z-box
 	left := 0
 	right := 0
 
 	for i := 1; i < n; i++ { // we calculate from [1] since z[0] is not important (it will be the whole string match) and set to 0
-		if i > right { // [i] not within the window -> start to expand window from [i] with the start of the string
+		if i > right { // [i] not within the window -> start to expand window from [i] while window matches the start of the string (i.e. matches the prefix)
 			left = i
 			right = i
 
@@ -107,8 +135,8 @@ func calculateZArray(s string) []int {
 			}
 
 			// right is now the first non-matching character
-			right--
-			z[i] = right - left + 1 // size of the matched window
+			right--                 // move to the first matching character, can be (left - 1) if there were no matching characters
+			z[i] = right - left + 1 // size of the matched window, can be 0
 		} else {
 			// [i] is within the window
 
@@ -117,8 +145,8 @@ func calculateZArray(s string) []int {
 
 			// Since the current window has matches with prefix,
 			// we're trying to copy z[j] from the prefix if possible.
-			// It is possible to copy if adding characters up to the matched z[j]
-			// are smaller than the end of the window (right).
+			// It is possible to copy if adding z[j] characters from s[i]
+			// will end earlier that the end of the window (end of the window is right).
 
 			// So we're trying to append z[j] characters starting from s[i], s[i] inclusive.
 			zOfPrefixCharacter := z[prefixCharactersCount]
@@ -139,8 +167,9 @@ func calculateZArray(s string) []int {
 					right++
 				}
 
-				right--
-				z[i] = right - left + 1 // size of the matched window
+				// right is now the first non-matching character
+				right--                 // move to the first matching character, can be (left - 1) if there were no matching characters
+				z[i] = right - left + 1 // size of the matched window, can be 0
 			}
 		}
 	}
@@ -311,9 +340,9 @@ func test2() {
 
 func main() {
 	// 2223. Sum of Scores of Built Strings
-	//test1()
-	//test2()
+	test1()
+	test2()
 
 	//testZArraySuite()
-	testZAlgorithmSuite()
+	//testZAlgorithmSuite()
 }
