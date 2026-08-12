@@ -3,10 +3,16 @@ package main
 import "fmt"
 
 func sumScores(s string) int64 {
+
+	// Z-array sum is calculated when calculating Z-array itself
+	// O(n) time
+	// runs _a bit_ faster than O(2 * n) version - I was able to execute it in 2-5 ms
+	return sumScores_zArray_optimized(s)
+
 	// todo: we can calculate the sums in the same iteration as calculating the Z-array, but it will require modification of the standard Z-algorithm
 	// O(2*n) time - O(n) to calculate the z-array and O(n) to sum the sums
 	// It passed in 5-6 ms
-	return sumScores_zArray(s)
+	//return sumScores_zArray(s)
 
 	// Brute-force O(n^2) like in "214. Shortest Palindrome".
 	// However, since we don't break fast on finding 1 solution,
@@ -14,6 +20,101 @@ func sumScores(s string) int64 {
 	// Test-case 43 / 150 testcases passed
 	// String length: 39239
 	//return sumScores_bruteForce(s)
+}
+
+func sumScores_zArray_optimized(s string) int64 {
+	if s == "" { // corner-case
+		return 0
+	}
+
+	n := len(s)
+	fmt.Printf("String length: %v \n", n)
+
+	// modified version that returns just the sum of values in the Z-array
+	zArraySum := calculateZArraySum(s)
+	fmt.Printf("Z-array sum for string \"%v\": \n%v \n", s, zArraySum)
+
+	return int64(len(s)) + zArraySum // complete string is always a match in this problem, but it is not calculated within the Z-array
+}
+
+func calculateZArraySum(s string) int64 {
+	// see https://www.youtube.com/watch?v=CpZh4eF8QBw
+
+	// For every s[i], we calculate z[i] = the length of the longest string starting at s[i]
+	// that coincides with the prefix s[0:j] of s.
+
+	// s[0] is not important and set to 0.
+
+	// basically we calculate with a sliding window
+
+	sum := int64(0)
+
+	n := len(s)
+
+	z := make([]int, n)
+	z[0] = 0
+
+	// i - index in the string for that we're calculating z[i]
+
+	// sliding window borders
+	// window can be called z-box
+	left := 0
+	right := 0
+
+	for i := 1; i < n; i++ { // we calculate from [1] since z[0] is not important (it will be the whole string match) and set to 0
+		if i > right { // [i] not within the window -> start to expand window from [i] while window matches the start of the string (i.e. matches the prefix)
+			left = i
+			right = i
+
+			// s[right - left] is the character of the prefix
+			for (right < n) && (s[right] == s[right-left]) {
+				right++
+			}
+
+			// right is now the first non-matching character
+			right--                 // move to the first matching character, can be (left - 1) if there were no matching characters
+			z[i] = right - left + 1 // size of the matched window, can be 0
+			sum += int64(z[i])
+		} else {
+			// [i] is within the window
+
+			// how many prefix characters we currently matched at the [i] position
+			prefixCharactersCount := i - left
+
+			// Since the current window has matches with prefix,
+			// we're trying to copy z[j] from the prefix if possible.
+			// It is possible to copy if adding z[j] characters from s[i]
+			// will end earlier that the end of the window (end of the window is right).
+
+			// So we're trying to append z[j] characters starting from s[i], s[i] inclusive.
+			zOfPrefixCharacter := z[prefixCharactersCount]
+
+			if (i + zOfPrefixCharacter - 1) < right {
+				// we can just copy z[i] = z[j] from the prefix
+				z[i] = zOfPrefixCharacter
+				sum += int64(z[i])
+			} else {
+				// We CANNOT copy from the prefix character, since the match touches or overflows the right border.
+				// It means that we should try to match further after the right,
+				// since this part can (is?) different from the furrther prefix characters.
+
+				// try to expand the window starting from s[i]
+				left = i
+
+				// s[right - left] is the character of the prefix
+				for (right < n) && (s[right] == s[right-left]) {
+					right++
+				}
+
+				// right is now the first non-matching character
+				right--                 // move to the first matching character, can be (left - 1) if there were no matching characters
+				z[i] = right - left + 1 // size of the matched window, can be 0
+				sum += int64(z[i])
+			}
+		}
+	}
+
+	return sum
 }
 
 func sumScores_zArray(s string) int64 {
