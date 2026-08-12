@@ -95,6 +95,11 @@ func stringBuilder() {
 	s := sb.String() // toString
 
 	fmt.Printf("s from StringBuilder: %v \n", s)
+
+	// flush/clean the StringBuilder
+	sb.Reset()
+	fmt.Printf("StringBuilder after reset: %v \n", sb)
+	fmt.Printf("sb.String() after reset: %v \n", sb.String())
 }
 
 func main() {

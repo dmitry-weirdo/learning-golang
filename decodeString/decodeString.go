@@ -32,10 +32,11 @@ func decodeString_recursive(s string) string {
 				i++
 			}
 
-			if i >= len(t)-1 {
+			if i >= len(t)-1 { // letters reached the end of the string -> nothing to search anymore
 				break
 			}
 
+			// not the end of the string -> it must be the number now
 			start = i
 
 			for isDigit(t[i]) {
@@ -49,6 +50,7 @@ func decodeString_recursive(s string) string {
 
 			start = i
 
+			// after the number, it must be an expression within '[]' brackets. We're searching for the most outer brackets.
 			if t[i] != '[' {
 				panic(fmt.Sprintf("Next character after number %v must be '[', but is '%c'.", number, t[i]))
 			}

@@ -264,6 +264,26 @@ func testIntToBool(x int, expectedResult bool) { // nodes can be null
 	}
 }
 
+func IntToByteFunction(x int) byte { // if we need to return a 1-byte char in Go
+	return byte(x)
+}
+
+func testIntToByte(x int, expectedResult byte) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+
+	result := IntToByteFunction(x) // todo: replace with your function
+
+	fmt.Printf("Result: %c \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %c \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %c, actual result = %c \n", expectedResult, result)
+	}
+}
+
 func IntToIntFunction(x int) int {
 	return x + 1
 }
@@ -348,6 +368,26 @@ func testIntToIntMatrix(x int, expectedResult [][]int) { // nodes can be null
 }
 
 // ==================== String functions ==================== //
+func StringToByteFunction(s string) byte { // if we need to return a 1-byte char in Go
+	return s[0]
+}
+
+func testStringToByte(s string, expectedResult byte) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("String: %v \n", s) // todo: replace with your text if required
+
+	result := StringToByteFunction(s) // todo: replace with your function
+
+	fmt.Printf("Result: %c \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %c \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %c, actual result = %c \n", expectedResult, result)
+	}
+}
+
 func StringToIntFunction(s string) int {
 	return len(s)
 }
