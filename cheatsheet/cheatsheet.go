@@ -7,6 +7,25 @@ import (
 	"strings"
 )
 
+func sliceFunctions() {
+	fmt.Println()
+	fmt.Println("==================== slices/arrays functions ====================")
+
+	// remove a central element from the slice
+	a := []int{1, 2, 3}
+
+	fmt.Printf("Slice before removal: %v \n", a)
+
+	indexToRemove := 1
+	removedElement := a[indexToRemove]
+	a = append(a[:indexToRemove], a[indexToRemove+1:]...)
+
+	fmt.Printf("Element removed from a[%v] = %v \n", indexToRemove, removedElement)
+	fmt.Printf("Slice after removing a[%v]: %v \n", indexToRemove, a)
+
+	// todo: remove last element from the slice (actually the "middle removal" code should also work as general
+}
+
 func listFunctions() {
 	fmt.Println()
 	fmt.Println("==================== list.List functions ====================")
@@ -75,4 +94,5 @@ func stringBuilder() {
 func main() {
 	stringBuilder()
 	listFunctions()
+	sliceFunctions()
 }
