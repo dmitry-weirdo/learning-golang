@@ -6,6 +6,7 @@ import (
 	"demo/trees"
 	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without package prefix
 	"fmt"
+	"strconv"
 )
 
 // common test formats to copy-paste just from this file instead of searching by many files
@@ -274,6 +275,26 @@ func testIntToInt(x int, expectedResult int) { // nodes can be null
 	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
 
 	result := IntToIntFunction(x) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func IntToStringFunction(x int) string {
+	return strconv.Itoa(x)
+}
+
+func testIntToString(x int, expectedResult string) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+
+	result := IntToStringFunction(x) // todo: replace with your function
 
 	fmt.Printf("Result: %v \n", result) // todo: replace with your text
 	fmt.Printf("Expected result: %v \n", expectedResult)
