@@ -26,6 +26,12 @@ func sliceFunctions() {
 	// todo: remove last element from the slice (actually the "middle removal" code should also work as general
 }
 
+func copyArray(arr []int) []int {
+	arrayCopy := make([]int, len(arr))
+	copy(arrayCopy, arr)
+	return arrayCopy
+}
+
 func listFunctions() {
 	fmt.Println()
 	fmt.Println("==================== list.List functions ====================")
