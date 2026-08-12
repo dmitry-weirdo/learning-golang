@@ -61,7 +61,7 @@ func test(arr []int, k int, expectedResult int) { // nodes can be null
 
 	result := maxSubarrayLength(arr, k)
 
-	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Max length of subarray with frequencies of all elements <= K: %v \n", result)
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if result != expectedResult {
