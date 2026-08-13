@@ -549,3 +549,47 @@ func testIntArrayToTree(arr []int, expectedResult []any) { // nodes can be null
 		}
 	}
 }
+
+// ==================== Matrix functions - often used for graphs ==================== //
+func IntMatrixToIntMatrixFunction(m [][]int) [][]int {
+	return m
+}
+
+func testIntMatrixToIntMatrix(m [][]int, expectedResult [][]int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+
+	result := IntMatrixToIntMatrixFunction(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}

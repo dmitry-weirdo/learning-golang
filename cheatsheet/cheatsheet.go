@@ -12,7 +12,7 @@ func sliceFunctions() {
 	fmt.Println("==================== slices/arrays functions ====================")
 
 	// remove a central element from the slice
-	a := []int{1, 2, 3}
+	a := []int{1, 2, 3, 4}
 
 	fmt.Printf("Slice before removal: %v \n", a)
 
@@ -24,6 +24,27 @@ func sliceFunctions() {
 	fmt.Printf("Slice after removing a[%v]: %v \n", indexToRemove, a)
 
 	// todo: remove last element from the slice (actually the "middle removal" code should also work as general
+
+	// remove last element
+	a = a[:len(a)-1]
+	fmt.Printf("Slice after removing last element: %v \n", a)
+
+	// call the pointer operations
+	b := &a
+	slicePointerFunction(b)
+
+	fmt.Printf("Slice after performing operations by pointer: %v \n", b)
+}
+
+func slicePointerFunction(a *[]int) { // passing a pointer will modify the argument
+	// replace element by pointer
+	(*a)[0] = 666
+
+	// append to pointer to slice
+	*a = append(*a, 100, 200, 300)
+
+	// remove last from pointer to slice
+	*a = (*a)[:len(*a)-1]
 }
 
 func copyArray(arr []int) []int {
