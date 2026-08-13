@@ -101,7 +101,7 @@ class Solution {
             maxSubstringLengths = new int[size];
         }
 
-        private void buildArray(char[] nums, int i, int left, int right) { // i is root index
+        private void buildArray(char[] nums, int i, int left, int right) { // i is root index, left and right are segment indexes in the original array
             // todo: it's possible to build bottom-to-top iteratively,
             // but algorithm at https://leetcode.com/problems/range-sum-query-mutable/editorial/?envType=problem-list-v2&envId=segment-tree
             // is incorrect.
@@ -114,7 +114,7 @@ class Solution {
             // Child i to parent: parent = i/2
             if (left == right) {
                 // reached the leaf node -> set a[left] = a[right] to this node
-                buildValuesForTheLeaf(nums, i, left);
+                buildValuesForTheLeaf(i, nums[left]);
 //                chars[i] = nums[left];
 
                 return;
@@ -133,20 +133,27 @@ class Solution {
             // root is aggregate of leftChild and rightChild
             // update node (parent) aggregate data
 //            chars[i] = chars[leftChildIndex] + chars[rightChildIndex];
-            
+
             // todo: think about this length calculation
             int leftSegmentLength = mid - left + 1; // mid belongs to left
             int rightSegmentLength = right - mid; // mid does NOT belong to right
-            
+
             updateParentNode(i, leftChildIndex, rightChildIndex, leftSegmentLength, rightSegmentLength);
 //            chars[i] = chars[leftChildIndex] + chars[rightChildIndex];
         }
 
-        private void buildValuesForTheLeaf(char[] nums, int i, int left) {
-            // todo: is here i == left???
-            chars[i] = nums[left];
-            leftChars[i] = nums[left]; // just 1 character, it's both left and right
-            rightChars[i] = nums[left]; // just 1 character, it's both left and right
+        private void buildValuesForTheLeaf(int i, char value) {
+            // no, i != left
+            // i is the segment-tree index,
+            // indexInNums is index in the original array/string
+
+//            if (i != indexInNums) {
+//                throw new IllegalStateException(String.format("buildValuesForTheLeaf: i == %d, indexInNums == %d, i <> indexInNums.", i, indexInNums));
+//            }
+
+            chars[i] = value;
+            leftChars[i] = value; // just 1 character, it's both left and right
+            rightChars[i] = value; // just 1 character, it's both left and right
 
             // all lengths are 1 since it's just 1 single character
             longestPrefixLengths[i] = 1;
@@ -172,24 +179,41 @@ class Solution {
                 int leftLen, // length of the left segment
                 int rightLen // length of the right segment
         ) {
-            // root.leftmostChar is left.leftmostChar
-            // root.rightmostChar is right.rightmostChar
+            // parent.leftmostChar is left.leftmostChar
+            // parent.rightmostChar is right.rightmostChar
             leftChars[i] = leftChars[leftChildIndex];
             rightChars[i] = rightChars[rightChildIndex];
 
+            // initially, parent.longestPrefix = left.longestPrefix
             longestPrefixLengths[i] = longestPrefixLengths[leftChildIndex];
-            if (longestPrefixLengths[leftChildIndex] == leftLen && rightChars[leftChildIndex] == leftChars[rightChildIndex]) {
+            if (
+                    (longestPrefixLengths[leftChildIndex] == leftLen) && // left.longestPrefix is the complete left segment
+                            (rightChars[leftChildIndex] == leftChars[rightChildIndex]) // left.lastChar = right.firstChar
+            ) {
+                // join the complete left segment and right.longestPrefix, since they are the same character
                 longestPrefixLengths[i] = longestPrefixLengths[leftChildIndex] + longestPrefixLengths[rightChildIndex];
             }
 
+            // initially, parent.longestSuffix = right.longestSuffix
             longestSuffixLengths[i] = longestSuffixLengths[rightChildIndex];
-            if (longestSuffixLengths[rightChildIndex] == rightLen && rightChars[leftChildIndex] == leftChars[rightChildIndex]) {
+            if (
+                    (longestSuffixLengths[rightChildIndex] == rightLen) // right.longestSuffix is the complete right segment
+                            && (rightChars[leftChildIndex] == leftChars[rightChildIndex]) // left.lastChar = right.firstChar
+            ) {
+                // join the complete right segment and left.longestSuffix, since they are the same character
                 longestSuffixLengths[i] = longestSuffixLengths[rightChildIndex] + longestSuffixLengths[leftChildIndex];
             }
 
+            // initially, maxParent = max(maxLeft, maxRight)
             maxSubstringLengths[i] = Math.max(maxSubstringLengths[leftChildIndex], maxSubstringLengths[rightChildIndex]);
             if (rightChars[leftChildIndex] == leftChars[rightChildIndex]) {
-                maxSubstringLengths[i] = Math.max(maxSubstringLengths[i], longestSuffixLengths[leftChildIndex] + longestPrefixLengths[rightChildIndex]);
+                // If left ends on same char that right starts,
+                // combine left.longestEndingSuffix and right.longestStartingSuffix
+
+                // And this is a candidate for longest single-char substring
+                int leftSuffixPlusRightPrefix = longestSuffixLengths[leftChildIndex] + longestPrefixLengths[rightChildIndex];
+
+                maxSubstringLengths[i] = Math.max(maxSubstringLengths[i], leftSuffixPlusRightPrefix);
             }
         }
 
@@ -225,7 +249,7 @@ class Solution {
             // todo: think about this length calculation
             int leftSegmentLength = midRange - leftRange + 1; // mid belongs to left
             int rightSegmentLength = rightRange - midRange; // mid does NOT belong to right
-            
+
             // update node (parent) aggregate data
 //            chars[i] = chars[leftChildIndex] + chars[rightChildIndex];
             updateParentNode(i, leftChildIndex, rightChildIndex, leftSegmentLength, rightSegmentLength);
@@ -309,5 +333,7 @@ class Solution {
 
         // todo: add tests
         // todo: understand about lengths
+
+        // todo: try to rewrite the SegmentTree in Go, and check whether it will be faster. The current solution is slow, around 140 ms :(
     }
 }
