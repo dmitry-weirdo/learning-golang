@@ -456,6 +456,34 @@ func testStringToIntArray(s string, expectedResult []int) {
 	}
 }
 
+func StringToStringArrayFunction(s string) []string {
+	return []string{s}
+}
+
+func testStringToStringArray(s string, expectedResult []string) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("String: %v \n", s) // todo: replace with your text
+
+	result := StringToStringArrayFunction(s) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 // ==================== Tree functions ==================== //
 func TwoIntArraysToTreeFunction(a1 []int, a2 []int) *TreeNode { // typically used to build a tree from 2 order of traversals
 	return &TreeNode{a1[0] + a2[0], nil, nil}
