@@ -257,11 +257,11 @@ class Solution {
 
         @Override
         public int getLongestSingleCharacterSubstringLength(int left, int right) {
-            // root is a sum[0; n - 1]
-            return sumRangeInArray(ROOT_INDEX, ROOT_LEFT_RANGE, rootRightRange, left, right);
+            // root corresponds to range [0; n - 1] (aggregates this range)
+            return getLongestSingleCharacterSubstringLengthInArray(ROOT_INDEX, ROOT_LEFT_RANGE, rootRightRange, left, right);
         }
 
-        private int sumRangeInArray(int i, int leftRange, int rightRange, int left, int right) {
+        private int getLongestSingleCharacterSubstringLengthInArray(int i, int leftRange, int rightRange, int left, int right) {
             // The trick is that the range of the current node a[i]
             // is passed as parameters to this function [leftRange; rightRange].
             // [left; right] is the range that we are looking for.
@@ -278,16 +278,16 @@ class Solution {
 
             if (left > midRange) {
                 // both left and right are > than midRange -> go to the right subtree that is [midRange + 1; rightRange]
-                return sumRangeInArray(rightChildIndex, midRange + 1, rightRange, left, right);
+                return getLongestSingleCharacterSubstringLengthInArray(rightChildIndex, midRange + 1, rightRange, left, right);
             } else if (right <= midRange) {
                 // both left and right are <= than midRange -> go to the left subtree that is [leftRange; midRange]
-                return sumRangeInArray(leftChildIndex, leftRange, midRange, left, right);
+                return getLongestSingleCharacterSubstringLengthInArray(leftChildIndex, leftRange, midRange, left, right);
             } else {
                 // left <= midRange < right
                 // -> then the range [left; midRange] comes from the left subtree,
                 // and range [midRange + 1; right] comes from the right subtree.
-                return sumRangeInArray(leftChildIndex, leftRange, midRange, left, midRange) +
-                        sumRangeInArray(rightChildIndex, midRange + 1, rightRange, midRange + 1, right);
+                return getLongestSingleCharacterSubstringLengthInArray(leftChildIndex, leftRange, midRange, left, midRange) +
+                        getLongestSingleCharacterSubstringLengthInArray(rightChildIndex, midRange + 1, rightRange, midRange + 1, right);
             }
         }
 
