@@ -3,6 +3,7 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -34,6 +35,17 @@ func sliceFunctions() {
 	slicePointerFunction(b)
 
 	fmt.Printf("Slice after performing operations by pointer: %v \n", b)
+
+	// reverse works in place
+	slices.Reverse(a)
+	fmt.Printf("Slice reversed in place: %v \n", a)
+
+	startIndexInclusive := 1
+	endIndexNonInclusive := 3
+	sliceWithDeleteFromMiddle := slices.Delete(a, startIndexInclusive, endIndexNonInclusive) // in-places is also removed, but length remains, end elements will be set to 0
+
+	fmt.Printf("Slice after slices.Delete[%v; %v) is modified, but the length remains: %v \n", startIndexInclusive, endIndexNonInclusive, a)
+	fmt.Printf("Separate modified slice after slieces.Delete[%v; %v): %v \n", startIndexInclusive, endIndexNonInclusive, sliceWithDeleteFromMiddle)
 }
 
 func slicePointerFunction(a *[]int) { // passing a pointer will modify the argument
