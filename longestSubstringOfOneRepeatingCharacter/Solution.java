@@ -55,7 +55,7 @@ class Solution {
         private int rootRightRange;
 
         // these are arrays of values for every segment
-        private char[] chars; // just the character in the leaf segment // todo: this is not necessary for this task, it cannot be aggregatet above the leaf nodes
+//        private char[] chars; // just the character in the leaf segment // todo: this is not necessary for this task, it cannot be aggregatet above the leaf nodes
         private char[] leftChars; // leftmost character of the segment // todo: name startChars?
         private char[] rightChars; // leftmost character of the segment // todo: name endChars?
 
@@ -89,11 +89,11 @@ class Solution {
 
             buildArray(nums, ROOT_INDEX, ROOT_LEFT_RANGE, rootRightRange);
 
-            System.out.printf("Segment tree array: %s \n", Arrays.toString(chars));
+//            System.out.printf("Segment tree array: %s \n", Arrays.toString(chars));
         }
 
         private void initArrays(int size) {
-            chars = new char[size];
+//            chars = new char[size];
             leftChars = new char[size];
             rightChars = new char[size];
             longestPrefixLengths = new int[size];
@@ -151,7 +151,7 @@ class Solution {
 //                throw new IllegalStateException(String.format("buildValuesForTheLeaf: i == %d, indexInNums == %d, i <> indexInNums.", i, indexInNums));
 //            }
 
-            chars[i] = value;
+//            chars[i] = value;
             leftChars[i] = value; // just 1 character, it's both left and right
             rightChars[i] = value; // just 1 character, it's both left and right
 
@@ -162,7 +162,7 @@ class Solution {
         }
 
         private void updateLeafNode(int i, char value) {
-            chars[i] = value;
+//            chars[i] = value;
             leftChars[i] = value; // just 1 character, it's both left and right
             rightChars[i] = value; // just 1 character, it's both left and right
 
@@ -335,5 +335,7 @@ class Solution {
         // todo: understand about lengths
 
         // todo: try to rewrite the SegmentTree in Go, and check whether it will be faster. The current solution is slow, around 140 ms :(
+        // !!! commenting out chars usage and System.out of it decreased to around 110 ms
+        // Actually, this was a System.out, I tried with chars but without System.out
     }
 }
