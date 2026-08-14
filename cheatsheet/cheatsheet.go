@@ -65,6 +65,17 @@ func copyArray(arr []int) []int {
 	return arrayCopy
 }
 
+func maxInArray(arr []int) int {
+	// we assume the array is non-empty
+	m := arr[0]
+
+	for _, v := range arr {
+		m = max(m, v)
+	}
+
+	return m
+}
+
 func listFunctions() {
 	fmt.Println()
 	fmt.Println("==================== list.List functions ====================")
@@ -158,6 +169,97 @@ func getLongAndShortStrings(a, b string) (long, short string) {
 	}
 
 	return b, a
+}
+
+func uniquePrimeFactors(n int) []int { // gets unique prime factors
+	// todo: handle n == 1
+
+	// todo: we can use precalculated prime numbers to only iterate only via them
+	factors := make([]int, 0)
+
+	// todo: fix the potential overflow on (d * d)
+	for d := 2; d*d <= n; d++ { // iterate up to ceil(sqrt(n))
+		if n%d == 0 {
+			factors = append(factors, d) // only append this prime factor once
+
+			// Remove all occurrences of d, so that all non-prime will drop as well (dividing by 2 will remove 4, 6 etc).
+			for n%d == 0 {
+				n /= d
+			}
+		}
+	}
+
+	// if the remaining value is prime (not 1 after all the divisions) -> add it as well
+	// e.g. 7 -> 7 will remain
+	// 26 -> 13 will remain
+	if n > 1 {
+		factors = append(factors, n)
+	}
+
+	return factors
+}
+
+func uniquePrimeFactorsWithPrecalculatedPrimeNumbers(n int, primeNumbers []int) []int { // gets unique prime factors
+	// todo: handle n == 1
+
+	factors := make([]int, 0)
+
+	for _, d := range primeNumbers { // we only iterate over the prime numbers
+		// todo: fix the potential overflow on (d * d)
+		if d*d > n {
+			break
+		}
+
+		if n%d == 0 {
+			factors = append(factors, d) // only append this prime factor once
+
+			// Remove all occurrences of d, so that all non-prime will drop as well (dividing by 2 will remove 4, 6 etc).
+			for n%d == 0 {
+				n /= d
+			}
+		}
+	}
+
+	// if the remaining value is prime (not 1 after all the divisions) -> add it as well
+	// e.g. 7 -> 7 will remain
+	// 26 -> 13 will remain
+	if n > 1 {
+		factors = append(factors, n)
+	}
+
+	return factors
+}
+
+func primesUpTo(n int) []int {
+	// Sieve of Eratosthenes
+	if n < 2 {
+		return []int{}
+	}
+
+	// to not init all to true in a separate O(n) cycle, we use the negation
+	isNotPrime := make([]bool, n+1)
+
+	// 1 is NOT prime
+	isNotPrime[1] = true
+
+	// Remove multiples of each prime.
+	for p := 2; p*p <= n; p++ {
+		if !isNotPrime[p] {
+			for multiple := p * p; multiple <= n; multiple += p {
+				isNotPrime[multiple] = true
+			}
+		}
+	}
+
+	// Collect the primes.
+	primes := []int{}
+	for i := 2; i <= n; i++ {
+		if !isNotPrime[i] {
+			primes = append(primes, i)
+		}
+	}
+
+	return primes
 }
 
 func main() {
