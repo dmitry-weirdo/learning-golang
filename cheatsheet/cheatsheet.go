@@ -171,6 +171,14 @@ func getLongAndShortStrings(a, b string) (long, short string) {
 	return b, a
 }
 
+func getMinAndMax(a, b int) (smaller, greater int) {
+	if a <= b {
+		return a, b
+	}
+
+	return b, a
+}
+
 func uniquePrimeFactors(n int) []int { // gets unique prime factors
 	// todo: handle n == 1
 
