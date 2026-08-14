@@ -109,8 +109,7 @@ func nextOrNil(node *ListNode) *ListNode {
 }
 
 func valToString(node *ListNode) string {
-	// avoids NPE failing on assigning
-	// next = current.Next
+	// avoids NPE failing on printing node.Val in the log
 	if node == nil {
 		return "nil"
 	}
