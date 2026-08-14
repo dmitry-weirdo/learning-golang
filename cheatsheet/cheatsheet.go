@@ -135,6 +135,16 @@ func stringBuilder() {
 	fmt.Printf("sb.String() after reset: %v \n", sb.String())
 }
 
+func stringToIntArray(s string) []int { // every byte converted to int
+	a := make([]int, len(s))
+
+	for i := 0; i < len(s); i++ {
+		a[i] = int(s[i])
+	}
+
+	return a
+}
+
 func main() {
 	stringBuilder()
 	listFunctions()
