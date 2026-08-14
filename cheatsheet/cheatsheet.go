@@ -145,6 +145,21 @@ func stringToIntArray(s string) []int { // every byte converted to int
 	return a
 }
 
+func reverseString(s string) string {
+	stringAsSlice := []byte(s)
+	slices.Reverse(stringAsSlice) // reverses in place
+
+	return string(stringAsSlice)
+}
+
+func getLongAndShortStrings(a, b string) (long, short string) {
+	if len(a) > len(b) {
+		return a, b
+	}
+
+	return b, a
+}
+
 func main() {
 	stringBuilder()
 	listFunctions()

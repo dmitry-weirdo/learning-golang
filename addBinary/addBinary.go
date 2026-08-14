@@ -14,13 +14,7 @@ func addBinary(a string, b string) string {
 }
 
 func addBinary_naive(a string, b string) string {
-	short := a
-	long := b
-
-	if len(a) > len(b) {
-		short = b
-		long = a
-	}
+	long, short := getLongAndShortStrings(a, b)
 
 	var sb strings.Builder
 
@@ -74,6 +68,14 @@ func addBinary_naive(a string, b string) string {
 	// we're calculating from the last digit to the first, so the result must be reversed.
 	s := sb.String()
 	return reverseString(s)
+}
+
+func getLongAndShortStrings(a, b string) (long, short string) {
+	if len(a) > len(b) {
+		return a, b
+	}
+
+	return b, a
 }
 
 func reverseString(s string) string {
