@@ -20,6 +20,7 @@ func maximumLengthSubstring_adopted_2958(s string) int {
 }
 
 // copy-paste of "2958. Length of Longest Subarray With at Most K Frequency",
+// just changed to handling string instead of []int
 func maxSubarrayLength_adopted(s string, k int) int {
 	// Very similar to "424. Longest Repeating Character Replacement",
 	// we also can skip shrinking the window from left until the perfect condition
