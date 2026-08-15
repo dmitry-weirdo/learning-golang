@@ -285,6 +285,14 @@ func gcd(a, b int) int { // greatest common divisor
 	return a
 }
 
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+
+	return v
+}
+
 func main() {
 	stringBuilder()
 	listFunctions()
