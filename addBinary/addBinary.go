@@ -7,8 +7,9 @@ import (
 )
 
 func addBinary(a string, b string) string {
-	// todo: implement as parsing bits, adding int values ant returning the string of bits
+	// implement as parsing bits, adding int values ant returning the string of bits
 	// (this might not work since the strings can be of 10^4 length
+	// Bits level comparison summing is actually a separate task "371. Sum of Two Integers".
 
 	return addBinary_naive(a, b)
 }
@@ -114,9 +115,14 @@ func test3() {
 	test("11", "11", "110") // 3 + 3 = 6
 }
 
+func test4() {
+	test("1111101000", "1111101000", "11111010000") // 1000 + 1000 = 2000
+}
+
 func main() {
 	// 67. Add Binary
 	test1()
 	test2()
 	test3()
+	test4()
 }
