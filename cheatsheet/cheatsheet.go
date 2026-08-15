@@ -270,6 +270,21 @@ func primesUpTo(n int) []int {
 	return primes
 }
 
+func lcm(a, b int) int { // least common multiple
+	gcdOfAAndB := gcd(a, b)
+
+	return (a / gcdOfAAndB) * b
+}
+
+func gcd(a, b int) int { // greatest common divisor
+	// Euclidean algorithm
+	for b != 0 {
+		a, b = b, a%b
+	}
+
+	return a
+}
+
 func main() {
 	stringBuilder()
 	listFunctions()
