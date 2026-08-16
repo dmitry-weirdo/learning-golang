@@ -3,11 +3,11 @@ package main
 import "fmt"
 
 func findArray(pref []int) []int {
-	// working on pref array itself -> no need for time/space on a separate array
+	// working on the pref array itself -> no need for time/space on a separate array
 	// yes, it passes in 0-2 ms
 	return findArray_inPlace(pref)
 
-	//// allocating separate array -> works, but slowly, 5+ ms
+	//// allocating a separate array -> works, but slowly, 5+ ms
 	//return findArray_naive(pref)
 }
 
