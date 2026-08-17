@@ -4,7 +4,7 @@ import "fmt"
 
 func stoneGameV(stoneValue []int) int {
 	ps := getPrefixSums(stoneValue)
-	fmt.Printf("Prefix sums: %v \n", ps)
+	//fmt.Printf("Prefix sums: %v \n", ps)
 
 	n := len(stoneValue)
 
@@ -20,7 +20,7 @@ func stoneGameV(stoneValue []int) int {
 		}
 
 		if memo[left][right] != 0 { // already computed -> return
-			fmt.Printf("Memo[%v][%v] = %v already calculated. Returning it. \n", left, right, memo[left][right])
+			//fmt.Printf("Memo[%v][%v] = %v already calculated. Returning it. \n", left, right, memo[left][right])
 			return memo[left][right]
 		}
 
@@ -39,17 +39,27 @@ func stoneGameV(stoneValue []int) int {
 			leftSum = ps[k+1] - ps[left]
 			rightSum = ps[right+1] - ps[k+1]
 
-			fmt.Printf("Range [%v; %v], split (to left) = a[%v] = %v. Left sum = %v. Right sum = %v. \n", left, right, k, stoneValue[k], leftSum, rightSum)
+			//fmt.Printf("Range [%v; %v], split (to left) = a[%v] = %v. Left sum = %v. Right sum = %v. \n", left, right, k, stoneValue[k], leftSum, rightSum)
 
 			if leftSum < rightSum {
 				// Bob takes right, Alice gets left
-				// todo: optimization
+
+				// max possible win is rightSum (current take) + rightSum (all the remaining right array)
+				// if maxScore is already more than this possible max, no need to run DFS further -> prune
+				if maxScore > 2*leftSum {
+					continue
+				}
 
 				aliceScore1 = leftSum + dfs(left, k)
 				maxScore = max(maxScore, aliceScore1)
 			} else if leftSum > rightSum {
 				// Bob takes left, Alice gets right
-				// todo: optimization
+
+				// max possible win is rightSum (current take) + rightSum (all the remaining right array)
+				// if maxScore is already more than this possible max, no need to run DFS further -> prune
+				if maxScore > 2*rightSum {
+					continue
+				}
 
 				aliceScore1 = rightSum + dfs(k+1, right)
 				maxScore = max(maxScore, aliceScore1)
@@ -57,15 +67,24 @@ func stoneGameV(stoneValue []int) int {
 				// sums are equal -> Alice can try both option
 
 				// Alice takes left
-				aliceScore1 = leftSum + dfs(left, k)
-				aliceScore2 = rightSum + dfs(k+1, right)
+				if maxScore > 2*leftSum { // no need to DFS left
+					aliceScore1 = -1
+				} else {
+					aliceScore1 = leftSum + dfs(left, k)
+				}
+
+				if maxScore > 2*rightSum { // no need to DFS right
+					aliceScore2 = -1
+				} else {
+					aliceScore2 = rightSum + dfs(k+1, right)
+				}
 
 				maxScore = max(maxScore, aliceScore1)
 				maxScore = max(maxScore, aliceScore2)
 			}
 		}
 
-		fmt.Printf("Max score for range [%v; %v]: %v \n", left, right, maxScore)
+		//fmt.Printf("Max score for range [%v; %v]: %v \n", left, right, maxScore)
 		memo[left][right] = maxScore
 		return maxScore
 	}
