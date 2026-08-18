@@ -24,7 +24,7 @@ func largestInteger(nums []int, k int) int {
 		freq[v]++
 	}
 
-	// case 2: k < n -> all the values except the first and the last will be in > 1 subarrays
+	// case 2: (1 < k < n) -> all the values except the first and the last will be in > 1 subarrays
 	maxValue := -1 // values are in range [0; 50]
 
 	if (1 < k) && (k < n) {
@@ -42,7 +42,7 @@ func largestInteger(nums []int, k int) int {
 		return maxValue
 	}
 
-	// case 3: k == 1 -> we need to select biggest with (freq = 1) in the whole arra
+	// case 3: k == 1 -> we need to select the biggest value with (freq = 1) in the whole array
 	if k == 1 {
 		for key, v := range freq {
 			if v == 1 && key > maxValue {
