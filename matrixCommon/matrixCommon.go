@@ -75,6 +75,20 @@ func createIntMatrix(rows, columns int) [][]int {
 	return m
 }
 
+func createIntMatrixWithDefaultValues(rows, columns int, defaultValue int) [][]int {
+	m := make([][]int, rows)
+
+	for i := range rows {
+		m[i] = make([]int, columns)
+
+		for j := range columns { // !!! note that this is slow, will take O(m * n) additional operations :(
+			m[i][j] = defaultValue
+		}
+	}
+
+	return m
+}
+
 func cellExists(rows, columns, row, column int) bool {
 	return (0 <= row) &&
 		(row < rows) &&
