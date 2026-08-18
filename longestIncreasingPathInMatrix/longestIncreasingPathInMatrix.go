@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"demo/matrixCommon"
+	"fmt"
+)
 
 var directions = [][]int{
 	{-1, 0}, // top
@@ -14,19 +17,6 @@ func cellExists(rows, columns, row, column int) bool {
 		(row < rows) &&
 		(0 <= column) &&
 		(column < columns)
-}
-
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := range rows {
-		for j := range columns {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
 }
 
 func longestIncreasingPath(matrix [][]int) int {
@@ -49,7 +39,7 @@ func longestIncreasingPath(matrix [][]int) int {
 			fmt.Printf("[%v][%v], max path length = %v \n", i, j, pathLength)
 
 			fmt.Printf("Memo matrix: \n")
-			printMatrix(memo)
+			matrixCommon.PrintIntMatrix(memo)
 
 			maxPathLength = max(maxPathLength, pathLength)
 		}
@@ -93,7 +83,7 @@ func test(m [][]int, expectedResult int) {
 	fmt.Println("========================")
 
 	fmt.Println("Matrix:")
-	printMatrix(m)
+	matrixCommon.PrintIntMatrix(m)
 
 	result := longestIncreasingPath(m)
 

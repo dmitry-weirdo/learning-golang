@@ -79,13 +79,14 @@ func rankTeams(votes []string) string {
 	return string(resultBytes)
 }
 
+// this is a specific function for this problem, so we're using this method instead of matrixCommon.PrintIntMatrix
 func printMatrix(mat [][]int) {
 	// this is a special handling where we print the first column as character and other columns as int
 	rows := len(mat)
 	columns := len(mat[0])
 
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
+	for i := range rows {
+		for j := range columns {
 			if j == 0 { // print as string instead of numeric byte
 				fmt.Printf("%c ", mat[i][j])
 			} else {

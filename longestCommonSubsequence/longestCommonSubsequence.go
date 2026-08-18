@@ -73,7 +73,7 @@ func printMatrix(mat [][]int, s, t string) {
 	columns := len(mat[0])
 
 	// print the header, string T
-	for j := 0; j < columns; j++ {
+	for j := range columns {
 
 		if j == 0 {
 			fmt.Printf("  ")
@@ -84,14 +84,14 @@ func printMatrix(mat [][]int, s, t string) {
 
 	fmt.Println()
 
-	for i := 0; i < rows; i++ {
+	for i := range rows {
 		if i < len(s) {
 			fmt.Printf("%c ", s[i])
 		} else {
 			fmt.Printf("  ")
 		}
 
-		for j := 0; j < columns; j++ {
+		for j := range columns {
 			fmt.Printf("%v ", mat[i][j])
 		}
 

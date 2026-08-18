@@ -293,16 +293,6 @@ func abs(v int) int {
 	return v
 }
 
-func createIntMatrix(rows, columns int) [][]int {
-	m := make([][]int, rows)
-
-	for i := range rows {
-		m[i] = make([]int, columns)
-	}
-
-	return m
-}
-
 func main() {
 	stringBuilder()
 	listFunctions()

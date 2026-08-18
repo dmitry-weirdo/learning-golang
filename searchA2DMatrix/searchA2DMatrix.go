@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"demo/matrixCommon"
+	"fmt"
+)
 
 func searchMatrix(matrix [][]int, target int) bool {
 	// todo: we can also treat a matrix as one array, with (row = idx / n) and (column = idx % n)
@@ -61,25 +64,12 @@ func findPotentialRow(m [][]int, rows int, columns int, target int) int { // ret
 	return -1
 }
 
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func test(matrix [][]int, target int, expectedResult bool) {
 	fmt.Println()
 	fmt.Println("========================")
 
 	fmt.Println("Matrix: ")
-	printMatrix(matrix)
+	matrixCommon.PrintIntMatrix(matrix)
 
 	fmt.Printf("Target value: %v \n", target)
 

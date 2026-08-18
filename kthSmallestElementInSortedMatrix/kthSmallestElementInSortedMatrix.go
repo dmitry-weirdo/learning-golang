@@ -1,6 +1,7 @@
 package main
 
 import (
+	"demo/matrixCommon"
 	"fmt"
 )
 
@@ -88,23 +89,12 @@ func countValuesLessThanOrEqual(m [][]int, n int, mid int) int {
 	return count
 }
 
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := range rows {
-		for j := range columns {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func test(mat [][]int, k int, expected int) {
+	// todo: rewrite as common test with checking the result
+
 	fmt.Println()
 	fmt.Printf("======================== \n")
-	printMatrix(mat)
+	matrixCommon.PrintIntMatrix(mat)
 	kthSmallest := kthSmallest(mat, k)
 	fmt.Printf("%v-th smallest element: %v \n", k, kthSmallest)
 
@@ -233,6 +223,6 @@ func main() {
 	test5()
 	test6()
 
-	fmt.Printf("-7 / 2: %v \n", -7/2)
-	fmt.Printf("-7 >> 1: %v \n", -7>>1)
+	fmt.Printf("-7 / 2: %v \n", -7/2)   // -3
+	fmt.Printf("-7 >> 1: %v \n", -7>>1) // -4
 }

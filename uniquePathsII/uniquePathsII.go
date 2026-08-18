@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"demo/matrixCommon"
+	"fmt"
+)
 
 func uniquePathsWithObstacles(obstacleGrid [][]int) int {
 	m := len(obstacleGrid)
@@ -58,19 +61,6 @@ func uniquePathsWithObstacles(obstacleGrid [][]int) int {
 	return previousRow[0]
 }
 
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func test(obstacleGrid [][]int, expectedResult int) {
 	fmt.Println()
 	fmt.Println("=================================")
@@ -81,7 +71,7 @@ func test(obstacleGrid [][]int, expectedResult int) {
 	fmt.Printf("N (columns): %v \n", n)
 
 	fmt.Println("Obstacles matrix:")
-	printMatrix(obstacleGrid)
+	matrixCommon.PrintIntMatrix(obstacleGrid)
 
 	result := uniquePathsWithObstacles(obstacleGrid)
 

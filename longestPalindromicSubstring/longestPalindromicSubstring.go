@@ -67,10 +67,11 @@ func printMatrix(mat [][]bool) {
 	rows := len(mat)
 	columns := len(mat[0])
 
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
+	for i := range rows {
+		for j := range columns {
 			var v string
 
+			// this is very specific for this task, so we use this method instead of matrixCommon.PrintBoolMatrix
 			if i > j { // we don't care about these values
 				v = "."
 			} else if mat[i][j] {

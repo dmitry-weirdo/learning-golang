@@ -655,6 +655,39 @@ func testIntMatrixToBoolArray(m [][]int, expectedResult []bool) {
 	}
 }
 
+func IntMatrixToIntArray(m [][]int) []int { // e.g. find a path within a matrix
+	return make([]int, len(m))
+}
+
+func testIntMatrixToIntArray(m [][]int, expectedResult []int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+
+	result := IntMatrixToIntArray(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func IntMatrixToInt(m [][]int) int { // calculate some element or length of path in the matrix
 	return len(m)
 }

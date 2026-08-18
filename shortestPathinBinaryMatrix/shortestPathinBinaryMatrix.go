@@ -2,6 +2,7 @@ package main
 
 import (
 	"container/list"
+	"demo/matrixCommon"
 	"fmt"
 )
 
@@ -158,25 +159,12 @@ func createVisitedMatrix(rows int, columns int) [][]bool {
 	return visited
 }
 
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func test(m [][]int, expectedResult int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
 	fmt.Printf("Matrix: \n")
-	printMatrix(m)
+	matrixCommon.PrintIntMatrix(m)
 
 	result := shortestPathBinaryMatrix(m)
 

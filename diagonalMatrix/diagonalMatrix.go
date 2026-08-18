@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"demo/matrixCommon"
+	"fmt"
+)
 
 const (
 	TOP_RIGHT = iota
@@ -90,23 +93,10 @@ func isRightReached(column int, columns int) bool {
 	return column == (columns - 1)
 }
 
-func printMatrix(mat [][]int) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%v ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func handleMatrix(mat [][]int) {
 	fmt.Println()
 	fmt.Printf("======================== \n")
-	printMatrix(mat)
+	matrixCommon.PrintIntMatrix(mat)
 	order := findDiagonalOrder(mat)
 	fmt.Printf("Order: %v \n", order)
 }

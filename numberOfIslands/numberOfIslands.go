@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"demo/matrixCommon"
+	"fmt"
+)
 
 var directions = [][]int{
 	{-1, 0}, // top
@@ -96,31 +99,18 @@ func cellExists(rows, columns, row, column int) bool {
 		(column < columns)
 }
 
-func printMatrix(mat [][]byte) {
-	rows := len(mat)
-	columns := len(mat[0])
-
-	for i := 0; i < rows; i++ {
-		for j := 0; j < columns; j++ {
-			fmt.Printf("%c ", mat[i][j])
-		}
-
-		fmt.Println()
-	}
-}
-
 func test(m [][]byte, expected int) {
 	fmt.Println()
 	fmt.Println("========================")
 
 	fmt.Println("Initial islands:")
-	printMatrix(m)
+	matrixCommon.PrintByteMatrix(m)
 
 	numberOfIslands := numIslands(m)
 
 	fmt.Println()
 	fmt.Println("Islands after marking by numbers:")
-	printMatrix(m)
+	matrixCommon.PrintByteMatrix(m)
 
 	fmt.Println()
 	fmt.Printf("Expected number of Islands: %v \n", expected)
