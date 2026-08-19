@@ -46,6 +46,12 @@ func sliceFunctions() {
 
 	fmt.Printf("Slice after slices.Delete[%v; %v) is modified, but the length remains: %v \n", startIndexInclusive, endIndexNonInclusive, a)
 	fmt.Printf("Separate modified slice after slieces.Delete[%v; %v): %v \n", startIndexInclusive, endIndexNonInclusive, sliceWithDeleteFromMiddle)
+
+	// check if slice contains a value
+	contains666 := slices.Contains(sliceWithDeleteFromMiddle, 666)
+	contains100 := slices.Contains(sliceWithDeleteFromMiddle, 100)
+	fmt.Printf("Slice %v contains 666: %v \n", sliceWithDeleteFromMiddle, contains666)
+	fmt.Printf("Slice %v contains 100: %v \n", sliceWithDeleteFromMiddle, contains100)
 }
 
 func slicePointerFunction(a *[]int) { // passing a pointer will modify the argument
