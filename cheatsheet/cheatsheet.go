@@ -24,8 +24,6 @@ func sliceFunctions() {
 	fmt.Printf("Element removed from a[%v] = %v \n", indexToRemove, removedElement)
 	fmt.Printf("Slice after removing a[%v]: %v \n", indexToRemove, a)
 
-	// todo: remove last element from the slice (actually the "middle removal" code should also work as general
-
 	// remove last element
 	a = a[:len(a)-1]
 	fmt.Printf("Slice after removing last element: %v \n", a)
