@@ -708,6 +708,26 @@ func testIntMatrixToInt(m [][]int, expectedResult int) {
 	}
 }
 
+func IntMatrixToBool(m [][]int) bool { // e.g. check whether something is possible in the graph (matrix of edges)
+	return len(m) > 2
+}
+
+func testIntMatrixToBool(m [][]int, expectedResult bool) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+
+	result := IntMatrixToBool(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func IntMatrixToFloat64(m [][]int) float64 { // calculate some element or length of path in the matrix
 	return float64(len(m))
 }
