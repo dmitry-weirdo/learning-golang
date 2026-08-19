@@ -53,7 +53,7 @@ func test(x int, expectedResult string) { // nodes can be null
 
 	result := convertToTitle(x)
 
-	fmt.Printf("Excel column name: %v \n", result) // todo: replace with your text
+	fmt.Printf("Excel column name: %v \n", result)
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if result != expectedResult {
