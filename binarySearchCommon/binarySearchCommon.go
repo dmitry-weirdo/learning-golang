@@ -81,3 +81,25 @@ func binarySearchGeneric(
 	// after exiting the while loop, left is the minimal k satisfying the condition function;
 	return left
 }
+
+func binarySearchOnRangeGeneric(
+	left int, // left of your range
+	right int, // inclusive right of your range
+	condition func(int) bool, // we will find the leftmost value satisfying this condition within [left; right] range
+) int {
+	// Using a template from:
+	// https://leetcode.com/discuss/post/786126/python-powerful-ultimate-binary-search-t-rwv8/
+	for left < right {
+		mid := (left + right) / 2
+
+		// NOT using an array
+		if condition(mid) { // target condition
+			right = mid // in this template it is always mid, NOT mid - 1
+		} else {
+			left = mid + 1
+		}
+	}
+
+	// after exiting the while loop, left is the minimal k satisfying the condition function;
+	return left
+}
