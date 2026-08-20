@@ -140,3 +140,15 @@ func getListMiddle(head *ListNode) *ListNode {
 
 	return slow
 }
+
+func getListLength(head *ListNode) int {
+	length := 0
+	node := head
+
+	for node != nil {
+		length++
+		node = node.Next
+	}
+
+	return length
+}
