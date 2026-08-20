@@ -21,10 +21,10 @@ func resultArray_singleResultArray(nums []int) []int {
 	result[0] = nums[0]
 	result[n-1] = nums[1]
 
-	// left goes left -> right
+	// left goes (left -> right)
 	left := 0
 
-	// right goes right -> left
+	// right goes (right -> left)
 	right := n - 1
 
 	for i := 2; i < n; i++ {
@@ -37,7 +37,7 @@ func resultArray_singleResultArray(nums []int) []int {
 		}
 	}
 
-	// reverse the part [result; n-1]
+	// reverse the part [right; n-1]
 	slices.Reverse(result[right:])
 
 	return result

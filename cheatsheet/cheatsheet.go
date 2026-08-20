@@ -84,6 +84,15 @@ func maxInArray(arr []int) int {
 	return m
 }
 
+func uniqueSortedValuesInArray(arr []int) []int {
+	// overall complexity is O(n + n * log n + n) = O(2 * n + n * log n) = O(n * log n)
+
+	clone := slices.Clone(arr) // don't change the original array, O(n)
+	slices.Sort(clone)         // sorts in-place, O(n * log n)
+
+	return slices.Compact(clone) // removes consecutive duplicates, O(n)
+}
+
 func listFunctions() {
 	fmt.Println()
 	fmt.Println("==================== list.List functions ====================")
