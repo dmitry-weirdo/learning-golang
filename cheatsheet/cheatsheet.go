@@ -38,12 +38,16 @@ func sliceFunctions() {
 	slices.Reverse(a)
 	fmt.Printf("Slice reversed in place: %v \n", a)
 
+	// we can reverse just a part of the array
+	slices.Reverse(a[1:3]) // end is non-inclusive
+	fmt.Printf("Slice part [1:2] reversed in place: %v \n", a)
+
 	startIndexInclusive := 1
 	endIndexNonInclusive := 3
 	sliceWithDeleteFromMiddle := slices.Delete(a, startIndexInclusive, endIndexNonInclusive) // in-places is also removed, but length remains, end elements will be set to 0
 
 	fmt.Printf("Slice after slices.Delete[%v; %v) is modified, but the length remains: %v \n", startIndexInclusive, endIndexNonInclusive, a)
-	fmt.Printf("Separate modified slice after slieces.Delete[%v; %v): %v \n", startIndexInclusive, endIndexNonInclusive, sliceWithDeleteFromMiddle)
+	fmt.Printf("Separate modified slice after slices.Delete[%v; %v): %v \n", startIndexInclusive, endIndexNonInclusive, sliceWithDeleteFromMiddle)
 
 	// check if slice contains a value
 	contains666 := slices.Contains(sliceWithDeleteFromMiddle, 666)
