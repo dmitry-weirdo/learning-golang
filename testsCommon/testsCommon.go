@@ -3,6 +3,7 @@ package testsCommon
 import (
 	"demo/listsCommon"
 	. "demo/listsCommon" // not recommended, but ok for LeetCode -> to use ListNode without prefix
+	"demo/matrixCommon"
 	"demo/trees"
 	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without package prefix
 	"fmt"
@@ -591,8 +592,11 @@ func testIntMatrixToIntMatrix(m [][]int, expectedResult [][]int) {
 
 	result := IntMatrixToIntMatrixFunction(m) // todo: replace with your function
 
-	fmt.Printf("Result: %v \n", result) // todo: replace with your text
-	fmt.Printf("Expected result: %v \n", expectedResult)
+	fmt.Printf("Result: \n") // todo: replace with your text
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected result: \n", expectedResult)
+	matrixCommon.PrintIntMatrix(expectedResult)
 
 	if len(result) != len(expectedResult) {
 		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
