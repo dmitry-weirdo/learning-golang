@@ -47,7 +47,7 @@ func resultArray_twoFenwickTrees(nums []int) []int {
 	t1 := createEmptyFenwickTree(uniqueValuesCount)
 	t2 := createEmptyFenwickTree(uniqueValuesCount)
 
-	// add first values to tree1 and tree2 (i.e. set counts of these values 1
+	// add first values to tree1 and tree2 (i.e. set counts of these values to 1)
 	t1.Add(getIndexForFenwickTree(uniqueSortedValues, nums[0]), 1)
 	t2.Add(getIndexForFenwickTree(uniqueSortedValues, nums[1]), 1)
 
@@ -168,7 +168,7 @@ func binarySearchGeneric(
 }
 
 func getIndexForFenwickTree(uniqueSortedValues []int, value int) int {
-	return searchExactValueLeftmost(uniqueSortedValues, value) + 1 // FT has 1-based indexed
+	return searchExactValueLeftmost(uniqueSortedValues, value) + 1 // FT has 1-based indexes
 }
 
 type FenwickTree struct {
