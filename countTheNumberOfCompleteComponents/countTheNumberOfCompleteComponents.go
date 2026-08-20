@@ -1,6 +1,52 @@
-package unionFindCommon
+package main
 
 import "fmt"
+
+func countCompleteComponents(n int, edges [][]int) int {
+	// passes in 5-15 ms -> ok
+	return countCompleteComponents_unionFind(n, edges)
+}
+
+func countCompleteComponents_unionFind(n int, edges [][]int) int {
+	// group nodes into connected components
+	uf := newUnionFind(n)
+
+	for _, v := range edges {
+		uf.union(v[0], v[1])
+	}
+
+	//fmt.Printf("Parents of nodes: %v \n", uf.parents)
+	//fmt.Printf("Sizes of groups: %v \n", uf.sizes)
+
+	// group to edges count
+	groupToEdgesCount := make(map[int]int)
+
+	for _, v := range edges {
+		group := uf.find(v[0]) // we count just for one of the (from, to) nodes
+		groupToEdgesCount[group]++
+	}
+
+	//fmt.Printf("Count of edges by group: %v \n", groupToEdgesCount)
+
+	// count of nodes in every group
+	groupSizes := uf.getGroupsSizes()
+	//fmt.Printf("Group sizes: %v \n", groupSizes)
+
+	totalCompleteGroups := 0
+
+	for group, nodesInGroup := range groupSizes {
+		// Full graph will contain n * (n - 1) / 2 edges.
+		// Every node of N nodes connected to (n - 1) other nodes,
+		// divide by 2 since we counted every edge twice for both its nodes.
+		edgesCountForCompleteGroup := nodesInGroup * (nodesInGroup - 1) / 2
+
+		if groupToEdgesCount[group] == edgesCountForCompleteGroup {
+			totalCompleteGroups++
+		}
+	}
+
+	return totalCompleteGroups
+}
 
 type UnionFind struct {
 	parents []int // if parent[i] = i, it is the root, else it's the index of the parent
@@ -93,4 +139,58 @@ func (uf UnionFind) getGroupsSizes() map[int]int { // returns sizes for every gr
 	}
 
 	return m
+}
+
+func test(n int, edges [][]int, expectedResult int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Total vertices (from 0 to %v): %v \n", n-1, n)
+	fmt.Printf("Edges: %v \n", edges)
+
+	result := countCompleteComponents(n, edges)
+
+	fmt.Printf("Complete components count: %v \n", result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func test1() {
+	n := 6
+
+	edges := [][]int{
+		{0, 1},
+		{0, 2},
+		{1, 2},
+		{3, 4},
+	}
+
+	expected := 3
+
+	test(n, edges, expected)
+}
+
+func test2() {
+	n := 6
+
+	edges := [][]int{
+		{0, 1},
+		{0, 2},
+		{1, 2},
+		{3, 4},
+		{3, 5},
+	}
+
+	expected := 1
+
+	test(n, edges, expected)
+}
+
+func main() {
+	// 2685. Count the Number of Complete Components
+	test1()
+	test2()
 }
