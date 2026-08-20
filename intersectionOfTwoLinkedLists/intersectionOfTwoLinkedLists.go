@@ -15,7 +15,7 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
 	// O(2M + 2N) time = O(M + N)
 
 	// Passes in around 45-50 ms
-	return getIntersectionNode_twoPointers_clear(headA, headB)
+	//return getIntersectionNode_twoPointers_clear(headA, headB)
 
 	// iteration optimization that we can do everything in once cycle.
 	// Shorter pointer goes (N + M - N) = M
@@ -24,7 +24,9 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
 	// Total: 2M + 2N - same complexity as in the straightforward 2 pointers.
 
 	// -> O(2M + 2N) time = O(M + N)
-	//return getIntersectionNode_twoPointers_blackMagic(headA, headB)
+	// Passes in the same 45-50 ms
+	// -> there is NO NEED in this optimization, it complexifies the code, but makes NO time win.
+	return getIntersectionNode_twoPointers_blackMagic(headA, headB)
 }
 
 func getIntersectionNode_twoPointers_clear(headA, headB *ListNode) *ListNode {
@@ -95,8 +97,24 @@ func getIntersectionNode_twoPointers_blackMagic(headA, headB *ListNode) *ListNod
 	// - In the longer list, the poiner is at (M - N)
 	// - In the shorter list, the pointer is at the beginning
 
-	// todo: implement method
-	return nil
+	pA := headA
+	pB := headB
+
+	for pA != pB { // after 2 jumps to the lists start, we'll continue comparing from the same point (N nodes from the end of both lists)
+		if pA != nil {
+			pA = pA.Next
+		} else {
+			pA = headB
+		}
+
+		if pB != nil {
+			pB = pB.Next
+		} else {
+			pB = headA
+		}
+	}
+
+	return pA
 }
 
 func main() {
