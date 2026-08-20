@@ -5,7 +5,13 @@ import (
 )
 
 func getIntersectionNode(headA, headB *ListNode) *ListNode {
-	// todo: solution with a hashtable of list1 and then going through list2 will be a pure O(M + N) time, i.e. faster, but O(list1) space
+	// Solution with a hashtable of list1 and then going through list2
+	// should be a pure O(M + N) time, i.e. faster, but O(list1) space
+	// O(M + N) time, O(M) space
+	// !!! Interestingly, it takes bigger time 50-65 ms, since hashMap is a heavier/slower structure than just pointers.
+
+	// If we switch order of A and B iteration, to 45-55 ms :) But this is just "I am lucky with the test-cases" optimization.
+	return getIntersectionNode_hashMap(headA, headB)
 
 	// Basic two-pointer solution.
 	// -> O(M + N) time to find lengths
@@ -26,7 +32,30 @@ func getIntersectionNode(headA, headB *ListNode) *ListNode {
 	// -> O(2M + 2N) time = O(M + N)
 	// Passes in the same 45-50 ms
 	// -> there is NO NEED in this optimization, it complexifies the code, but makes NO time win.
-	return getIntersectionNode_twoPointers_blackMagic(headA, headB)
+	//return getIntersectionNode_twoPointers_blackMagic(headA, headB)
+}
+
+func getIntersectionNode_hashMap(headA, headB *ListNode) *ListNode {
+	m := make(map[*ListNode]bool)
+
+	node := headA
+
+	for node != nil {
+		m[node] = true
+		node = node.Next
+	}
+
+	node = headB
+
+	for node != nil {
+		if m[node] {
+			return node
+		}
+
+		node = node.Next
+	}
+
+	return node // will be nil
 }
 
 func getIntersectionNode_twoPointers_clear(headA, headB *ListNode) *ListNode {
