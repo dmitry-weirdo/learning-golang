@@ -692,6 +692,39 @@ func testIntMatrixToIntArray(m [][]int, expectedResult []int) {
 	}
 }
 
+func IntMatrixToStringArray(m [][]int) []string { // e.g. find a path within a matrix
+	return make([]string, len(m))
+}
+
+func testIntMatrixToStringArray(m [][]int, expectedResult []string) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+
+	result := IntMatrixToStringArray(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func IntMatrixToInt(m [][]int) int { // calculate some element or length of path in the matrix
 	return len(m)
 }
