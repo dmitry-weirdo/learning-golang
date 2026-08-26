@@ -19,7 +19,7 @@ type FrequencyNode struct {
 
 type LFUCache struct {
 	capacity      int
-	totalElements int
+	totalElements int                   // for code clarity, we can use len(m) instead.
 	freqList      *list.List            // List<*FrequencyNode>. We need to keep existing frequencies ordered
 	m             map[int]*list.Element // Key -> Element<*KeyValueFreq>. Element contains *KeyValueFreq. Element knows its key, value and frequency node element.
 }
@@ -266,25 +266,25 @@ func testGet(c *LFUCache, key, expectedValue int) {
 
 func test1() {
 	// Input
-	//["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
-	//[[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
+	// ["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
+	// [[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
 
 	// Output
-	//[null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+	// [null, null, null, 1, null, -1, 3, null, -1, 3, 4]
 
 	q := Constructor(2)
 	c := &q // pointer, to update the int fields
 
-	testPut(c, 1, 1)  // freq 1 -> 1
-	testPut(c, 2, 2)  // freq 1 ->  2, 1
-	testGet(c, 1, 1)  // freq 2 -> 1, freq 1 -> 2
-	testPut(c, 3, 3)  // freq 2 -> 1, freq 1 -> 3 | (key 2 removed)
-	testGet(c, 2, -1) // freq 2 -> 1, freq 1 -> 3
-	testGet(c, 3, 3)  // freq 2 -> 3, 1
-	testPut(c, 4, 4)  // freq 2 -> 3, freq 1 -> 4 (key 1 removed, even if it had freq > new key)
-	testGet(c, 1, -1) // freq 2 -> 3, freq 1 -> 4
-	testGet(c, 3, 3)  // freq 3 -> 3, freq 1 -> 4
-	testGet(c, 4, 4)  // freq 3 -> 3, freq 2 -> 4
+	testPut(c, 1, 1)  // freq 1 -> (1 -> 1)
+	testPut(c, 2, 2)  // freq 1 ->  (2 -> 2), (1 -> 1)
+	testGet(c, 1, 1)  // freq 2 -> (1 -> 1), freq 1 -> (2 -> 2)
+	testPut(c, 3, 3)  // freq 2 -> (1 -> 1), freq 1 -> (3 -> 3) | (key 2 removed)
+	testGet(c, 2, -1) // freq 2 -> (1 -> 1), freq 1 -> (3 -> 3)
+	testGet(c, 3, 3)  // freq 2 -> *(3 -> 3), (1 -> 1)
+	testPut(c, 4, 4)  // freq 2 -> (3 -> 3), freq 1 -> (4 -> 4) (key 1 removed, even if it had freq > new key)
+	testGet(c, 1, -1) // freq 2 -> (3 -> 3), freq 1 -> (4 -> 4)
+	testGet(c, 3, 3)  // freq 3 -> (3 -> 3), freq 1 -> (4 -> 4)
+	testGet(c, 4, 4)  // freq 3 -> (3 -> 3), freq 2 -> (4 -> 4)
 }
 
 func test2() {
