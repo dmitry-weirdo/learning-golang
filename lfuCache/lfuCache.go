@@ -14,15 +14,14 @@ type KeyValueFreq struct {
 type FrequencyNode struct {
 	name      string // just for printing usability
 	frequency int
-	elements  *list.List            // list contains *KeyValueFreq, so that we can update the value and freq in place
-	m         map[int]*list.Element // Map<Key, *KeyValueFreq> key to element // todo: do we need this?
+	elements  *list.List // List<*KeyValueFreq> list contains *KeyValueFreq, so that we can update the value and freq in place
 }
 
 type LFUCache struct {
 	capacity      int
 	totalElements int
-	freqList      *list.List            // List<FrequencyNode>. We need to keep existing frequencies ordered
-	m             map[int]*list.Element // Key -> Element<*KeyValueFreq>. key to element. Element contains *KeyValueFreq. Element knows its key, value and frequency.
+	freqList      *list.List            // List<*FrequencyNode>. We need to keep existing frequencies ordered
+	m             map[int]*list.Element // Key -> Element<*KeyValueFreq>. Element contains *KeyValueFreq. Element knows its key, value and frequency node element.
 }
 
 func Constructor(capacity int) LFUCache {
@@ -30,14 +29,12 @@ func Constructor(capacity int) LFUCache {
 		name:      "head",
 		frequency: -1,
 		elements:  list.New(), // no elements in fake head
-		m:         nil,        // no elements in fake head
 	}
 
 	tail := FrequencyNode{
 		name:      "tail",
 		frequency: -666,
 		elements:  list.New(), // no elements in fake tail
-		m:         nil,        // no elements in fake tail
 	}
 
 	frequencyList := list.New()
@@ -92,7 +89,6 @@ func (this *LFUCache) Get(key int) int {
 		newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
 
 		newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
-		nextFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
 		this.m[key] = newKeyValueFreqElement
 	} else {
 		// newFrequency does not exist -> add new frequencyNode for newFrequency
@@ -100,7 +96,6 @@ func (this *LFUCache) Get(key int) int {
 			name:      this.getFrequencyNodeName(newFrequency),
 			frequency: newFrequency,
 			elements:  list.New(),
-			m:         make(map[int]*list.Element),
 		}
 
 		newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
@@ -109,7 +104,6 @@ func (this *LFUCache) Get(key int) int {
 
 		// add new KeyValueFreq to newFrequencyNode
 		newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-		newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
 		this.m[key] = newKeyValueFreqElement
 	}
 
@@ -122,11 +116,8 @@ func (this *LFUCache) Get(key int) int {
 func (this *LFUCache) RemoveElementFromFrequencyNode(frequencyElement *list.Element, keyValueFreqElement *list.Element) {
 	frequencyNode := frequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
 
-	keyValueFreq := keyValueFreqElement.Value.(*KeyValueFreq)
-
 	// remove from old frequency node
 	frequencyNode.elements.Remove(keyValueFreqElement)
-	delete(frequencyNode.m, keyValueFreq.key) // todo: do we need this?
 
 	// no values for old frequency -> remove the frequency node from LFU.freqList
 	if frequencyNode.elements.Len() <= 0 {
@@ -140,17 +131,21 @@ func (this *LFUCache) Put(key int, value int) {
 		this.totalElements++
 
 		if this.totalElements > this.capacity {
-			fmt.Printf("Total elements = %v > capacity = %v. Removing the LFU -> LRU element. \n", this.totalElements, this.capacity)
+			//fmt.Printf("Total elements = %v > capacity = %v. Removing the LFU -> LRU element. \n", this.totalElements, this.capacity)
 
 			// get LFU frequency
 			leastFrequencyElement := this.freqList.Front().Next()
 			leastFrequencyNode := leastFrequencyElement.Value.(*FrequencyNode)
 
+			if leastFrequencyNode.elements.Len() <= 0 { // this must never happen, only can happen if capacity is set to 0
+				panic(fmt.Sprintf("There are no elements in the LFU list for least frequency = %v.", leastFrequencyNode.frequency))
+			}
+
 			// get LRU element within LRU frequency
 			lruKeyValueFreqElement := leastFrequencyNode.elements.Back()
 			lruKeyValueFreq := lruKeyValueFreqElement.Value.(*KeyValueFreq)
 
-			fmt.Printf("From the least frequency %v, removing the LRU (key %v -> value %v). \n", leastFrequencyNode.frequency, lruKeyValueFreq.key, lruKeyValueFreq.value)
+			//fmt.Printf("From the least frequency %v, removing the LRU (key %v -> value %v). \n", leastFrequencyNode.frequency, lruKeyValueFreq.key, lruKeyValueFreq.value)
 
 			this.RemoveElementFromFrequencyNode(leastFrequencyElement, lruKeyValueFreqElement)
 
@@ -174,14 +169,12 @@ func (this *LFUCache) Put(key int, value int) {
 			newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
 
 			newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
-			nextFrequencyNode.m[key] = nextFrequencyElement // todo: do we need this?
 			this.m[key] = newKeyValueFreqElement
 		} else { // frequency 1 node does not exist -> add it
 			newFrequencyNode := &FrequencyNode{
 				name:      this.getFrequencyNodeName(newFrequency),
 				frequency: newFrequency,
 				elements:  list.New(),
-				m:         make(map[int]*list.Element),
 			}
 
 			// insert freq 1 after head
@@ -191,7 +184,6 @@ func (this *LFUCache) Put(key int, value int) {
 
 			// add new KeyValueFreq to newFrequencyNode
 			newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-			newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
 			this.m[key] = newKeyValueFreqElement
 		}
 
@@ -226,7 +218,6 @@ func (this *LFUCache) Put(key int, value int) {
 			newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
 
 			newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
-			nextFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
 			this.m[key] = newKeyValueFreqElement
 		} else {
 			// newFrequency does not exist -> add new frequencyNode for newFrequency
@@ -234,7 +225,6 @@ func (this *LFUCache) Put(key int, value int) {
 				name:      this.getFrequencyNodeName(newFrequency),
 				frequency: newFrequency,
 				elements:  list.New(),
-				m:         make(map[int]*list.Element),
 			}
 
 			newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
@@ -243,7 +233,6 @@ func (this *LFUCache) Put(key int, value int) {
 
 			// add new KeyValueFreq to newFrequencyNode
 			newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-			newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
 			this.m[key] = newKeyValueFreqElement
 		}
 
