@@ -12,7 +12,7 @@ type KeyValueFreq struct {
 }
 
 type FrequencyNode struct {
-	name      string // just for printing usability
+	//name      string // just for printing usability
 	frequency int
 	elements  *list.List // List<*KeyValueFreq> list contains *KeyValueFreq, so that we can update the value and freq in place
 }
@@ -26,13 +26,13 @@ type LFUCache struct {
 
 func Constructor(capacity int) LFUCache {
 	head := FrequencyNode{
-		name:      "head",
+		//name:      "head",
 		frequency: -1,
 		elements:  list.New(), // no elements in fake head
 	}
 
 	tail := FrequencyNode{
-		name:      "tail",
+		//name:      "tail",
 		frequency: -666,
 		elements:  list.New(), // no elements in fake tail
 	}
@@ -93,7 +93,7 @@ func (this *LFUCache) Get(key int) int {
 	} else {
 		// newFrequency does not exist -> add new frequencyNode for newFrequency
 		newFrequencyNode := &FrequencyNode{
-			name:      this.getFrequencyNodeName(newFrequency),
+			//name:      this.getFrequencyNodeName(newFrequency),
 			frequency: newFrequency,
 			elements:  list.New(),
 		}
@@ -172,7 +172,7 @@ func (this *LFUCache) Put(key int, value int) {
 			this.m[key] = newKeyValueFreqElement
 		} else { // frequency 1 node does not exist -> add it
 			newFrequencyNode := &FrequencyNode{
-				name:      this.getFrequencyNodeName(newFrequency),
+				//name:      this.getFrequencyNodeName(newFrequency),
 				frequency: newFrequency,
 				elements:  list.New(),
 			}
@@ -222,7 +222,7 @@ func (this *LFUCache) Put(key int, value int) {
 		} else {
 			// newFrequency does not exist -> add new frequencyNode for newFrequency
 			newFrequencyNode := &FrequencyNode{
-				name:      this.getFrequencyNodeName(newFrequency),
+				//name:      this.getFrequencyNodeName(newFrequency),
 				frequency: newFrequency,
 				elements:  list.New(),
 			}
@@ -253,7 +253,7 @@ func (this *LFUCache) Print() {
 		// for every frequency
 		v := freqElement.Value.(*FrequencyNode)
 
-		fmt.Printf("%v: ", v.frequency)
+		fmt.Printf("Frequency %v: ", v.frequency)
 
 		for e := v.elements.Front(); e != nil; e = e.Next() {
 			keyValueFreq := e.Value.(*KeyValueFreq)
