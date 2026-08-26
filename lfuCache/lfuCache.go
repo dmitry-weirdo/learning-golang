@@ -27,7 +27,7 @@ type LFUCache struct {
 func Constructor(capacity int) LFUCache {
 	head := FrequencyNode{
 		//name:      "head",
-		frequency: -1,
+		frequency: 0,          // so that "frequency: 1" node should be after it
 		elements:  list.New(), // no elements in fake head
 	}
 
@@ -91,39 +91,23 @@ func (this *LFUCache) Put(key int, value int) {
 			this.RemoveLruElementFromLfuFrequency()
 		}
 
-		newFrequency := 1
+		frequency0Element := this.freqList.Front()
 
-		nextFrequencyElement := this.freqList.Front().Next()
-		nextFrequencyNode := nextFrequencyElement.Value.(*FrequencyNode)
-		nextFrequency := nextFrequencyNode.frequency
+		// get frequencyElement for frequency = 1
+		newFrequencyElement := this.GetFrequencyElementForFrequencyPlusOne(frequency0Element)
+		newFrequencyNode := newFrequencyElement.Value.(*FrequencyNode)
 
 		newKeyValueFreq := &KeyValueFreq{
 			key:                  key,
 			value:                value,
-			frequencyNodeElement: nil, // will be set below to thew newFrequencyElement
+			frequencyNodeElement: newFrequencyElement,
 		}
 
-		if nextFrequency == newFrequency { // frequency 1 node already exists -> add to it
-			newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
+		// add new KeyValueFreq to the beginning of newFrequencyNode.elements
+		newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
 
-			newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
-			this.m[key] = newKeyValueFreqElement
-		} else { // frequency 1 node does not exist -> add it
-			newFrequencyNode := &FrequencyNode{
-				//name:      this.getFrequencyNodeName(newFrequency),
-				frequency: newFrequency,
-				elements:  list.New(),
-			}
-
-			// insert freq 1 after head
-			newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, this.freqList.Front())
-
-			newKeyValueFreq.frequencyNodeElement = newFrequencyElement
-
-			// add new KeyValueFreq to newFrequencyNode
-			newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-			this.m[key] = newKeyValueFreqElement
-		}
+		// for the global O(1) access by key, set the new element for this key
+		this.m[key] = newKeyValueFreqElement
 
 		// there was no old frequency for this key -> we do not remove it from the old frequency
 	} else {
