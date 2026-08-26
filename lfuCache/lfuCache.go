@@ -1,0 +1,356 @@
+package main
+
+import (
+	"container/list"
+	"fmt"
+)
+
+type KeyValueFreq struct {
+	key                  int // need to store the key to remove the LRU key from the map
+	value                int
+	frequencyNodeElement *list.Element // to just keep a link on element in the main map
+}
+
+type FrequencyNode struct {
+	name      string // just for printing usability
+	frequency int
+	elements  *list.List            // list contains *KeyValueFreq, so that we can update the value and freq in place
+	m         map[int]*list.Element // Map<Key, *KeyValueFreq> key to element // todo: do we need this?
+}
+
+type LFUCache struct {
+	capacity      int
+	totalElements int
+	freqList      *list.List            // List<FrequencyNode>. We need to keep existing frequencies ordered
+	m             map[int]*list.Element // Key -> Element<*KeyValueFreq>. key to element. Element contains *KeyValueFreq. Element knows its key, value and frequency.
+}
+
+func Constructor(capacity int) LFUCache {
+	head := FrequencyNode{
+		name:      "head",
+		frequency: -1,
+		elements:  list.New(), // no elements in fake head
+		m:         nil,        // no elements in fake head
+	}
+
+	tail := FrequencyNode{
+		name:      "tail",
+		frequency: -666,
+		elements:  list.New(), // no elements in fake tail
+		m:         nil,        // no elements in fake tail
+	}
+
+	frequencyList := list.New()
+	frequencyList.PushFront(&head)
+	frequencyList.PushBack(&tail)
+
+	return LFUCache{
+		capacity:      capacity,
+		totalElements: 0,
+		freqList:      frequencyList,
+		m:             make(map[int]*list.Element),
+	}
+}
+
+func (this *LFUCache) GetWithoutFrequencyUpdate(key int) int {
+	if _, ok := this.m[key]; !ok { // element not found
+		return -1
+	}
+
+	return this.m[key].Value.(*KeyValueFreq).value
+}
+
+func (this *LFUCache) Get(key int) int {
+	if _, ok := this.m[key]; !ok { // element not found
+		return -1
+	}
+
+	// key used -> increase its frequency, remove from old frequency, add new frequency
+	oldKeyValueFreqElement := this.m[key]
+	oldKeyValueFreq := oldKeyValueFreqElement.Value.(*KeyValueFreq)
+
+	oldFrequencyElement := oldKeyValueFreq.frequencyNodeElement
+	oldFrequencyNode := oldFrequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
+	oldFrequency := oldFrequencyNode.frequency
+
+	// add to new frequency node
+	newFrequency := oldFrequency + 1
+
+	// todo: if possible, reuse the same keyValueFreq
+	newKeyValueFreq := &KeyValueFreq{
+		key:                  key,
+		value:                oldKeyValueFreq.value,
+		frequencyNodeElement: nil, // will be set below to thew newFrequencyElement
+	}
+
+	nextFrequencyElement := oldFrequencyElement.Next()
+	nextFrequencyNode := nextFrequencyElement.Value.(*FrequencyNode)
+	nextFrequency := nextFrequencyNode.frequency
+
+	if nextFrequency == newFrequency {
+		// newFrequency exists -> add to this nextFrequencyNode
+		newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
+
+		newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
+		nextFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
+		this.m[key] = newKeyValueFreqElement
+	} else {
+		// newFrequency does not exist -> add new frequencyNode for newFrequency
+		newFrequencyNode := &FrequencyNode{
+			name:      this.getFrequencyNodeName(newFrequency),
+			frequency: newFrequency,
+			elements:  list.New(),
+			m:         make(map[int]*list.Element),
+		}
+
+		newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
+
+		newKeyValueFreq.frequencyNodeElement = newFrequencyElement
+
+		// add new KeyValueFreq to newFrequencyNode
+		newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+		newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
+		this.m[key] = newKeyValueFreqElement
+	}
+
+	// remove from old frequency node
+	this.RemoveElementFromFrequencyNode(oldFrequencyElement, oldKeyValueFreqElement)
+
+	return oldKeyValueFreq.value
+}
+
+func (this *LFUCache) RemoveElementFromFrequencyNode(frequencyElement *list.Element, keyValueFreqElement *list.Element) {
+	frequencyNode := frequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
+
+	keyValueFreq := keyValueFreqElement.Value.(*KeyValueFreq)
+
+	// remove from old frequency node
+	frequencyNode.elements.Remove(keyValueFreqElement)
+	delete(frequencyNode.m, keyValueFreq.key) // todo: do we need this?
+
+	// no values for old frequency -> remove the frequency node from LFU.freqList
+	if frequencyNode.elements.Len() <= 0 {
+		this.freqList.Remove(frequencyElement)
+	}
+}
+
+func (this *LFUCache) Put(key int, value int) {
+	if _, ok := this.m[key]; !ok { // element not found -> add new element for this key
+		// new key -> increase totalElements, potentially removed the LFU -> LRU element
+		this.totalElements++
+
+		if this.totalElements > this.capacity {
+			fmt.Printf("Total elements = %v > capacity = %v. Removing the LFU -> LRU element. \n", this.totalElements, this.capacity)
+
+			// get LFU frequency
+			leastFrequencyElement := this.freqList.Front().Next()
+			leastFrequencyNode := leastFrequencyElement.Value.(*FrequencyNode)
+
+			// get LRU element within LRU frequency
+			lruKeyValueFreqElement := leastFrequencyNode.elements.Back()
+			lruKeyValueFreq := lruKeyValueFreqElement.Value.(*KeyValueFreq)
+
+			fmt.Printf("From the least frequency %v, removing the LRU (key %v -> value %v). \n", leastFrequencyNode.frequency, lruKeyValueFreq.key, lruKeyValueFreq.value)
+
+			this.RemoveElementFromFrequencyNode(leastFrequencyElement, lruKeyValueFreqElement)
+
+			delete(this.m, lruKeyValueFreq.key)
+			this.totalElements--
+		}
+
+		newFrequency := 1
+
+		nextFrequencyElement := this.freqList.Front().Next()
+		nextFrequencyNode := nextFrequencyElement.Value.(*FrequencyNode)
+		nextFrequency := nextFrequencyNode.frequency
+
+		newKeyValueFreq := &KeyValueFreq{
+			key:                  key,
+			value:                value,
+			frequencyNodeElement: nil, // will be set below to thew newFrequencyElement
+		}
+
+		if nextFrequency == newFrequency { // frequency 1 node already exists -> add to it
+			newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
+
+			newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
+			nextFrequencyNode.m[key] = nextFrequencyElement // todo: do we need this?
+			this.m[key] = newKeyValueFreqElement
+		} else { // frequency 1 node does not exist -> add it
+			newFrequencyNode := &FrequencyNode{
+				name:      this.getFrequencyNodeName(newFrequency),
+				frequency: newFrequency,
+				elements:  list.New(),
+				m:         make(map[int]*list.Element),
+			}
+
+			// insert freq 1 after head
+			newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, this.freqList.Front())
+
+			newKeyValueFreq.frequencyNodeElement = newFrequencyElement
+
+			// add new KeyValueFreq to newFrequencyNode
+			newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+			newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
+			this.m[key] = newKeyValueFreqElement
+		}
+
+		// there was no old frequency for this key -> we do not remove it from the old frequency
+	} else {
+		// element found -> updated it to the new frequency, remove from the old frequency
+		// totalElements not changed -> no removal
+
+		oldKeyValueFreqElement := this.m[key]
+		oldKeyValueFreq := oldKeyValueFreqElement.Value.(*KeyValueFreq)
+
+		oldFrequencyElement := oldKeyValueFreq.frequencyNodeElement
+		oldFrequencyNode := oldFrequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
+		oldFrequency := oldFrequencyNode.frequency
+
+		// add to new frequency node
+		newFrequency := oldFrequency + 1
+
+		// todo: if possible, reuse the same keyValueFreq
+		newKeyValueFreq := &KeyValueFreq{
+			key:                  key,
+			value:                value,
+			frequencyNodeElement: nil, // will be set below to thew newFrequencyElement
+		}
+
+		nextFrequencyElement := oldFrequencyElement.Next()
+		nextFrequencyNode := nextFrequencyElement.Value.(*FrequencyNode)
+		nextFrequency := nextFrequencyNode.frequency
+
+		if nextFrequency == newFrequency {
+			// newFrequency exists -> add to this nextFrequencyNode
+			newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
+
+			newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
+			nextFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
+			this.m[key] = newKeyValueFreqElement
+		} else {
+			// newFrequency does not exist -> add new frequencyNode for newFrequency
+			newFrequencyNode := &FrequencyNode{
+				name:      this.getFrequencyNodeName(newFrequency),
+				frequency: newFrequency,
+				elements:  list.New(),
+				m:         make(map[int]*list.Element),
+			}
+
+			newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
+
+			newKeyValueFreq.frequencyNodeElement = newFrequencyElement
+
+			// add new KeyValueFreq to newFrequencyNode
+			newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+			newFrequencyNode.m[key] = newKeyValueFreqElement // todo: do we need this?
+			this.m[key] = newKeyValueFreqElement
+		}
+
+		// remove from old frequency node
+		this.RemoveElementFromFrequencyNode(oldFrequencyElement, oldKeyValueFreqElement)
+	}
+}
+
+func (this *LFUCache) getFrequencyNodeName(frequency int) string {
+	return fmt.Sprintf("frequency-%v", frequency)
+}
+
+func (this *LFUCache) Print() {
+	fmt.Println("====================")
+	fmt.Printf("Total elements: %v / %v \n", this.totalElements, this.capacity)
+
+	for freqElement := this.freqList.Front(); freqElement != nil; freqElement = freqElement.Next() {
+		// for every frequency
+		v := freqElement.Value.(*FrequencyNode)
+
+		fmt.Printf("%v: ", v.frequency)
+
+		for e := v.elements.Front(); e != nil; e = e.Next() {
+			keyValueFreq := e.Value.(*KeyValueFreq)
+
+			fmt.Printf("%v -> %v, ", keyValueFreq.key, keyValueFreq.value)
+		}
+
+		fmt.Println()
+	}
+
+	fmt.Println("====================")
+	fmt.Println()
+}
+
+func testPut(c *LFUCache, key, value int) {
+	fmt.Println()
+
+	c.Put(key, value)
+	fmt.Printf("Put value %v to key %v \n", value, key)
+
+	updatedValue := c.GetWithoutFrequencyUpdate(key) // avoid frequency side effect
+	fmt.Printf("Updated value for key %v: %v \n", key, updatedValue)
+
+	if updatedValue != value {
+		fmt.Printf("FAILURE: expected updated value = %v, actual updated value = %v \n", updatedValue, value)
+	}
+
+	c.Print()
+}
+
+func testGet(c *LFUCache, key, expectedValue int) {
+	fmt.Println()
+
+	value := c.Get(key)
+	fmt.Printf("Got value for key %v: %v \n", key, value)
+
+	if value != expectedValue {
+		fmt.Printf("FAILURE: expected value = %v, actual value = %v \n", expectedValue, value)
+	}
+
+	c.Print()
+}
+
+func test1() {
+	// Input
+	//["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
+	//[[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
+
+	// Output
+	//[null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+
+	q := Constructor(2)
+	c := &q // pointer, to update the int fields
+
+	testPut(c, 1, 1)  // freq 1 -> 1
+	testPut(c, 2, 2)  // freq 1 ->  2, 1
+	testGet(c, 1, 1)  // freq 2 -> 1, freq 1 -> 2
+	testPut(c, 3, 3)  // freq 2 -> 1, freq 1 -> 3 | (key 2 removed)
+	testGet(c, 2, -1) // freq 2 -> 1, freq 1 -> 3
+	testGet(c, 3, 3)  // freq 2 -> 3, 1
+	testPut(c, 4, 4)  // freq 2 -> 3, freq 1 -> 4 (key 1 removed, even if it had freq > new key)
+	testGet(c, 1, -1) // freq 2 -> 3, freq 1 -> 4
+	testGet(c, 3, 3)  // freq 3 -> 3, freq 1 -> 4
+	testGet(c, 4, 4)  // freq 3 -> 3, freq 2 -> 4
+}
+
+func test2() {
+	// Input
+	// ["LFUCache","put","put","put","put","get"]
+	// [[2],[3,1],[2,1],[2,2],[4,4],[2]]
+
+	// Output
+	// [null,null,null,null,null,2]
+
+	q := Constructor(2)
+	c := &q // pointer, to update the int fields
+
+	testPut(c, 3, 1) // freq 1 -> (3 -> 1)
+	testPut(c, 2, 1) // freq 1 -> (2 -> 1), (3 -> 1)
+	testPut(c, 2, 2) // freq 2 -> (2 -> 2), freq 1 -> (3 -> 1)
+	testPut(c, 4, 4) // freq 2 -> (2 -> 2), freq 1 -> (4 -> 4) (key 3 removed)
+	testGet(c, 2, 2) // freq 3 -> (2 -> 2), freq 1 -> (4 -> 4)
+}
+
+func main() {
+	// 460. LFU Cache
+	test1()
+	test2()
+}

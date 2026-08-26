@@ -12,7 +12,7 @@ type KeyValue struct {
 
 type LRUCache struct {
 	capacity int
-	elements *list.List
+	elements *list.List            // list contains *KeyValue, so that we can update the value in place
 	m        map[int]*list.Element // key to element
 }
 
@@ -38,7 +38,7 @@ func (this *LRUCache) Get(key int) int {
 
 func (this *LRUCache) Put(key int, value int) {
 	if _, ok := this.m[key]; !ok { // element not found -> add it
-		el := this.elements.PushFront(&KeyValue{key, value}) // todo: maybe *KeyValue
+		el := this.elements.PushFront(&KeyValue{key, value})
 		this.m[key] = el
 
 		if this.elements.Len() > this.capacity { // remove the LRU element from the end of the list

@@ -17,19 +17,19 @@ type AllOne struct {
 }
 
 func Constructor() AllOne {
-	var head = Node{
+	head := Node{
 		"head",
 		-1,
 		make(map[string]int, 0),
 	}
 
-	var tail = Node{
+	tail := Node{
 		"tail",
 		-100,
 		make(map[string]int, 0),
 	}
 
-	var l = list.New()
+	l := list.New()
 	l.PushFront(&head)
 	l.PushBack(&tail)
 
