@@ -142,15 +142,22 @@ func (this *LFUCache) IncreaseFrequencyForExistingKey(key int, newValue int) {
 	newFrequencyElement := this.GetFrequencyElementForFrequencyPlusOne(oldFrequencyElement)
 	newFrequencyNode := newFrequencyElement.Value.(*FrequencyNode)
 
-	// todo: if possible, reuse the same keyValueFreq
-	newKeyValueFreq := &KeyValueFreq{
-		key:                  key,
-		value:                newValue,
-		frequencyNodeElement: newFrequencyElement,
-	}
+	// todo: theoretically we can also move list.Element from oldFrequencyNode.elements to newFrequencyNode.elements. But it will lead to ugly and unsafe code.
+	/*
+		// if possible, reuse the same keyValueFreq
+		newKeyValueFreq := &KeyValueFreq{
+			key:                  key,
+			value:                newValue,
+			frequencyNodeElement: newFrequencyElement,
+		}
+	*/
+
+	// we can reuse the same KeyValueFreq, just change its value and link to the FrequencyNode
+	oldKeyValueFreq.value = newValue
+	oldKeyValueFreq.frequencyNodeElement = newFrequencyElement
 
 	// add new KeyValueFreq to the beginning of newFrequencyNode.elements
-	newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+	newKeyValueFreqElement := newFrequencyNode.elements.PushFront(oldKeyValueFreq)
 
 	// for the global O(1) access by key, set the new element for this key
 	this.m[key] = newKeyValueFreqElement
