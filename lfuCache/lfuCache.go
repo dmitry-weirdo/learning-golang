@@ -131,26 +131,7 @@ func (this *LFUCache) Put(key int, value int) {
 		this.totalElements++
 
 		if this.totalElements > this.capacity {
-			//fmt.Printf("Total elements = %v > capacity = %v. Removing the LFU -> LRU element. \n", this.totalElements, this.capacity)
-
-			// get LFU frequency
-			leastFrequencyElement := this.freqList.Front().Next()
-			leastFrequencyNode := leastFrequencyElement.Value.(*FrequencyNode)
-
-			if leastFrequencyNode.elements.Len() <= 0 { // this must never happen, only can happen if capacity is set to 0
-				panic(fmt.Sprintf("There are no elements in the LFU list for least frequency = %v.", leastFrequencyNode.frequency))
-			}
-
-			// get LRU element within LRU frequency
-			lruKeyValueFreqElement := leastFrequencyNode.elements.Back()
-			lruKeyValueFreq := lruKeyValueFreqElement.Value.(*KeyValueFreq)
-
-			//fmt.Printf("From the least frequency %v, removing the LRU (key %v -> value %v). \n", leastFrequencyNode.frequency, lruKeyValueFreq.key, lruKeyValueFreq.value)
-
-			this.RemoveElementFromFrequencyNode(leastFrequencyElement, lruKeyValueFreqElement)
-
-			delete(this.m, lruKeyValueFreq.key)
-			this.totalElements--
+			this.RemoveLruElementFromLfuFrequency()
 		}
 
 		newFrequency := 1
@@ -239,6 +220,29 @@ func (this *LFUCache) Put(key int, value int) {
 		// remove from old frequency node
 		this.RemoveElementFromFrequencyNode(oldFrequencyElement, oldKeyValueFreqElement)
 	}
+}
+
+func (this *LFUCache) RemoveLruElementFromLfuFrequency() {
+	//fmt.Printf("Total elements = %v > capacity = %v. Removing the LFU -> LRU element. \n", this.totalElements, this.capacity)
+
+	// get LFU frequency
+	leastFrequencyElement := this.freqList.Front().Next()
+	leastFrequencyNode := leastFrequencyElement.Value.(*FrequencyNode)
+
+	if leastFrequencyNode.elements.Len() <= 0 { // this must never happen, only can happen if capacity is set to 0
+		panic(fmt.Sprintf("There are no elements in the LFU list for least frequency = %v.", leastFrequencyNode.frequency))
+	}
+
+	// get LRU element within LRU frequency
+	lruKeyValueFreqElement := leastFrequencyNode.elements.Back()
+	lruKeyValueFreq := lruKeyValueFreqElement.Value.(*KeyValueFreq)
+
+	//fmt.Printf("From the least frequency %v, removing the LRU (key %v -> value %v). \n", leastFrequencyNode.frequency, lruKeyValueFreq.key, lruKeyValueFreq.value)
+
+	this.RemoveElementFromFrequencyNode(leastFrequencyElement, lruKeyValueFreqElement)
+
+	delete(this.m, lruKeyValueFreq.key)
+	this.totalElements--
 }
 
 func (this *LFUCache) getFrequencyNodeName(frequency int) string {
