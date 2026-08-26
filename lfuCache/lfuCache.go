@@ -138,48 +138,56 @@ func (this *LFUCache) IncreaseFrequencyForExistingKey(key int, newValue int) {
 	oldKeyValueFreq := oldKeyValueFreqElement.Value.(*KeyValueFreq)
 
 	oldFrequencyElement := oldKeyValueFreq.frequencyNodeElement
-	oldFrequencyNode := oldFrequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
-	oldFrequency := oldFrequencyNode.frequency
 
-	// add to new frequency node
-	newFrequency := oldFrequency + 1
+	newFrequencyElement := this.GetFrequencyElementForFrequencyPlusOne(oldFrequencyElement)
+	newFrequencyNode := newFrequencyElement.Value.(*FrequencyNode)
 
 	// todo: if possible, reuse the same keyValueFreq
 	newKeyValueFreq := &KeyValueFreq{
 		key:                  key,
 		value:                newValue,
-		frequencyNodeElement: nil, // will be set below to thew newFrequencyElement
+		frequencyNodeElement: newFrequencyElement,
 	}
+
+	// add new KeyValueFreq to the beginning of newFrequencyNode.elements
+	newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+
+	// for the global O(1) access by key, set the new element for this key
+	this.m[key] = newKeyValueFreqElement
+
+	// remove from old frequency node
+	this.RemoveElementFromFrequencyNode(oldFrequencyElement, oldKeyValueFreqElement)
+}
+
+func (this *LFUCache) GetFrequencyElementForFrequencyPlusOne(oldFrequencyElement *list.Element) *list.Element {
+	// if frequency element for (frequency + 1) exists -> return it
+	// if frequency element for (frequency + 1) does not exist -> adds it after oldFrequencyElement and returns it
+
+	oldFrequencyNode := oldFrequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
+	oldFrequency := oldFrequencyNode.frequency
+
+	newFrequency := oldFrequency + 1
 
 	nextFrequencyElement := oldFrequencyElement.Next()
 	nextFrequencyNode := nextFrequencyElement.Value.(*FrequencyNode)
 	nextFrequency := nextFrequencyNode.frequency
 
 	if nextFrequency == newFrequency {
-		// newFrequency exists -> add to this nextFrequencyNode
-		newKeyValueFreq.frequencyNodeElement = nextFrequencyElement
-
-		newKeyValueFreqElement := nextFrequencyNode.elements.PushFront(newKeyValueFreq)
-		this.m[key] = newKeyValueFreqElement
-	} else {
-		// newFrequency does not exist -> add new frequencyNode for newFrequency
-		newFrequencyNode := &FrequencyNode{
-			//name:      this.getFrequencyNodeName(newFrequency),
-			frequency: newFrequency,
-			elements:  list.New(),
-		}
-
-		newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
-
-		newKeyValueFreq.frequencyNodeElement = newFrequencyElement
-
-		// add new KeyValueFreq to newFrequencyNode
-		newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-		this.m[key] = newKeyValueFreqElement
+		// (oldFrequency + 1) node exists -> return it
+		return nextFrequencyElement
 	}
 
-	// remove from old frequency node
-	this.RemoveElementFromFrequencyNode(oldFrequencyElement, oldKeyValueFreqElement)
+	// newFrequency node does not exist -> add new frequencyNode for newFrequency
+	newFrequencyNode := &FrequencyNode{
+		//name:      this.getFrequencyNodeName(newFrequency),
+		frequency: newFrequency,
+		elements:  list.New(),
+	}
+
+	// add the newFrequencyNode after the oldFrequencyNode
+	newFrequencyElement := this.freqList.InsertAfter(newFrequencyNode, oldFrequencyElement)
+
+	return newFrequencyElement
 }
 
 func (this *LFUCache) RemoveLruElementFromLfuFrequency() {
