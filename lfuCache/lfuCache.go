@@ -88,33 +88,37 @@ func (this *LFUCache) Put(key int, value int) {
 		this.totalElements++
 
 		if this.totalElements > this.capacity {
-			this.RemoveLruElementFromLfuFrequency()
+			this.RemoveLruElementFromLfuFrequency() // will decrease totalElements
 		}
 
-		frequency0Element := this.freqList.Front()
-
-		// get frequencyElement for frequency = 1
-		newFrequencyElement := this.GetFrequencyElementForFrequencyPlusOne(frequency0Element)
-		newFrequencyNode := newFrequencyElement.Value.(*FrequencyNode)
-
-		newKeyValueFreq := &KeyValueFreq{
-			key:                  key,
-			value:                value,
-			frequencyNodeElement: newFrequencyElement,
-		}
-
-		// add new KeyValueFreq to the beginning of newFrequencyNode.elements
-		newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
-
-		// for the global O(1) access by key, set the new element for this key
-		this.m[key] = newKeyValueFreqElement
-
-		// there was no old frequency for this key -> we do not remove it from the old frequency
+		this.AddNewKeyWithFrequencyOne(key, value)
 	} else {
 		// element found -> updated it to the new frequency, remove from the old frequency
 		// totalElements not changed -> no removal
 		this.IncreaseFrequencyForExistingKey(key, value)
 	}
+}
+
+func (this *LFUCache) AddNewKeyWithFrequencyOne(key int, value int) {
+	frequency0Element := this.freqList.Front()
+
+	// get frequencyElement for frequency = 1
+	newFrequencyElement := this.GetFrequencyElementForFrequencyPlusOne(frequency0Element)
+	newFrequencyNode := newFrequencyElement.Value.(*FrequencyNode)
+
+	newKeyValueFreq := &KeyValueFreq{
+		key:                  key,
+		value:                value,
+		frequencyNodeElement: newFrequencyElement,
+	}
+
+	// add new KeyValueFreq to the beginning of newFrequencyNode.elements
+	newKeyValueFreqElement := newFrequencyNode.elements.PushFront(newKeyValueFreq)
+
+	// for the global O(1) access by key, set the new element for this key
+	this.m[key] = newKeyValueFreqElement
+
+	// there was no old frequency for this key -> we do not remove it from the old frequency
 }
 
 func (this *LFUCache) IncreaseFrequencyForExistingKey(key int, newValue int) {
