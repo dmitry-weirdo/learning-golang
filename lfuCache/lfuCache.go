@@ -70,18 +70,6 @@ func (this *LFUCache) Get(key int) int {
 	return currentValue
 }
 
-func (this *LFUCache) RemoveElementFromFrequencyNode(frequencyElement *list.Element, keyValueFreqElement *list.Element) {
-	frequencyNode := frequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
-
-	// remove from old frequency node
-	frequencyNode.elements.Remove(keyValueFreqElement)
-
-	// no values for old frequency -> remove the frequency node from LFU.freqList
-	if frequencyNode.elements.Len() <= 0 {
-		this.freqList.Remove(frequencyElement)
-	}
-}
-
 func (this *LFUCache) Put(key int, value int) {
 	if _, ok := this.m[key]; !ok { // element not found -> add new element for this key
 		// new key -> increase totalElements, potentially removed the LFU -> LRU element
@@ -174,7 +162,7 @@ func (this *LFUCache) GetFrequencyElementForFrequencyPlusOne(oldFrequencyElement
 
 	// newFrequency node does not exist -> add new frequencyNode for newFrequency
 	newFrequencyNode := &FrequencyNode{
-		//name:      this.getFrequencyNodeName(newFrequency),
+		//name:      this.GetFrequencyNodeName(newFrequency),
 		frequency: newFrequency,
 		elements:  list.New(),
 	}
@@ -208,7 +196,19 @@ func (this *LFUCache) RemoveLruElementFromLfuFrequency() {
 	this.totalElements--
 }
 
-func (this *LFUCache) getFrequencyNodeName(frequency int) string {
+func (this *LFUCache) RemoveElementFromFrequencyNode(frequencyElement *list.Element, keyValueFreqElement *list.Element) {
+	frequencyNode := frequencyElement.Value.(*FrequencyNode) // value of oldFrequencyElement
+
+	// remove from old frequency node
+	frequencyNode.elements.Remove(keyValueFreqElement)
+
+	// no values for old frequency -> remove the frequency node from LFU.freqList
+	if frequencyNode.elements.Len() <= 0 {
+		this.freqList.Remove(frequencyElement)
+	}
+}
+
+func (this *LFUCache) GetFrequencyNodeName(frequency int) string {
 	return fmt.Sprintf("frequency-%v", frequency)
 }
 
