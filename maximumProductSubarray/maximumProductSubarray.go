@@ -5,10 +5,10 @@ import "fmt"
 func maxProduct(nums []int) int {
 	bestResult := nums[0]
 
-	const FAKE_MIN_NEGATIVE = -10000 // -10 <= nums[i] <= 10
+	const FAKE_MAX_NEGATIVE = -10000 // -10 <= nums[i] <= 10
 
 	minPositive := 1
-	minNegative := FAKE_MIN_NEGATIVE // min by abs, so it's logically maxNegative :)
+	maxNegative := FAKE_MAX_NEGATIVE // min by abs, so it's logically maxNegative :)
 
 	product := 1
 
@@ -19,7 +19,7 @@ func maxProduct(nums []int) int {
 			bestResult = max(bestResult, 0) // if we only have negative products -> 0 is a better answer
 
 			minPositive = 1
-			minNegative = FAKE_MIN_NEGATIVE
+			maxNegative = FAKE_MAX_NEGATIVE
 			product = 1
 		} else {
 			product *= nums[i]
@@ -27,13 +27,13 @@ func maxProduct(nums []int) int {
 			if product > 0 {
 				bestResult = max(bestResult, product/minPositive)
 
-				minPositive = min(minPositive, product) // todo: this doesn't make since minPositive is always 1
+				minPositive = min(minPositive, product) // todo: this doesn't make sense since minPositive is always 1
 			} else {
-				if minNegative != FAKE_MIN_NEGATIVE {
-					bestResult = max(bestResult, product/minNegative)
+				if maxNegative != FAKE_MAX_NEGATIVE { // there was a negative number -> consider a "negative / negative" product as well.
+					bestResult = max(bestResult, product/maxNegative)
 				}
 
-				minNegative = max(minNegative, product)
+				maxNegative = max(maxNegative, product)
 			}
 		}
 
@@ -73,8 +73,16 @@ func test2() {
 	)
 }
 
+func test3() {
+	test(
+		[]int{-1}, // only negative values
+		-1,
+	)
+}
+
 func main() {
 	// 152. Maximum Product Subarray
 	test1()
 	test2()
+	test3()
 }
