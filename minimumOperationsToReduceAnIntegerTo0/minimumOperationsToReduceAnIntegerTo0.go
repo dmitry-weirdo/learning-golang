@@ -40,7 +40,7 @@ func test(x int, expectedResult int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
-	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+	fmt.Printf("Number: %v \n", x)
 
 	result := minOperations(x)
 
