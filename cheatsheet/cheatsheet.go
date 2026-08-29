@@ -310,6 +310,15 @@ func abs(v int) int {
 	return v
 }
 
+func hexStringToInt(s string) int {
+	v, _ := strconv.ParseInt(s, 16, 32) // use 64 if you need int64
+	return int(v)
+}
+
+func intTo2HexDigits(v int) string {
+	return fmt.Sprintf("%02x", v) // x is lower-case, X is upper-case
+}
+
 func main() {
 	stringBuilder()
 	listFunctions()
