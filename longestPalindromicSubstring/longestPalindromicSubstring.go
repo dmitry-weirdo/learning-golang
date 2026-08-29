@@ -10,7 +10,7 @@ func longestPalindrome(s string) string {
 	m := make([][]bool, n)
 
 	// put true values to [i][i] (since 1 character is a palindrome), other values to false
-	for i := 0; i < n; i++ {
+	for i := range n {
 		m[i] = make([]bool, n)
 		m[i][i] = true
 	}
@@ -87,26 +87,28 @@ func printMatrix(mat [][]bool) {
 	}
 }
 
-func test(s string) {
+func test(s string, expectedResult string) { // nodes can be null
 	fmt.Println()
-	fmt.Println("========================")
+	fmt.Println("====================")
+
 	fmt.Printf("String: %v \n", s)
 
-	palindrome := longestPalindrome(s)
+	result := longestPalindrome(s)
 
-	fmt.Printf("Longest palindrome: %v \n", palindrome)
+	fmt.Printf("Longest palindrome substring: %v \n", result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
 }
 
 func test1() {
-	s := "babad"
-
-	test(s)
+	test("babad", "aba") // since we're searching from the end. "bab" will also be a valid answer
 }
 
 func test2() {
-	s := "cbbd"
-
-	test(s)
+	test("cbbd", "bb")
 }
 
 func main() {

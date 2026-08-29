@@ -93,6 +93,16 @@ func uniqueSortedValuesInArray(arr []int) []int {
 	return slices.Compact(clone) // removes consecutive duplicates, O(n)
 }
 
+func createIntArrayWithDefaultValues(n int, defaultValue int) []int {
+	a := make([]int, n)
+
+	for i := range n {
+		a[i] = defaultValue
+	}
+
+	return a
+}
+
 func listFunctions() {
 	fmt.Println()
 	fmt.Println("==================== list.List functions ====================")
