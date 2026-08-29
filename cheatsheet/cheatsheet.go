@@ -173,6 +173,18 @@ func stringBuilder() {
 	fmt.Printf("sb.String() after reset: %v \n", sb.String())
 }
 
+func stringFunctions() {
+	fmt.Println()
+	fmt.Println("==================== string functions ====================")
+
+	s := "Some String"
+
+	lowerCase := strings.ToLower(s)
+	upperCase := strings.ToUpper(s)
+
+	fmt.Printf("String: \"%v\", to lowercase: \"%v\", to uppercase: \"%v\" \n", s, lowerCase, upperCase)
+}
+
 func stringToIntArray(s string) []int { // every byte converted to int
 	a := make([]int, len(s))
 
@@ -331,6 +343,7 @@ func intTo2HexDigits(v int) string {
 
 func main() {
 	stringBuilder()
+	stringFunctions()
 	listFunctions()
 	sliceFunctions()
 }
