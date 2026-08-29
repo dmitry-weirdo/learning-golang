@@ -173,6 +173,52 @@ func testIntArrayToIntArray(arr []int, expectedResult []int) {
 	}
 }
 
+func IntArrayToIntMatrixFunction(arr []int) [][]int {
+	return make([][]int, len(arr))
+}
+
+func testIntArrayToIntMatrix(arr []int, expectedResult [][]int) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
+
+	result := IntArrayToIntMatrixFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Result: \n") // todo: replace with your text
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected result: \n")
+	matrixCommon.PrintIntMatrix(expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}
+
 func IntArrayToIntFunction(arr []int) int {
 	return len(arr)
 }
