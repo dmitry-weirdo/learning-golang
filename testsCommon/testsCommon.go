@@ -588,14 +588,15 @@ func testIntMatrixToIntMatrix(m [][]int, expectedResult [][]int) {
 	fmt.Println()
 	fmt.Println("====================")
 
-	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+	fmt.Printf("Matrix: \n") // todo: replace with your text if required
+	matrixCommon.PrintIntMatrix(m)
 
 	result := IntMatrixToIntMatrixFunction(m) // todo: replace with your function
 
 	fmt.Printf("Result: \n") // todo: replace with your text
 	matrixCommon.PrintIntMatrix(result)
 
-	fmt.Printf("Expected result: \n", expectedResult)
+	fmt.Printf("Expected result: \n")
 	matrixCommon.PrintIntMatrix(expectedResult)
 
 	if len(result) != len(expectedResult) {

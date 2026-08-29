@@ -111,3 +111,27 @@ func isLeftReached(column int) bool {
 func isRightReached(column int, columns int) bool {
 	return column == (columns - 1)
 }
+
+func transposeSquareMatrixOverMainDiagonal(m [][]int) { // transposes in place
+	n := len(m)
+
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			m[i][j], m[j][i] = m[j][i], m[i][j]
+		}
+	}
+}
+
+func reverseMatrixRows(m [][]int) {
+	rows, columns := getRowsAndColumns(m)
+
+	for i := range rows {
+		for j := range columns / 2 { // will ignore the center if columns is odd
+			// let n = 3,
+			// we need to swap 0 and 2
+			// j = 0,
+			// n - j - 1 = 2
+			m[i][j], m[i][columns-j-1] = m[i][columns-j-1], m[i][j]
+		}
+	}
+}
