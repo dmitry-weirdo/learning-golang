@@ -3,10 +3,33 @@ package main
 import "fmt"
 
 func sortColors(nums []int) {
-	// todo: solve as "Dutch National Flag Problem" algorithm, that will be O(n)
+	// "Dutch National Flag Problem" algorithm, that will be O(n)
+	// O(n)
+	sortColors_dutchNationalFlag(nums)
 
 	// O(2 * n)
-	sortColors_counts(nums)
+	//sortColors_counts(nums)
+}
+
+func sortColors_dutchNationalFlag(nums []int) {
+	left := 0              // write positions of 0 values
+	right := len(nums) - 1 // write positions of 2 values
+
+	i := 0 // current index
+
+	for i <= right { // i < right will not work
+		if nums[i] == 0 { // 0 is put to the left
+			nums[i], nums[left] = nums[left], nums[i]
+			left++
+			i++ // non-obvious, but we have to move the current position
+		} else if nums[i] == 2 { // 2 is put to the right
+			nums[i], nums[right] = nums[right], nums[i]
+			right--
+			// !!! no i++
+		} else if nums[i] == 1 { // 1 is in place -> move to next position
+			i++
+		}
+	}
 }
 
 func sortColors_counts(nums []int) {
