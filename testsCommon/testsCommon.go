@@ -289,6 +289,27 @@ func testIntArrayToPairsArrayFunction(arr []int, expectedResult [][]int) {
 	}
 }
 
+// ==================== []byte byte arrays functions ==================== //
+func ByteArrayToByteFunction(arr []byte) byte {
+	return byte(len(arr))
+}
+
+func testByteArrayToByte(arr []byte, expectedResult byte) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %s \n", arr) // %s used to display as characters, it will be just one string without spaces // todo: replace with your text if required
+
+	result := ByteArrayToByteFunction(arr) // todo: update to your function
+
+	fmt.Printf("Result: %c \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %c \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %c, actual result = %c \n", expectedResult, result)
+	}
+}
+
 // ==================== Int functions ==================== //
 
 func IntToBoolFunction(x int) bool {
