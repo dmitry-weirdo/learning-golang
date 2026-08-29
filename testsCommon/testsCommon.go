@@ -567,6 +567,26 @@ func testStringToString(s string, expectedResult string) { // nodes can be null
 	}
 }
 
+func StringToBoolFunction(s string) bool {
+	return len(s) > 666
+}
+
+func testStringToBool(s string, expectedResult bool) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("String: %v \n", s) // todo: replace with your text if required
+
+	result := StringToBoolFunction(s) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func StringToIntArrayFunction(s string) []int {
 	return []int{len(s)}
 }
