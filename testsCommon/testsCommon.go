@@ -765,6 +765,30 @@ func testTreeToTree(arr []any, expectedResult []any) { // nodes can be null
 	}
 }
 
+func TreeToIntFunction(root *TreeNode) int { // count something in a tree, e.g. height
+	return root.Val
+}
+
+func testTreeToInt(arr []any, expectedResult int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Tree array: %v \n", arr) // todo: replace with your text if required
+
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(tree)
+
+	result := TreeToIntFunction(tree) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 // ==================== Matrix functions - often used for graphs ==================== //
 func IntMatrixToIntMatrixFunction(m [][]int) [][]int {
 	return m
