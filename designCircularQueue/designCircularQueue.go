@@ -42,7 +42,7 @@ func (this *MyCircularQueue) DeQueue() bool { // removes from head if there are 
 
 	this.size--
 
-	if this.size <= 0 {
+	if this.IsEmpty() {
 		// if queue is empty -> reset to the initial state to append from the start of the array again
 		this.head = 0
 		this.tail = -1
