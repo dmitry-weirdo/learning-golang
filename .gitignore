@@ -17,3 +17,6 @@ go.work.sum
 
 # IDE
 .idea/
+
+# out compilation / IDE build folder
+out/
