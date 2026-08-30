@@ -54,14 +54,26 @@ func PrintBoolMatrix(mat [][]bool) {
 }
 
 func getRowsAndColumns(mat [][]int) (rows, columns int) {
+	if len(mat) <= 0 {
+		return 0, 0
+	}
+
 	return len(mat), len(mat[0]) // !!! we assume that all rows have the same length
 }
 
 func getRowsAndColumnsOfByteMatrix(mat [][]byte) (rows, columns int) {
+	if len(mat) <= 0 {
+		return 0, 0
+	}
+
 	return len(mat), len(mat[0]) // !!! we assume that all rows have the same length
 }
 
 func getRowsAndColumnsOfBoolMatrix(mat [][]bool) (rows, columns int) {
+	if len(mat) <= 0 {
+		return 0, 0
+	}
+
 	return len(mat), len(mat[0]) // !!! we assume that all rows have the same length
 }
 
