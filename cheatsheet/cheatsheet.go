@@ -365,6 +365,10 @@ func intTo2HexDigits(v int) string {
 	return fmt.Sprintf("%02x", v) // x is lower-case, X is upper-case
 }
 
+func isDigit(b byte) bool {
+	return b >= '0' && b <= '9'
+}
+
 func main() {
 	stringBuilder()
 	stringFunctions()
