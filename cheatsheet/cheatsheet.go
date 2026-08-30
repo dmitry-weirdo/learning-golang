@@ -84,6 +84,19 @@ func maxInArray(arr []int) int {
 	return m
 }
 
+func minAndMaxInArray(arr []int) (minValue, maxValue int) {
+	// we assume the array is non-empty
+	minValue = arr[0]
+	maxValue = arr[0]
+
+	for _, v := range arr {
+		minValue = min(minValue, v)
+		maxValue = max(maxValue, v)
+	}
+
+	return minValue, maxValue
+}
+
 func uniqueSortedValuesInArray(arr []int) []int {
 	// overall complexity is O(n + n * log n + n) = O(2 * n + n * log n) = O(n * log n)
 

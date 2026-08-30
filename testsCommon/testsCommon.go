@@ -239,6 +239,26 @@ func testIntArrayToInt(arr []int, expectedResult int) { // nodes can be null
 	}
 }
 
+func IntArrayToFloat64Function(arr []int) float64 {
+	return float64(len(arr))
+}
+
+func testIntArrayToFloat64(arr []int, expectedResult float64) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := IntArrayToFloat64Function(arr) // todo: update to your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func IntArrayToBoolFunction(arr []int) bool {
 	return len(arr) > 0
 }
