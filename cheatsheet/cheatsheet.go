@@ -332,6 +332,17 @@ func abs(v int) int {
 	return v
 }
 
+func sign(v int) int {
+	switch {
+	case v == 0:
+		return 0
+	case v < 0:
+		return -1
+	default:
+		return 1
+	}
+}
+
 func hexStringToInt(s string) int {
 	v, _ := strconv.ParseInt(s, 16, 32) // use 64 if you need int64
 	return int(v)
