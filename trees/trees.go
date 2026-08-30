@@ -126,6 +126,10 @@ func TreeFromArrayWithParent(arr []any) *Node {
 }
 
 func TreeToArray(node *TreeNode) []any { // returns as full binary BFS tree with nulls when nodes are not present in position
+	if node == nil {
+		return []any{}
+	}
+
 	arr := make([]any, 0) // int or null
 
 	// BFS the tree, including null values

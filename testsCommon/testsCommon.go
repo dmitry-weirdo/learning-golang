@@ -729,6 +729,42 @@ func testIntArrayToTree(arr []int, expectedResult []any) { // nodes can be null
 	}
 }
 
+func TreeToTreeFunction(root *TreeNode) *TreeNode { // typically used to build a tree from 2 order of traversals
+	return root
+}
+
+func testTreeToTree(arr []any, expectedResult []any) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Tree array: %v \n", arr) // todo: replace with your text if required
+
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(tree)
+
+	result := TreeToTreeFunction(tree) // todo: replace with your function
+
+	fmt.Printf("Updated tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(result)
+
+	resultAsArray := trees.TreeToArray(result)
+	fmt.Printf("Result tree as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result:      %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 // ==================== Matrix functions - often used for graphs ==================== //
 func IntMatrixToIntMatrixFunction(m [][]int) [][]int {
 	return m
