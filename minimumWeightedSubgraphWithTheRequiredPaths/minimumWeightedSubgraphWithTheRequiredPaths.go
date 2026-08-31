@@ -1,54 +1,69 @@
-package graphsCommon
+package main
 
-import "container/heap"
+import (
+	"container/heap"
+	"fmt"
+)
 
-func createAdjacencyListUndirectedUnweighted(n int, edges [][]int) [][]int {
-	adj := make([][]int, n)
+func minimumWeight(n int, edges [][]int, src1 int, src2 int, dest int) int64 {
+	// todo: possible to implement with just 1 Dijkstra run, see https://leetcode.com/problems/minimum-weighted-subgraph-with-the-required-paths/solutions/1844479/simultaneous-dijkstra-beats-100-only-1-d-1mat/
 
-	v1 := 0
-	v2 := 0
-
-	for _, v := range edges {
-		v1 = v[0]
-		v2 = v[1]
-
-		// add v2 to v1
-		if adj[v1] == nil {
-			adj[v1] = []int{v2}
-		} else {
-			adj[v1] = append(adj[v1], v2)
-		}
-
-		// add v1 to v2
-		if adj[v2] == nil {
-			adj[v2] = []int{v1}
-		} else {
-			adj[v2] = append(adj[v2], v1)
-		}
-	}
-
-	return adj
+	// pretty slow, passes in 160-220 ms
+	return minimumWeight_3DijkstraRuns(n, edges, src1, src2, dest)
 }
 
-func createAdjacencyListDirectedUnweighted(n int, edges [][]int) [][]int {
-	adj := make([][]int, n)
+func minimumWeight_3DijkstraRuns(n int, edges [][]int, src1 int, src2 int, dest int) int64 {
+	// For more optimal fail-fast, we can run adjReversed first and check dist1 & dist2 here
+	// It means calculations from src1 and src2 will not be executed at all if there is no path to dest.
 
-	from := 0
-	to := 0
+	// Count distances from target on the reversed graph.
+	// It basically means "distances from all nodes to dest" on the original graph
+	adjReversed := createAdjacencyListDirectedWeightedReversed(n, edges)
+	//fmt.Printf("Adjacency list reversed: %d \n", adjReversed)
 
-	for _, v := range edges {
-		from = v[0]
-		to = v[1]
+	distDest := getShortestDistancesDijkstra(adjReversed, dest)
+	if distDest[src1] < 0 || distDest[src2] < 0 {
+		// dest non-reachable from src1 or src2 -> unable to build the target subgraph
+		return -1
+	}
 
-		// add from -> to
-		if adj[from] == nil {
-			adj[from] = []int{to}
+	// nodes are [0; n - 1]
+	adj := createAdjacencyListDirectedWeighted(n, edges)
+	//fmt.Printf("Adjacency list: %d \n", adj)
+
+	// count distances from src1 and src2 on the original graph
+	distSrc1 := getShortestDistancesDijkstra(adj, src1)
+	distSrc2 := getShortestDistancesDijkstra(adj, src2)
+
+	// For all the nodes K, find the min of (src1 -> K) + (src2 -> K) + (K -> dest)
+	minDistance := -1
+
+	for k := range n {
+		// if K is non-reachable from any of the nodes -> skip it
+		if (distSrc1[k] < 0) ||
+			(distSrc2[k] < 0) ||
+			(distDest[k] < 0) {
+			continue
+		}
+
+		dist := distSrc1[k] + // src1 -> k
+			distSrc2[k] + // src2 -> k
+			distDest[k] // k -> dest (= dest-> k on the reversed graph)
+
+		//fmt.Println()
+		//fmt.Printf("src1 -> %v: %v \n", k, distSrc1[k])
+		//fmt.Printf("src2 -> %v: %v \n", k, distSrc2[k])
+		//fmt.Printf("%v -> dest: %v \n", k, distDest[k])
+		//fmt.Printf("Total dist: %v \n", dist)
+
+		if minDistance == -1 {
+			minDistance = dist
 		} else {
-			adj[from] = append(adj[from], to)
+			minDistance = min(minDistance, dist)
 		}
 	}
 
-	return adj
+	return int64(minDistance)
 }
 
 func createAdjacencyListDirectedWeighted(n int, edges [][]int) [][][]int {
@@ -244,3 +259,93 @@ func (pq *PriorityQueue) Peek() NodeWeight {
 }
 
 // ========================= Dijkstra shortest paths end ========================= //
+
+func test(n int, m [][]int, src1, src2, dest int, expectedResult int64) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Total nodes: %v \n", n)
+	fmt.Printf("Starting node src1: %v \n", src1)
+	fmt.Printf("Starting node src2: %v \n", src2)
+	fmt.Printf("Target node dest: %v \n", dest)
+	fmt.Printf("Edges with weights: %v \n", m)
+
+	result := minimumWeight(n, m, src1, src2, dest)
+
+	fmt.Printf("Min weight of subgraph where it is possible to reach (%v -> %v) and (%v -> %v): %v \n", src1, dest, src2, dest, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func test1() {
+	n := 6
+	src1 := 0
+	src2 := 1
+	dest := 5
+
+	edges := [][]int{
+		{0, 2, 2},
+		{0, 5, 6},
+		{1, 0, 3},
+		{1, 4, 5},
+		{2, 1, 1},
+		{2, 3, 3},
+		{2, 3, 4},
+		{3, 4, 2},
+		{4, 5, 1},
+	}
+
+	expected := int64(9)
+
+	test(n, edges, src1, src2, dest, expected)
+}
+
+func test2() {
+	n := 3
+	src1 := 0
+	src2 := 1
+	dest := 2
+
+	edges := [][]int{
+		{0, 1, 1},
+		{2, 1, 1},
+	}
+
+	expected := int64(-1) // no possible subgraph to reach src1 -> dest and src2 -> dest
+
+	test(n, edges, src1, src2, dest, expected)
+}
+
+func test3() {
+	// failing test-case 21/88
+	n := 8
+	src1 := 4
+	src2 := 1
+	dest := 6
+
+	edges := [][]int{
+		{4, 7, 24},
+		{1, 3, 30},
+		{4, 0, 31},
+		{1, 2, 31},
+		{1, 5, 18},
+		{1, 6, 19},
+		{4, 6, 25},
+		{5, 6, 32},
+		{0, 6, 50},
+	}
+
+	expected := int64(44)
+
+	test(n, edges, src1, src2, dest, expected)
+}
+
+func main() {
+	// 2203. Minimum Weighted Subgraph With the Required Paths
+	test1()
+	test2()
+	test3()
+}
