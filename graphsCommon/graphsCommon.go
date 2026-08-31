@@ -27,3 +27,24 @@ func createAdjacencyListUndirected(n int, edges [][]int) [][]int {
 
 	return adj
 }
+
+func createAdjacencyListDirected(n int, edges [][]int) [][]int {
+	adj := make([][]int, n)
+
+	from := 0
+	to := 0
+
+	for _, v := range edges {
+		from = v[0]
+		to = v[1]
+
+		// add v2 to v1
+		if adj[from] == nil {
+			adj[from] = []int{to}
+		} else {
+			adj[from] = append(adj[from], to)
+		}
+	}
+
+	return adj
+}
