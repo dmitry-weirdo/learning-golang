@@ -526,6 +526,27 @@ func testIntToStringMatrix(x int, expectedResult [][]string) { // nodes can be n
 	}
 }
 
+// ==================== []string string array functions ==================== //
+func StringArrayToIntFunction(arr []string) int {
+	return len(arr)
+}
+
+func testStringArrayToInt(arr []string, expectedResult int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := StringArrayToIntFunction(arr) // todo: update to your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 // ==================== String functions ==================== //
 func StringToByteFunction(s string) byte { // if we need to return a 1-byte char in Go
 	return s[0]
