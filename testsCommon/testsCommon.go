@@ -810,6 +810,53 @@ func testTreeToInt(arr []any, expectedResult int) { // nodes can be null
 	}
 }
 
+func TreeToIntMatrixFunction(root *TreeNode) [][]int { // e.g. return a level-by-level traversal
+	return make([][]int, root.Val)
+}
+
+func testTreeToIntMatrix(arr []any, expectedResult [][]int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Tree array: %v \n", arr) // todo: replace with your text if required
+
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(tree)
+
+	result := TreeToIntMatrixFunction(tree) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}
+
 // ==================== Matrix functions - often used for graphs ==================== //
 func IntMatrixToIntMatrixFunction(m [][]int) [][]int {
 	return m

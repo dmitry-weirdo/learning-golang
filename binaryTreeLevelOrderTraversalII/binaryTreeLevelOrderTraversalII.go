@@ -1,48 +1,47 @@
 package main
 
 import (
-	"container/list"
 	"demo/trees"
 	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without prefix
 	"fmt"
+	"slices"
 )
 
-func levelOrder(root *TreeNode) [][]int {
+func levelOrderBottom(root *TreeNode) [][]int {
 	result := make([][]int, 0)
 
 	if root == nil {
 		return result
 	}
 
-	// todo: we can use a slice instead of list.List to decrease the memory overhead
-	queue := list.New()
-	queue.PushBack(root)
+	queue := make([]*TreeNode, 0)
+	queue = append(queue, root)
 
-	for queue.Len() > 0 {
-		currentLevelCount := queue.Len()
+	for len(queue) > 0 {
+		currentLevelCount := len(queue)
 		currentLevel := make([]int, currentLevelCount)
 
 		for i := range currentLevelCount {
 			// handle just the elements of the current level
-			frontElement := queue.Front()
-			queue.Remove(frontElement)
-
-			node := frontElement.Value.(*TreeNode)
+			node := queue[0]
+			queue = queue[1:]
 
 			currentLevel[i] = node.Val
 
 			if node.Left != nil {
-				queue.PushBack(node.Left)
+				queue = append(queue, node.Left)
 			}
 
 			if node.Right != nil {
-				queue.PushBack(node.Right)
+				queue = append(queue, node.Right)
 			}
 		}
 
 		result = append(result, currentLevel)
 	}
 
+	// return the levels in the opposite order (bottom-to-top)
+	slices.Reverse(result)
 	return result
 }
 
@@ -56,9 +55,9 @@ func test(arr []any, expectedResult [][]int) { // nodes can be nil
 	fmt.Printf("Tree: \n")
 	trees.PrintTreeTopDown(tree)
 
-	result := levelOrder(tree)
+	result := levelOrderBottom(tree)
 
-	fmt.Printf("BFS level-by-level, left-to-right traversal: %v \n", result)
+	fmt.Printf("Bottom-up levels, left-to-right traversal: %v \n", result)
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if len(result) != len(expectedResult) {
@@ -90,37 +89,38 @@ func test(arr []any, expectedResult [][]int) { // nodes can be nil
 }
 
 func test1() {
-	arr := []any{3, 9, 20, nil, nil, 15, 7}
+	a := []any{3, 9, 20, nil, nil, 15, 7}
 
 	expected := [][]int{
-		{3},
-		{9, 20},
 		{15, 7},
+		{9, 20},
+		{3},
 	}
 
-	test(arr, expected)
+	test(a, expected)
 }
 
 func test2() {
-	arr := []any{1}
+	a := []any{1}
 
 	expected := [][]int{
 		{1},
 	}
 
-	test(arr, expected)
+	test(a, expected)
 }
 
 func test3() {
-	arr := []any{}
+	a := []any{}
 
 	expected := [][]int{}
 
-	test(arr, expected)
+	test(a, expected)
 }
 
 func main() {
-	// 102. Binary Tree Level Order Traversal
+	// 107. Binary Tree Level Order Traversal II
+	// Basically the same as "102. Binary Tree Level Order Traversal", we just revert the result by level
 	test1()
 	test2()
 	test3()
