@@ -6,9 +6,15 @@ import (
 
 func numDistinct(s string, t string) int {
 	// O(m * n) time
+	// O(n) space - just save one row of the matrix since we only need a previous row for every calculation
+	// is faster because we don't need the M * N matrix initialization
+	// passes in 0-1 ms
+	return numDistinct_dp_oneArray(s, t)
+
+	// O(m * n) time
 	// O(m * n) space
 	// passes in same 6-10 ms
-	return numDistinct_dp_iterative(s, t)
+	//return numDistinct_dp_iterative(s, t)
 
 	// O(m * n) time
 	// O(m * n) space
@@ -114,6 +120,51 @@ func numDistinct_dp_iterative(s string, t string) int {
 	//matrixCommon.PrintIntMatrix(dp)
 
 	return dp[0][0]
+}
+
+func numDistinct_dp_oneArray(s string, t string) int {
+	m := len(s)
+	n := len(t)
+
+	if m < n {
+		return 0
+	}
+
+	if m == n {
+		if s == t {
+			return 1
+		}
+
+		return 0
+	}
+
+	dp := make([]int, n)
+
+	// iterate in reverse
+	for i := m - 1; i >= 0; i-- {
+		// if we ran over T end, it's a solution
+		prev := 1 // dp[i+1][n], generally prev is dp[i+1][j+1]
+
+		for j := n - 1; j >= 0; j-- {
+			oldDpJ := dp[j] // dp[i+1][j]
+
+			if s[i] == t[j] {
+				// characters s[i] and t[j] match -> 2 choices:
+				// - use both characters (i + 1, j + 1)
+				// - skip character in S (i + 1, j)
+				//dp[i][j] = dp[i+1][j+1] + dp[i+1][j]
+				dp[j] = prev + oldDpJ
+			} else { // no match -> skip a character in S
+				//dp[i][j] = dp[i+1][j]
+				dp[j] = oldDpJ
+			}
+
+			// prev is dp[i+1][j+1]
+			prev = oldDpJ
+		}
+	}
+
+	return dp[0]
 }
 
 func createIntMatrix(rows, columns int) [][]int {
