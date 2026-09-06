@@ -579,7 +579,7 @@ func StringArrayToIntFunction(arr []string) int {
 	return len(arr)
 }
 
-func testStringArrayToInt(arr []string, expectedResult int) { // nodes can be null
+func testStringArrayToInt(arr []string, expectedResult int) {
 	fmt.Println()
 	fmt.Println("====================")
 
@@ -592,6 +592,34 @@ func testStringArrayToInt(arr []string, expectedResult int) { // nodes can be nu
 
 	if result != expectedResult {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func StringArrayToStringArrayFunction(s []string) []string {
+	return s
+}
+
+func testStringArrayToStringArray(arr []string, expectedResult []string) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := StringArrayToStringArrayFunction(arr) // todo: update to your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
 	}
 }
 
