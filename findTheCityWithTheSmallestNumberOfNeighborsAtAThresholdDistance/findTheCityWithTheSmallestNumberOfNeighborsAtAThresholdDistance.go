@@ -1,54 +1,57 @@
-package graphsCommon
+package main
 
-import "container/heap"
+import (
+	"container/heap"
+	"fmt"
+)
 
-func createAdjacencyListUndirectedUnweighted(n int, edges [][]int) [][]int {
-	adj := make([][]int, n)
-
-	v1 := 0
-	v2 := 0
-
-	for _, v := range edges {
-		v1 = v[0]
-		v2 = v[1]
-
-		// add v2 to v1
-		if adj[v1] == nil {
-			adj[v1] = []int{v2}
-		} else {
-			adj[v1] = append(adj[v1], v2)
-		}
-
-		// add v1 to v2
-		if adj[v2] == nil {
-			adj[v2] = []int{v1}
-		} else {
-			adj[v2] = append(adj[v2], v1)
-		}
-	}
-
-	return adj
+func findTheCity(n int, edges [][]int, distanceThreshold int) int {
+	// O(E * log V) = O(V^2 * log V) for every distance -> O(V^3 * log V)
+	// and O(V) to count the number of nodes within distanceThreshold for every node -> O(V^2)
+	// Total: O(V^3 * log V + V^2) = O(V^3 * log V)
+	// passes in 62-72 ms
+	return findTheCity_dijkstraNaive(n, edges, distanceThreshold)
 }
 
-func createAdjacencyListDirectedUnweighted(n int, edges [][]int) [][]int {
-	adj := make([][]int, n)
+func findTheCity_dijkstraNaive(n int, edges [][]int, distanceThreshold int) int {
+	// !!! unweighted graph -> we add both directions for every edge
+	adj := createAdjacencyListUndirectedWeighted(n, edges)
 
-	from := 0
-	to := 0
+	//distances := make([][]int, n)
 
-	for _, v := range edges {
-		from = v[0]
-		to = v[1]
+	minNodes := n + 1
+	minIndex := -1
 
-		// add from -> to
-		if adj[from] == nil {
-			adj[from] = []int{to}
-		} else {
-			adj[from] = append(adj[from], to)
+	const DISTANCE_NOT_FOUND = -1
+
+	// calculate shortest for every node
+	for i := range n {
+		shortestDistances := getShortestDistancesDijkstraNodesStartFrom0(adj, i, DISTANCE_NOT_FOUND)
+		//distances[i] = shortestDistances
+
+		nodesReachableWithinDistance := 0
+
+		for j, v := range shortestDistances {
+			if v == DISTANCE_NOT_FOUND { // do not count unreachable nodes
+				continue
+			}
+
+			if j == i { // do not count 0 distance to node itself // todo: this can be skipped
+				continue
+			}
+
+			if v <= distanceThreshold {
+				nodesReachableWithinDistance++
+			}
+		}
+
+		if nodesReachableWithinDistance <= minNodes {
+			minIndex = i
+			minNodes = nodesReachableWithinDistance
 		}
 	}
 
-	return adj
+	return minIndex
 }
 
 func createAdjacencyListUndirectedWeighted(n int, edges [][]int) [][][]int {
@@ -85,68 +88,6 @@ func createAdjacencyListUndirectedWeighted(n int, edges [][]int) [][][]int {
 			adj[to] = [][]int{fromAndWeight}
 		} else {
 			adj[to] = append(adj[to], fromAndWeight)
-		}
-	}
-
-	return adj
-}
-
-func createAdjacencyListDirectedWeighted(n int, edges [][]int) [][][]int {
-	// todo: we can return an array of {node, weight} structs instead of 2-elements array
-	// adj[i][j][0] - "to" node
-	// adj[i][j][1] - weight of "from-to" edge
-	// we're assuming there are no duplicate parallel edges for the same "from + to"
-
-	adj := make([][][]int, n)
-
-	from := 0
-	to := 0
-	weight := 0
-	toAndWeight := []int{}
-
-	for _, v := range edges {
-		from = v[0]
-		to = v[1]
-		weight = v[2]
-
-		toAndWeight = []int{to, weight}
-
-		// add v2 to v1
-		if adj[from] == nil {
-			adj[from] = [][]int{toAndWeight}
-		} else {
-			adj[from] = append(adj[from], toAndWeight)
-		}
-	}
-
-	return adj
-}
-
-func createAdjacencyListDirectedWeightedReversed(n int, edges [][]int) [][][]int { // from -> to is reversed
-	// todo: we can return an array of {node, weight} structs instead of 2-elements array
-	// adj[i][j][0] - "to" node
-	// adj[i][j][1] - weight of "from-to" edge
-	// we're assuming there are no duplicate parallel edges for the same "from + to"
-
-	adj := make([][][]int, n)
-
-	from := 0
-	to := 0
-	weight := 0
-	toAndWeight := []int{}
-
-	for _, v := range edges {
-		from = v[1]   // !!! we reverse from and to
-		to = v[0]     // !!! we reverse from and to
-		weight = v[2] // weight stays the same
-
-		toAndWeight = []int{to, weight}
-
-		// add v2 to v1
-		if adj[from] == nil {
-			adj[from] = [][]int{toAndWeight}
-		} else {
-			adj[from] = append(adj[from], toAndWeight)
 		}
 	}
 
@@ -298,3 +239,63 @@ func (pq *PriorityQueue) Peek() NodeWeight {
 }
 
 // ========================= Dijkstra shortest paths end ========================= //
+
+func test(n int, m [][]int, distanceThreshold int, expectedResult int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("N - count of nodes: %v \n", n)
+	fmt.Printf("Edges: %v \n", m)
+	fmt.Printf("Distance threshold: %v \n", distanceThreshold)
+
+	result := findTheCity(n, m, distanceThreshold)
+
+	fmt.Printf("City with smallest edges reachable within distance %v: %v \n", distanceThreshold, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func test1() {
+	n := 4
+
+	edges := [][]int{
+		{0, 1, 3},
+		{1, 2, 1},
+		{1, 3, 4},
+		{2, 3, 1},
+	}
+
+	distanceThreshold := 4
+
+	expected := 3
+
+	test(n, edges, distanceThreshold, expected)
+}
+
+func test2() {
+	n := 5
+
+	edges := [][]int{
+		{0, 1, 2},
+		{0, 4, 8},
+		{1, 2, 3},
+		{1, 4, 2},
+		{2, 3, 1},
+		{3, 4, 1},
+	}
+
+	distanceThreshold := 2
+
+	expected := 0
+
+	test(n, edges, distanceThreshold, expected)
+}
+
+func main() {
+	// 1334. Find the City With the Smallest Number of Neighbors at a Threshold Distance
+	test1()
+	test2()
+}
