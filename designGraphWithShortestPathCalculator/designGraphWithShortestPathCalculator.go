@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 const INFINITY = math.MaxInt32 / 2 // avoid overlow on addition
 
@@ -107,6 +110,50 @@ func createIntMatrixWithDefaultValues(rows, columns int, defaultValue int) [][]i
 	return m
 }
 
+// ========================= Test methods ========================= //
+func addEdge(g Graph, from, to, weight int) {
+	g.AddEdge([]int{from, to, weight})
+
+	fmt.Println()
+	fmt.Printf("Added edge (%v -> %v) with weight %v. \n", from, to, weight)
+}
+
+func getShortestPath(g Graph, from, to, expectedResult int) {
+	result := g.ShortestPath(from, to)
+
+	fmt.Println()
+	fmt.Printf("Shortest path (%v -> %v): %v \n", from, to, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func test1() {
+	//Input
+	//["Graph", "shortestPath", "shortestPath", "addEdge", "shortestPath"]
+	//[[4, [[0, 2, 5], [0, 1, 2], [1, 2, 1], [3, 0, 3]]],
+	// [3, 2], [0, 3], [[1, 3, 4]], [0, 3]]
+	//
+	//Output
+	//[null, 6, -1, null, 6]
+
+	edges := [][]int{
+		{0, 2, 5},
+		{0, 1, 2},
+		{1, 2, 1},
+		{3, 0, 3},
+	}
+
+	g := Constructor(4, edges)
+
+	getShortestPath(g, 3, 2, 6)  // (3 -> 0 -> 1 -> 2) = 3 + 2 + 1 = 6
+	getShortestPath(g, 0, 3, -1) // no path -> -1
+	addEdge(g, 1, 3, 4)
+	getShortestPath(g, 0, 3, 6) // (0 -> 1 -> 3) = 2 + 4 = 6
+}
+
 func main() {
 	// 2642. Design Graph With Shortest Path Calculator
 
@@ -119,4 +166,5 @@ func main() {
 	// getShortestPath will be O(1) - just get a value from the matrix
 
 	// I implemented the Floyd-Warshall and yes, it CAN pass in 15 ms (beats 100%)
+	test1()
 }
