@@ -222,6 +222,36 @@ func createIntMatrixWithDefaultValues(rows, columns int, defaultValue int) [][]i
 
 // ========================= Floyd-Warshall shortest paths between all nodes end ========================= //
 
+// ========================= Bellman-Ford shortest paths from 1 starting node begin ========================= //
+func getShortestDistancesBellmanFord(n int, edges [][]int, start int, infinity int) []int {
+	// O(V * E) = O(V^3) - for EVERY starting node
+	// O(V^2) to count the number of nodes within distanceThreshold for every node.
+	// Total: O(V^4)
+
+	dist := createIntArrayWithDefaultValues(n, infinity)
+	dist[start] = 0 // distance to the starting node is 0
+
+	for range n {
+		// for ever node, iterate every edge in the graph,
+		// !!! Not just node's edges, ALL the edges
+		for _, edge := range edges {
+			from := edge[0]
+			to := edge[1]
+			weight := edge[2]
+
+			// undirected -> use edges in both ways (from -> to and to -> from)
+			dist[to] = min(dist[to], dist[from]+weight)   // from -> to
+			dist[from] = min(dist[from], dist[to]+weight) // to -> from
+		}
+
+		// todo: detect nodes affected by the  negative cycles and set their dist[i] to NEGATIVE_INFINITY - see https://www.youtube.com/watch?v=lyw4FaxrwHg
+	}
+
+	return dist
+}
+
+// ========================= Bellman-Ford shortest paths from 1 starting node end ========================= //
+
 // ========================= Dijkstra shortest paths from 1 starting node begin ========================= //
 func getShortestDistancesDijkstraNodesStartFrom0(adj [][][]int, start int, distanceNotFoundValue int) []int {
 	n := len(adj)

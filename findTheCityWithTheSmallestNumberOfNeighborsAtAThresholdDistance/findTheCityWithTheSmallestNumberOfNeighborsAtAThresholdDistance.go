@@ -7,11 +7,17 @@ import (
 )
 
 func findTheCity(n int, edges [][]int, distanceThreshold int) int {
+	// O(V * E) = O(V^3) - for EVERY starting node
+	// O(V^2) to count the number of nodes within distanceThreshold for every node.
+	// Total: O(V^4)
+	// Passes in 90-105 ms
+	return findTheCity_bellmanFord(n, edges, distanceThreshold)
+
 	// O(V^3) to calculate distances.
 	// O(V^2) to count the number of nodes within distanceThreshold for every node.
 	// Total: O(V^3 + V^2) = O(V^3)
 	// Passes in 4-5 ms
-	return findTheCity_floydWarshall(n, edges, distanceThreshold)
+	//return findTheCity_floydWarshall(n, edges, distanceThreshold)
 
 	// O(E * log V) = O(V^2 * log V) for every distance -> O(V^3 * log V)
 	// and O(V) to count the number of nodes within distanceThreshold for every node -> O(V^2)
@@ -19,6 +25,70 @@ func findTheCity(n int, edges [][]int, distanceThreshold int) int {
 	// passes in 62-72 ms
 	//return findTheCity_dijkstraNaive(n, edges, distanceThreshold)
 }
+
+func findTheCity_bellmanFord(n int, edges [][]int, distanceThreshold int) int {
+	const infinity = math.MaxInt32 / 2 // avoid overlow on addition
+	const DISTANCE_NOT_FOUND = infinity
+
+	minNodes := n + 1
+	minIndex := -1
+
+	// calculate shortest for every node
+	for i := range n {
+		// run Bellman-Ford
+		shortestDistances := getShortestDistancesBellmanFord(n, edges, i, infinity)
+
+		nodesReachableWithinDistance := 0
+
+		for j, v := range shortestDistances {
+			if v == DISTANCE_NOT_FOUND { // do not count unreachable nodes
+				continue
+			}
+
+			if j == i { // do not count 0 distance to node itself // todo: this can be skipped
+				continue
+			}
+
+			if v <= distanceThreshold {
+				nodesReachableWithinDistance++
+			}
+		}
+
+		if nodesReachableWithinDistance <= minNodes {
+			minIndex = i
+			minNodes = nodesReachableWithinDistance
+		}
+	}
+
+	return minIndex
+}
+
+// ========================= Bellman-Ford shortest paths from 1 starting node begin ========================= //
+func getShortestDistancesBellmanFord(n int, edges [][]int, start int, infinity int) []int {
+	// run Bellman-Ford
+	dist := createIntArrayWithDefaultValues(n, infinity)
+	dist[start] = 0 // distance to the starting node is 0
+
+	for range n {
+		// for ever node, iterate every edge in the graph,
+		// !!! Not just node's edges, ALL the edges
+		for _, edge := range edges {
+			from := edge[0]
+			to := edge[1]
+			weight := edge[2]
+
+			// undirected -> use edges in both ways (from -> to and to -> from)
+			dist[to] = min(dist[to], dist[from]+weight)   // from -> to
+			dist[from] = min(dist[from], dist[to]+weight) // to -> from
+		}
+
+		// todo: detect nodes affected by the  negative cycles and set their dist[i] to NEGATIVE_INFINITY - see https://www.youtube.com/watch?v=lyw4FaxrwHg
+	}
+
+	return dist
+}
+
+// ========================= Bellman-Ford shortest paths from 1 starting node end ========================= //
 
 func findTheCity_floydWarshall(n int, edges [][]int, distanceThreshold int) int {
 	infinity := math.MaxInt32 / 2 // avoid overlow on addition
