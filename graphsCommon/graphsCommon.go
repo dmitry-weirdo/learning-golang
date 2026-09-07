@@ -154,6 +154,30 @@ func createAdjacencyListDirectedWeightedReversed(n int, edges [][]int) [][][]int
 }
 
 // ========================= Floyd-Warshall shortest paths between all nodes begin ========================= //
+func getShortestDistancesFloydWarshallDirected(n int, edges [][]int, infinity int) [][]int {
+	m := createFloydWarshallInitialMatrixDirected(n, edges, infinity)
+
+	//fmt.Printf("Initial matrix for Floyd-Warshall: \n")
+	//PrintIntMatrix(m)
+
+	// todo: save paths if required, see https://www.youtube.com/watch?v=oNI0rf2P9gE
+
+	// Floyd-Warshall execution
+	// No paths saved, no negative weight cycles handled
+	// O(V^3)
+	for k := range n {
+		for i := range n {
+			for j := range n {
+				m[i][j] = min(m[i][j], m[i][k]+m[k][j])
+			}
+		}
+	}
+
+	// todo: exclude negative paths if required, see https://www.youtube.com/watch?v=oNI0rf2P9gE
+
+	return m
+}
+
 func getShortestDistancesFloydWarshallUndirected(n int, edges [][]int, infinity int) [][]int {
 	m := createFloydWarshallInitialMatrixUndirected(n, edges, infinity)
 
@@ -201,6 +225,33 @@ func createFloydWarshallInitialMatrixUndirected(n int, edges [][]int, infinity i
 
 		m[from][to] = weight
 		m[to][from] = weight
+	}
+
+	return m
+}
+
+func createFloydWarshallInitialMatrixDirected(n int, edges [][]int, infinity int) [][]int {
+	// Initial n x n matrix:
+	// - distance to self = 0
+	// - directly connected nodes -> set edge weight
+	// - no direct edge -> set infinity
+	m := createIntMatrixWithDefaultValues(n, n, infinity)
+
+	for i := range n { // distance to self is 0
+		m[i][i] = 0
+	}
+
+	from := 0
+	to := 0
+	weight := 0
+
+	// undirected -> add to both sides
+	for _, v := range edges {
+		from = v[0]
+		to = v[1]
+		weight = v[2]
+
+		m[from][to] = weight
 	}
 
 	return m

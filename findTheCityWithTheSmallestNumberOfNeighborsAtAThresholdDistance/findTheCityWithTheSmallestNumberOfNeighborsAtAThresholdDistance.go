@@ -23,7 +23,7 @@ func findTheCity(n int, edges [][]int, distanceThreshold int) int {
 	// and O(V) to count the number of nodes within distanceThreshold for every node -> O(V^2)
 	// Total: O(V^3 * log V + V^2) = O(V^3 * log V)
 	// passes in 62-72 ms
-	//return findTheCity_dijkstraNaive(n, edges, distanceThreshold)
+	return findTheCity_dijkstra(n, edges, distanceThreshold)
 }
 
 func findTheCity_bellmanFord(n int, edges [][]int, distanceThreshold int) int {
@@ -213,7 +213,7 @@ func getRowsAndColumns(mat [][]int) (rows, columns int) {
 	return len(mat), len(mat[0]) // !!! we assume that all rows have the same length
 }
 
-func findTheCity_dijkstraNaive(n int, edges [][]int, distanceThreshold int) int {
+func findTheCity_dijkstra(n int, edges [][]int, distanceThreshold int) int {
 	// !!! unweighted graph -> we add both directions for every edge
 	adj := createAdjacencyListUndirectedWeighted(n, edges)
 
