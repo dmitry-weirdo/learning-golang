@@ -3,6 +3,7 @@ package main
 import (
 	"container/list"
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -369,9 +370,22 @@ func isDigit(b byte) bool {
 	return b >= '0' && b <= '9'
 }
 
+func infinity() {
+	positiveInfinity := math.Inf(1)  // !!! returns float64, NOT int
+	negativeInfinity := math.Inf(-1) // !!! returns float64, NOT int
+
+	fmt.Printf("Positive infinity: %v \n", positiveInfinity)
+	fmt.Printf("Negative infinity: %v \n", negativeInfinity)
+
+	fmt.Printf("Max int32 < Positive infinity: %v \n", math.MaxInt32 < positiveInfinity)
+	fmt.Printf("Min int32 > Negative infinity: %v \n", math.MinInt32 > negativeInfinity)
+}
+
 func main() {
 	stringBuilder()
 	stringFunctions()
 	listFunctions()
 	sliceFunctions()
+
+	infinity()
 }

@@ -3,14 +3,144 @@ package main
 import (
 	"container/heap"
 	"fmt"
+	"math"
 )
 
 func findTheCity(n int, edges [][]int, distanceThreshold int) int {
+	// O(V^3) to calculate distances.
+	// O(V^2) to count the number of nodes within distanceThreshold for every node.
+	// Total: O(V^3 + V^2) = O(V^3)
+	// Passes in 4-5 ms
+	return findTheCity_floydWarshall(n, edges, distanceThreshold)
+
 	// O(E * log V) = O(V^2 * log V) for every distance -> O(V^3 * log V)
 	// and O(V) to count the number of nodes within distanceThreshold for every node -> O(V^2)
 	// Total: O(V^3 * log V + V^2) = O(V^3 * log V)
 	// passes in 62-72 ms
-	return findTheCity_dijkstraNaive(n, edges, distanceThreshold)
+	//return findTheCity_dijkstraNaive(n, edges, distanceThreshold)
+}
+
+func findTheCity_floydWarshall(n int, edges [][]int, distanceThreshold int) int {
+	infinity := math.MaxInt32 / 2 // avoid overlow on addition
+
+	// executed Floyd-Warshall
+	m := getShortestDistancesFloydWarshallUndirected(n, edges, infinity)
+
+	// calculate the result
+	minNodes := n + 1
+	minIndex := -1
+
+	for i := range n { // every node
+
+		nodesReachableWithinDistance := 0
+
+		for j, v := range m[i] { // distances from node[i] to all other nodes
+			if v == infinity { // do not count unreachable nodes
+				continue
+			}
+
+			if j == i { // do not count 0 distance to node itself // todo: this can be skipped
+
+			}
+
+			if v <= distanceThreshold {
+				nodesReachableWithinDistance++
+			}
+		}
+
+		if nodesReachableWithinDistance <= minNodes {
+			minIndex = i
+			minNodes = nodesReachableWithinDistance
+		}
+	}
+
+	return minIndex
+}
+
+func getShortestDistancesFloydWarshallUndirected(n int, edges [][]int, infinity int) [][]int {
+	m := createFloydWarshallInitialMatrixUndirected(n, edges, infinity)
+
+	//fmt.Printf("Initial matrix for Floyd-Warshall: \n")
+	//PrintIntMatrix(m)
+
+	// todo: save paths if required, see https://www.youtube.com/watch?v=oNI0rf2P9gE
+
+	// Floyd-Warshall execution
+	// No path, no negative weight cycles
+	// O(V^3)
+	for k := range n {
+		for i := range n {
+			for j := range n {
+				m[i][j] = min(m[i][j], m[i][k]+m[k][j])
+			}
+		}
+	}
+
+	// todo: exclude negative paths if required, see https://www.youtube.com/watch?v=oNI0rf2P9gE
+
+	return m
+}
+
+func createFloydWarshallInitialMatrixUndirected(n int, edges [][]int, infinity int) [][]int {
+	// Initial n x n matrix:
+	// - distance to self = 0
+	// - directly connected nodes -> set edge weight
+	// - no direct edge -> set infinity
+	m := createIntMatrixWithDefaultValues(n, n, infinity)
+
+	for i := range n { // distance to self is 0
+		m[i][i] = 0
+	}
+
+	from := 0
+	to := 0
+	weight := 0
+
+	// undirected -> add to both sides
+	for _, v := range edges {
+		from = v[0]
+		to = v[1]
+		weight = v[2]
+
+		m[from][to] = weight
+		m[to][from] = weight
+	}
+
+	return m
+}
+
+func createIntMatrixWithDefaultValues(rows, columns int, defaultValue int) [][]int {
+	m := make([][]int, rows)
+
+	for i := range rows {
+		m[i] = make([]int, columns)
+
+		for j := range columns { // !!! note that this is slow, will take O(m * n) additional operations :(
+			m[i][j] = defaultValue
+		}
+	}
+
+	return m
+}
+
+func PrintIntMatrix(mat [][]int) {
+	rows, columns := getRowsAndColumns(mat)
+
+	for i := range rows {
+		for j := range columns {
+			fmt.Printf("%v ", mat[i][j])
+		}
+
+		fmt.Println()
+	}
+}
+
+func getRowsAndColumns(mat [][]int) (rows, columns int) {
+	if len(mat) <= 0 {
+		return 0, 0
+	}
+
+	return len(mat), len(mat[0]) // !!! we assume that all rows have the same length
 }
 
 func findTheCity_dijkstraNaive(n int, edges [][]int, distanceThreshold int) int {
