@@ -648,7 +648,7 @@ func StringToIntFunction(s string) int {
 	return len(s)
 }
 
-func testStringToInt(s string, expectedResult int) { // nodes can be null
+func testStringToInt(s string, expectedResult int) {
 	fmt.Println()
 	fmt.Println("====================")
 
