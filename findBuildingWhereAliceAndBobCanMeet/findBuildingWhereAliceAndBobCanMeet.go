@@ -75,7 +75,19 @@ func GetNextGreaterWithIndexesOptimized(a []int, noElementValue int, q map[int][
 	//result := make([]MatchingElement, n) // we're not calculating indexes for all elements
 
 	for i := n - 1; i >= 0; i-- {
-		// todo: this can be done after the remove step, this should decrease the search array
+		// this is the usual monotonic stack code
+		v := a[i]
+
+		for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value <= v) {
+			removeFromStackWithIndex(stack)
+		}
+
+		// =======================================================
+		// Query execution on monotonic stack.
+
+		// This can be done after the remove step, this should decrease the search array.
+		// Checked - it doesn't significantly improve the speed.
+		// But ok, let's leave this in place.
 
 		// !!! The main trick is that the current state of the stack contains all the values after the current index[i] that are >
 		// , and the values are in DECREASING order, so we can search within the stack using the binary search.
@@ -119,11 +131,6 @@ func GetNextGreaterWithIndexesOptimized(a []int, noElementValue int, q map[int][
 		}
 
 		// next is the logic of the normal monotonic stack
-		v := a[i]
-
-		for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value <= v) {
-			removeFromStackWithIndex(stack)
-		}
 
 		/* // we're not calculating the results for this task
 		if stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value > v) {
