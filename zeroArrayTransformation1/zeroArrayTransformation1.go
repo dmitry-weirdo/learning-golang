@@ -146,6 +146,7 @@ func test3() {
 
 func main() {
 	// 3355. Zero Array Transformation I
+	// Line Sweep algorithm, also used in "731. My Calendar II".
 	test1()
 	test2()
 	test3()
