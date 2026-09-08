@@ -3,6 +3,14 @@ package main
 import "fmt"
 
 func leftmostBuildingQueries(heights []int, queries [][]int) []int {
+	// O(log N) for every query.
+	// The trick is: while calculating the monotonic stack, for every index [i],
+	// the stack contains the DECREASING array of bigger values after [i].
+	// It means that we can binary-search on this array for all the queries that start at index [i].
+
+	// This passes in 85-110 ms
+	return leftmostBuildingQueries_monotonicStack_optimized(heights, queries)
+
 	// this fails TLE on 949 / 953
 	// 50000 increasing values.
 	// 50000 queries with [0, 1]
@@ -11,7 +19,149 @@ func leftmostBuildingQueries(heights []int, queries [][]int) []int {
 	// after adding a cache, it's failing TLE on 951 / 953
 	// 50000 increasing values,
 	// 50000 distinct queries with [0, 2], [0, 3], [0, 4] etc
-	return leftmostBuildingQueries_monotonicStack_naive(heights, queries)
+	//return leftmostBuildingQueries_monotonicStack_naive(heights, queries)
+}
+
+type Query struct {
+	queryIndex int // index in result. We set the found index to result[i]
+	height     int // we're searching for heights[j] > height
+}
+
+func leftmostBuildingQueries_monotonicStack_optimized(heights []int, queries [][]int) []int {
+	result := make([]int, len(queries))
+
+	// key: start index [i] to search.
+	// value: list of values height[left] to search the next greater indexes after [i]
+	m := make(map[int][]Query)
+
+	for i, q := range queries {
+		// sort query indexes to be left and right
+		left, right := getMinAndMax(q[0], q[1])
+
+		if left == right {
+			result[i] = left
+		} else if heights[left] < heights[right] { // can jump directly from left to right
+			result[i] = right
+		} else {
+			// for the queries where we need the monotonic stack logic (find next greater element),
+			// we calculate queries for every index [i], to find the values > height[left]
+			if _, ok := m[right]; !ok {
+				m[right] = []Query{}
+			}
+
+			// for position[right], we're searching for values > heights[left]
+			// and set the found index to result[i]
+			query := Query{queryIndex: i, height: heights[left]}
+			m[right] = append(m[right], query)
+		}
+	}
+
+	//fmt.Printf("Queries to get by monotonic stack: %v \n", m)
+
+	GetNextGreaterWithIndexesOptimized(heights, -1, m, result)
+
+	return result
+}
+
+func GetNextGreaterWithIndexesOptimized(a []int, noElementValue int, q map[int][]Query, r []int) {
+	// direction: right -> left
+	// stack: increasing from top to bottom
+	// removal from stack: <= current value
+	// select top as result: if > current value
+	// push current value to stack: always
+	stack := createStackWithIndex()
+
+	n := len(a)
+	//result := make([]MatchingElement, n) // we're not calculating indexes for all elements
+
+	for i := n - 1; i >= 0; i-- {
+		// todo: this can be done after the remove step, this should decrease the search array
+
+		// !!! The main trick is that the current state of the stack contains all the values after the current index[i] that are >
+		// , and the values are in DECREASING order, so we can search within the stack using the binary search.
+
+		// Execute all queries for the index [i].
+		if q[i] != nil && len(q[i]) > 0 {
+			for _, query := range q[i] {
+				// stack is decreasing, not increasing.
+				// So we're searching for the first <= element and then trying to go left
+
+				condition := func(e MatchingElement) bool {
+					return e.value <= query.height // we're searching for values <= query.height
+				}
+
+				index := binarySearchGeneric(
+					*stack,
+					0,           // we search the complete stack
+					len(*stack), // search insert position. If not found -> result will be after the end of the array
+					condition,
+				)
+
+				// set the index from the original array
+				// index is in MatchingElement.index
+				if index == 0 { // no element to the left
+					r[query.queryIndex] = -1
+				} else {
+					// we find the leftmost <= element -> go one left anc check whether it is >
+					index--
+
+					if (*stack)[index].value <= query.height {
+						r[query.queryIndex] = -1
+					} else {
+						r[query.queryIndex] = (*stack)[index].index
+
+					}
+				}
+
+				//fmt.Printf("Stack: %v \n", stack)
+				//fmt.Printf("Result[%v] set to %v. \n", query.queryIndex, r[query.queryIndex])
+			}
+		}
+
+		// next is the logic of the normal monotonic stack
+		v := a[i]
+
+		for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value <= v) {
+			removeFromStackWithIndex(stack)
+		}
+
+		/* // we're not calculating the results for this task
+		if stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value > v) {
+			result[i] = getStackTopWithIndex(stack)
+		} else { // no next greater element
+			result[i] = MatchingElement{value: noElementValue, index: -1} // should default to -1
+		}
+		*/
+
+		currentElement := MatchingElement{value: v, index: i}
+		pushToStackWithIndex(stack, currentElement)
+	}
+
+	//return result
+}
+
+func binarySearchGeneric(
+	arr []MatchingElement,
+	left int, // usually it starts with 0, if we search in the complete array
+	right int, // set len(arr) - 1 if you want to be within array. Set len(arr) if index after the array can be returned.
+	condition func(MatchingElement) bool, // we will find the leftmost index satisfying this condition within [left; right] range
+) int {
+	// todo: this method can return an incorrect value for the empty array
+
+	// Using a template from:
+	// https://leetcode.com/discuss/post/786126/python-powerful-ultimate-binary-search-t-rwv8/
+	for left < right {
+		mid := (left + right) / 2
+
+		if condition(arr[mid]) { // target condition
+			right = mid // in this template it is always mid, NOT mid - 1
+		} else {
+			left = mid + 1
+		}
+	}
+
+	// after exiting the while loop, left is the minimal k satisfying the condition function;
+	return left
 }
 
 func leftmostBuildingQueries_monotonicStack_naive(heights []int, queries [][]int) []int {
@@ -185,8 +335,17 @@ func test2() {
 	)
 }
 
+func test3() {
+	test(
+		[]int{1, 2, 3, 4},
+		[][]int{{0, 1}, {0, 2}},
+		[]int{1, 2},
+	)
+}
+
 func main() {
 	// 2940. Find Building Where Alice and Bob Can Meet
 	test1()
 	test2()
+	test3()
 }
