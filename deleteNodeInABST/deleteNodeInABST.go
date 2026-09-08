@@ -1,16 +1,11 @@
 package main
 
 import (
+	"demo/trees"
+	. "demo/trees" // not recommended, but ok for LeetCode -> to use TreeNode without package prefix
 	"fmt"
 	"strconv"
-	"strings"
 )
-
-type TreeNode struct {
-	Val   int
-	Left  *TreeNode
-	Right *TreeNode
-}
 
 func deleteNode(root *TreeNode, key int) *TreeNode {
 	if root == nil { // key not found!
@@ -90,7 +85,7 @@ func getMinNodeAndItsParent(root *TreeNode, rootParent *TreeNode) (minNode *Tree
 	}
 
 	// to find the min, we constantly move to the left
-	var parent *TreeNode = rootParent
+	var parent = rootParent
 	node := root
 
 	for node.Left != nil {
@@ -101,145 +96,67 @@ func getMinNodeAndItsParent(root *TreeNode, rootParent *TreeNode) (minNode *Tree
 	return node, parent
 }
 
-func treeFromArray(arr []any) *TreeNode {
-	if len(arr) < 1 || arr[0] == nil { // empty array -> empty tree
-		return nil
-	}
+func test(arr []any, key int, expectedResult []any) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
 
-	// we do kind of BST to construct the tree
-	// first we append 0-th level (root), then 1st level, etc.
-	root := &TreeNode{Val: arr[0].(int)}
+	fmt.Printf("Tree array: %v \n", arr)
 
-	// todo: we can use list (LinkedList) instead of slice
-	// 0th level is just the root
-	queue := []*TreeNode{root}
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n")
+	trees.PrintTreeTopDown(tree)
 
-	i := 1 // skip the root
+	fmt.Printf("Key to delete: %v \n", key)
 
-	for (len(queue) > 0) && (i < len(arr)) {
-		node := queue[0]
-		queue = queue[1:]
+	result := deleteNode(tree, key)
 
-		if i < len(arr) && arr[i] != nil {
-			node.Left = &TreeNode{Val: arr[i].(int)}
-			queue = append(queue, node.Left)
-		}
-		i++
+	fmt.Printf("Tree with node %v deleted: \n", key)
+	trees.PrintTreeTopDown(result)
 
-		if i < len(arr) && arr[i] != nil {
-			node.Right = &TreeNode{Val: arr[i].(int)}
-			queue = append(queue, node.Right)
-		}
-		i++
-	}
+	resultAsArray := trees.TreeToArray(result)
+	fmt.Printf("Result tree as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result:      %v \n", expectedResult)
 
-	return root
-}
-
-func printTree(root *TreeNode) { // level by level
-	if root == nil {
-		fmt.Printf("[] (root is nil)")
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
 		return
 	}
 
-	queue := []*TreeNode{root}
-
-	for len(queue) > 0 {
-		levelSize := len(queue)
-
-		for i := 0; i < levelSize; i++ {
-			node := queue[0]
-			queue = queue[1:]
-
-			if node != nil {
-				fmt.Printf("%v ", node.Val)
-			} else {
-				fmt.Printf("%v ", ".")
-			}
-
-			//if node != nil && node.Left != nil {
-			if node != nil {
-				queue = append(queue, node.Left)
-			}
-
-			//if node.Right != nil {
-			if node != nil {
-				queue = append(queue, node.Right)
-			}
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
 		}
-
-		fmt.Println()
 	}
 }
 
-func PrintTreeTopDown(root *TreeNode) {
-	if root == nil {
-		return
-	}
-
-	height := treeHeight(root)
-	width := (1 << height) * 2
-
-	current := []*TreeNode{root}
-
-	for level := 0; level < height; level++ {
-		gap := width / (1 << (level + 1))
-
-		next := make([]*TreeNode, 0)
-
-		fmt.Print(strings.Repeat(" ", gap))
-
-		for _, node := range current {
-			if node == nil {
-				fmt.Print(" ")
-				next = append(next, nil, nil)
-			} else {
-				fmt.Print(node.Val)
-				next = append(next, node.Left, node.Right)
-			}
-
-			fmt.Print(strings.Repeat(" ", gap*2-1))
-		}
-
-		fmt.Println()
-		current = next
-	}
+func test1() {
+	test(
+		[]any{50, 30, 70, nil, 40, 60, 80},
+		50,
+		[]any{60, 30, 70, nil, 40, nil, 80},
+	)
 }
 
-func treeHeight(node *TreeNode) int {
-	if node == nil {
-		return 0
-	}
+func test2() {
+	test(
+		[]any{5, 3, 6, 2, 4, nil, 7},
+		3,
+		[]any{5, 4, 6, 2, nil, nil, 7},
+	)
+}
 
-	return 1 + max(
-		treeHeight(node.Left),
-		treeHeight(node.Right),
+func test3() {
+	test(
+		[]any{5, 3, 6, 2, 4, nil, 7},
+		0, // value not in the tree -> no changes
+		[]any{5, 3, 6, 2, 4, nil, 7},
 	)
 }
 
 func main() {
 	// 450. Delete Node in a BST
-	/*	nodes := []any{5, 3, 6, 2, 4, nil, 7}
-		tree := treeFromArray(nodes)
-		//printTree(tree)
-		//fmt.Printf("====================")
-		PrintTreeTopDown(tree)
-
-		key := 5
-		deleteNode(tree, key)
-
-		fmt.Printf("Tree after removing the node %v: \n", key)
-		PrintTreeTopDown(tree)
-	*/
-	// failing test-case
-	nodes := []any{50, 30, 70, nil, 40, 60, 80}
-	tree := treeFromArray(nodes)
-	PrintTreeTopDown(tree)
-
-	key := 50
-
-	deleteNode(tree, key)
-
-	fmt.Printf("Tree after removing the node %v: \n", key)
-	PrintTreeTopDown(tree)
+	test1()
+	test2()
+	test3()
 }
