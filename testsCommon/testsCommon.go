@@ -933,6 +933,38 @@ func testTreeToIntMatrix(arr []any, expectedResult [][]int) { // nodes can be nu
 	}
 }
 
+func IntMatrixToTreeFunction(m [][]int) *TreeNode { // e.g. generate tree from node data
+	return &TreeNode{Val: len(m), Left: nil, Right: nil}
+}
+
+func testIntMatrixToTree(m [][]int, expectedResult []any) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m)
+
+	result := IntMatrixToTreeFunction(m) // todo: replace with your function
+
+	fmt.Printf("Tree from matrix: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(result)
+
+	resultAsArray := trees.TreeToArray(result)
+	fmt.Printf("Result tree as array: %v \n", resultAsArray)
+	fmt.Printf("Expected result:      %v \n", expectedResult)
+
+	if len(resultAsArray) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(resultAsArray))
+		return
+	}
+
+	for i, v := range resultAsArray {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 // ==================== Matrix functions - often used for graphs ==================== //
 func IntMatrixToIntMatrixFunction(m [][]int) [][]int {
 	return m
