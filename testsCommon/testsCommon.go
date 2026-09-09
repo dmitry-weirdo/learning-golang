@@ -412,6 +412,26 @@ func testIntToInt(x int, expectedResult int) { // nodes can be null
 	}
 }
 
+func Int64ToInt64Function(x int64) int64 {
+	return x + 1
+}
+
+func testInt64ToInt64(x int64, expectedResult int64) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Number: %v \n", x) // todo: replace with your text if required
+
+	result := Int64ToInt64Function(x) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func IntToStringFunction(x int) string {
 	return strconv.Itoa(x)
 }
