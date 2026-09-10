@@ -42,7 +42,9 @@ func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
 		}
 
 		// should we still put to the map if uf.Union returned false? No, since the edge is not added
-		if weight%10 == 0 { // with int16, it fails on 7690
+		if weight%10 == 0 {
+			// with int, it fails on 1880
+			// with int16, it fails on 7690 - much better, but still MLE, we need 10000 to work :(
 			fmt.Printf("%v \n", weight)
 		}
 
