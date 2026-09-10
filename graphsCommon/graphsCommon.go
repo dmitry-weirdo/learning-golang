@@ -636,22 +636,7 @@ func getMinimumSpanningTreeKruskal(n int, startIndex int, edges [][]int) Minimum
 
 	// Instead of using a complex Heap structure for getting the smallest edge, we can just sort an array of edges by weight
 	// Complexity should be the save O(E * log E)
-	slices.SortFunc(edges, func(a, b []int) int {
-		// from = v[0]
-		// to = v[1]
-		// weight = v[2]
-
-		if a[2] != b[2] { // different weights -> compare by weights
-			return cmp.Compare(a[2], b[2])
-		}
-
-		if a[0] != b[0] { // different from -> compare by from
-			return cmp.Compare(a[0], b[0])
-		}
-
-		// compare by to
-		return cmp.Compare(a[1], b[1])
-	})
+	sortEdgesForKruskal(edges)
 
 	// union-find controls the visited by including them in the same node set
 	uf := NewUnionFind(n)
@@ -689,6 +674,25 @@ func getMinimumSpanningTreeKruskal(n int, startIndex int, edges [][]int) Minimum
 	mst.allNodesUsed = len(mst.edges) == (n - startIndex - 1)
 
 	return mst
+}
+
+func sortEdgesForKruskal(edges [][]int) {
+	slices.SortFunc(edges, func(a, b []int) int {
+		// from = v[0]
+		// to = v[1]
+		// weight = v[2]
+
+		if a[2] != b[2] { // different weights -> compare by weights
+			return cmp.Compare(a[2], b[2])
+		}
+
+		if a[0] != b[0] { // different from -> compare by from
+			return cmp.Compare(a[0], b[0])
+		}
+
+		// compare by to
+		return cmp.Compare(a[1], b[1])
+	})
 }
 
 type UnionFind struct {

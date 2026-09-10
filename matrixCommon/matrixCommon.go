@@ -9,6 +9,16 @@ var directions = [][]int{
 	{0, -1}, // left
 }
 
+func PrintIntMatrixWithDifferentColumnsCount(mat [][]int) {
+	for i, row := range mat {
+		for j := range row {
+			fmt.Printf("%v ", mat[i][j])
+		}
+
+		fmt.Println()
+	}
+}
+
 func PrintIntMatrix(mat [][]int) {
 	rows, columns := getRowsAndColumns(mat)
 
