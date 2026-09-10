@@ -1,11 +1,18 @@
 package main
 
 import (
+	"cmp"
 	"container/heap"
 	"fmt"
+	"slices"
 )
 
 func minCostConnectPoints(points [][]int) int {
+	// should be the same as Prim's time.
+	// But space is better since we only keep edges in one direction. It is still N * (N - 1) / 2 that is O(N^2) space.
+	// Is just a bit faster than Prim's (maybe just LeetCode's speed glitches)
+	// Passes in 470-550 ms
+	return minCostConnectPoints_kruskal(points)
 
 	// todo: adj list in case of a very dense graph is slow and a lot of space. Optimization to O(V^2) will be using minDist[] array, which stores the minimum Manhattan distance from node i to any node already added to the MST.
 	// Pures Prim's algorithm, with heap.
@@ -14,7 +21,7 @@ func minCostConnectPoints(points [][]int) int {
 	// O(E log E) = O(E log V^2) = O(2E log V) = O(E log V) = O(V^2 * log V)
 
 	// Actually, it's also O(V^2) on constructing the adjacency list.
-	return minCostConnectPoints_prim(points)
+	//return minCostConnectPoints_prim(points)
 }
 
 func minCostConnectPoints_prim(points [][]int) int {
@@ -81,6 +88,42 @@ func abs(v int) int {
 	}
 
 	return v
+}
+
+func minCostConnectPoints_kruskal(points [][]int) int {
+	// We need to get the MST tree of a fully-connected graph of points
+	n := len(points)
+
+	// Edges list is a full graph of points (every point [i] connected to every other point [j])
+	// We don't need both directions of edges, so it's less space than the adjacency list
+	edges := getEdgesUndirected(n, points)
+	//fmt.Printf("Edges: %v \n", edges)
+
+	mst := getMinimumSpanningTreeKruskal(n, edges)
+
+	return mst.weight
+}
+
+func getEdgesUndirected(n int, points [][]int) [][]int {
+	edges := make([][]int, 0)
+
+	from := 0
+	to := 0
+	weight := 0
+
+	for i := range n - 1 { // p1
+		for j := i + 1; j < n; j++ { // p2
+			from = i
+			to = j
+			weight = getManhattanDistance(points[i], points[j])
+
+			// we only add 1 direction, these are edges, NOT adj list
+			// it will stay undirected
+			edges = append(edges, []int{from, to, weight})
+		}
+	}
+
+	return edges
 }
 
 // ========================= Prim's algorithm for MST begin ========================= //
@@ -243,6 +286,160 @@ func (pq *PriorityQueuePrim) Peek() Edge {
 }
 
 // ========================= Prim's algorithm for MST end ========================= //
+
+// ========================= Kruskal's algorithm for MST begin ========================= //
+func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { // start can be 0 or 1
+	// Prim can work with negative edge weights.
+	// Returns an array of edges of MST.
+	// We assume that the graph is undirected. It's necessary for Kruskal's since we're uniting 2 nodes with Union-Find
+
+	// Instead of using a complex Heap structure for getting the smallest edge, we can just sort an array of edges by weight
+	// Complexity should be the save O(E * log E)
+	slices.SortFunc(edges, func(a, b []int) int {
+		// from = v[0]
+		// to = v[1]
+		// weight = v[2]
+
+		if a[2] != b[2] { // different weights -> compare by weights
+			return cmp.Compare(a[2], b[2])
+		}
+
+		if a[0] != b[0] { // different from -> compare by from
+			return cmp.Compare(a[0], b[0])
+		}
+
+		// compare by to
+		return cmp.Compare(a[1], b[1])
+	})
+
+	// union-find controls the visited by including them in the same node set
+	uf := NewUnionFind(n)
+
+	mst := MinimumSpanningTree{
+		edges:  make([][]int, 0),
+		weight: 0,
+	}
+
+	i := 0
+
+	// todo: this must be adopted if node numeration starts from 1
+	for (len(mst.edges) < n-1) && (i < len(edges)) {
+		from := edges[i][0]
+		to := edges[i][1]
+		weight := edges[i][2]
+
+		if !uf.Union(from, to) { // from and to already in the same MST set -> skip this edge
+			i++
+			continue
+		}
+
+		// Add the current edge to MST
+		mst.edges = append(mst.edges, []int{from, to, weight})
+
+		// Add the edge weight to total weight
+		mst.weight += weight
+
+		// go to next edge
+		i++
+	}
+
+	return mst
+}
+
+type UnionFind struct {
+	parents []int // if parent[i] = i, it is the root, else it's the index of the parent
+	sizes   []int // sizes of the tree for every element
+}
+
+func NewUnionFind(n int) UnionFind {
+	parents := make([]int, n)
+	sizes := make([]int, n)
+
+	for i := range n {
+		// every group is just a root
+		parents[i] = i
+
+		// every group has a size of 1
+		sizes[i] = 1
+	}
+
+	return UnionFind{
+		parents: parents,
+		sizes:   sizes,
+	}
+}
+
+func (uf UnionFind) Find(x int) int { // recursive version
+	if uf.parents[x] == x { // parent points to itself -> reached the root
+		return x
+	}
+
+	// path compression -> set the root to every parents[i] in the chain
+	uf.parents[x] = uf.Find(uf.parents[x])
+
+	return uf.parents[x]
+}
+
+func (uf UnionFind) Print() {
+	fmt.Printf("Parents: %v \n", uf.parents)
+	fmt.Printf("Sizes: %v \n", uf.sizes)
+}
+
+func (uf UnionFind) Union(x, y int) bool { // returns false if they're already in the same set
+	// these find will perform path compression
+	rootX := uf.Find(x)
+	rootY := uf.Find(y)
+
+	//fmt.Printf("root of %d: %d, root of %d: %d\n", x, rootX, y, rootY)
+
+	// x and y are already in the same set -> nothing to merge
+	if rootX == rootY {
+		//fmt.Printf("Element %v and %v already belong to the same root %v. Nothing to merge. \n", x, y, rootX)
+		return false
+	}
+
+	// merge the smaller group into the bigger group
+	// todo: ideally, we should merge the tree with smaller depth into the tree with bigger depth
+	if uf.sizes[rootX] < uf.sizes[rootY] { // merge x into y
+		//fmt.Printf("sizes[%v] = %v < sizes[%v] = %v. Merging root %v into root %v \n", rootX, uf.sizes[rootX], rootY, uf.sizes[rootY], rootX, rootY)
+
+		uf.parents[rootX] = rootY
+		uf.sizes[rootY] += uf.sizes[rootX]
+	} else { // merge y into x
+		//fmt.Printf("sizes[%v] = %v >= sizes[%v] = %v. Merging root %v into root %v \n", rootX, uf.sizes[rootX], rootY, uf.sizes[rootY], rootY, rootX)
+
+		uf.parents[rootY] = rootX
+		uf.sizes[rootX] += uf.sizes[rootY]
+	}
+
+	return true
+}
+
+func (uf UnionFind) GroupSize(x int) int {
+	return uf.sizes[uf.Find(x)]
+}
+
+func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every group
+	m := make(map[int]int)
+
+	for i := range uf.parents {
+		if uf.Find(i) == i { // root node
+			// every root group will be iterated just once, no need to check whether it's already in the map
+			m[i] = uf.GroupSize(i)
+
+			/*
+				if _, ok := m[i]; !ok {
+					// group not yet in map -> add it
+					m[i] = uf.groupSize(i)
+				}
+			*/
+		}
+	}
+
+	return m
+}
+
+// ========================= Kruskal's algorithm for MST end ========================= //
 
 func test(m [][]int, expectedResult int) {
 	fmt.Println()

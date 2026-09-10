@@ -654,6 +654,7 @@ func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { /
 		weight := edges[i][2]
 
 		if !uf.Union(from, to) { // from and to already in the same MST set -> skip this edge
+			i++
 			continue
 		}
 
