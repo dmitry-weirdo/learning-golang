@@ -926,6 +926,30 @@ func testTreeToInt(arr []any, expectedResult int) { // nodes can be null
 	}
 }
 
+func TreeToBoolFunction(root *TreeNode) bool { // count something in a tree, e.g. height
+	return root.Val > 0
+}
+
+func testTreeToBool(arr []any, expectedResult bool) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Tree array: %v \n", arr) // todo: replace with your text if required
+
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n") // todo: replace with your text if required
+	trees.PrintTreeTopDown(tree)
+
+	result := TreeToBoolFunction(tree) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func TreeToIntMatrixFunction(root *TreeNode) [][]int { // e.g. return a level-by-level traversal
 	return make([][]int, root.Val)
 }
