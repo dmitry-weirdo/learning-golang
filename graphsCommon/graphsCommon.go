@@ -789,35 +789,23 @@ func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every gr
 // ========================= Kruskal's algorithm for MST end ========================= //
 
 // ========================= Test functions ========================= //
-func testPrim1() {
+func testPrim(n int, startIndex int, edges [][]int, expectedMstAllNodesUsed bool, expectedMstWeight int, expectedMstEdges [][]int) {
 	fmt.Println()
 	fmt.Println("====================")
+	fmt.Printf("Testing method \"%v\"... \n", "getMinimumSpanningTreePrim")
 
-	edges := [][]int{
-		// from - to - weight
-		{0, 1, 10},
-		{0, 2, 3},
-		{1, 2, 4},
-		{1, 3, 1},
-		{2, 3, 4},
-		{2, 4, 4},
-		{3, 4, 2},
+	adj := createAdjacencyListUndirectedWeighted(n, edges)
+	mst := getMinimumSpanningTreePrim(n, startIndex, adj)
+
+	// validate MST all nodes in single component
+	fmt.Printf("MST all nodes used: %v \n", mst.allNodesUsed)
+	fmt.Printf("Expected MST all nodes used: %v \n", expectedMstAllNodesUsed)
+
+	if mst.allNodesUsed != expectedMstAllNodesUsed {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstAllNodesUsed, mst.allNodesUsed)
 	}
 
-	adj := createAdjacencyListUndirectedWeighted(5, edges)
-
-	expectedMstWeight := 10 // 3 + 4 + 1 + 2
-
-	// from, to, weight
-	expectedMstEdges := [][]int{
-		{0, 2, 3},
-		{2, 1, 4},
-		{1, 3, 1},
-		{3, 4, 2},
-	}
-
-	mst := getMinimumSpanningTreePrimNodesStartFrom0(adj)
-
+	// validate MST weight
 	fmt.Printf("MST weight: %v \n", mst.weight)
 	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
 
@@ -863,8 +851,63 @@ func testPrim1() {
 	}
 }
 
+func testPrim1() {
+	n := 5
+	startIndex := 0
+
+	edges := [][]int{
+		// from - to - weight
+		{0, 1, 10},
+		{0, 2, 3},
+		{1, 2, 4},
+		{1, 3, 1},
+		{2, 3, 4},
+		{2, 4, 4},
+		{3, 4, 2},
+	}
+
+	expectedMstAllNodesUsed := true
+
+	expectedMstWeight := 10 // 3 + 4 + 1 + 2
+
+	// from, to, weight
+	expectedMstEdges := [][]int{
+		{0, 2, 3},
+		{2, 1, 4},
+		{1, 3, 1},
+		{3, 4, 2},
+	}
+
+	testPrim(n, startIndex, edges, expectedMstAllNodesUsed, expectedMstWeight, expectedMstEdges)
+}
+
+func testPrim2() {
+	n := 5 // 1-4, index 0 not used
+	startIndex := 1
+
+	edges := [][]int{
+		// from - to - weight
+		{1, 2, 3},
+		{3, 4, 4},
+	}
+
+	expectedMstAllNodesUsed := false
+
+	expectedMstWeight := 3 // 3, not connected. Edge 4 will not be reached
+
+	// from, to, weight
+	// For non-connected graph, Prim's will only return the edges of the component where the starting node (0 or 1) belongs.
+	expectedMstEdges := [][]int{
+		{1, 2, 3},
+		//{3, 4, 4},
+	}
+
+	testPrim(n, startIndex, edges, expectedMstAllNodesUsed, expectedMstWeight, expectedMstEdges)
+}
+
 func testPrimSuite() {
 	testPrim1()
+	testPrim2()
 }
 
 func testKruskal(n int, startIndex int, edges [][]int, expectedMstAllNodesUsed bool, expectedMstWeight int, expectedMstEdges [][]int) {
@@ -961,7 +1004,7 @@ func testKruskal1() {
 }
 
 func testKruskal2() {
-	n := 5 // 1-4, 0 not used
+	n := 5 // 1-4, index 0 not used
 	startIndex := 1
 
 	edges := [][]int{
