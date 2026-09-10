@@ -7,15 +7,15 @@ import (
 )
 
 type DistanceLimitedPathsExist struct {
-	m map[int][]int // weight -> UF array for this weight
-	w []int         // weights , to do binary-search for (value < weight), since we do NOT have sortedMap/treeMap in Go
+	m map[int][]int16 // weight -> UF array for this weight
+	w []int           // weights , to do binary-search for (value < weight), since we do NOT have sortedMap/treeMap in Go
 }
 
 func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
 	// clone of UF array for every weight
 	// If multiple node have the same weights, we will override after adding more nodes.
-	m := make(map[int][]int) // weight -> UF array for this weight
-	w := make([]int, 0)      // weights , to do binary-search for (value < weight), since we do NOT have sortedMap/treeMap in Go
+	m := make(map[int][]int16) // weight -> UF array for this weight
+	w := make([]int, 0)        // weights , to do binary-search for (value < weight), since we do NOT have sortedMap/treeMap in Go
 
 	// Simplified Kruskal
 	// We don't need the MST, we only need the UF states
@@ -41,7 +41,11 @@ func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
 			continue
 		}
 
-		// todo: should we still put to the map if uf.Union returned false?
+		// should we still put to the map if uf.Union returned false? No, since the edge is not added
+		if weight%10 == 0 { // with int16, it fails on 7690
+			fmt.Printf("%v \n", weight)
+		}
+
 		w = append(w, weight)
 		m[weight] = copyArray(uf.parents)
 
@@ -56,10 +60,19 @@ func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
 	return DistanceLimitedPathsExist{m: m, w: w}
 }
 
-func copyArray(arr []int) []int {
-	arrayCopy := make([]int, len(arr))
-	copy(arrayCopy, arr)
+func copyArray(arr []int) []int16 {
+	// todo: we can make union-find array also int16
+	arrayCopy := make([]int16, len(arr))
+
+	for i, v := range arr {
+		arrayCopy[i] = int16(v)
+	}
+
 	return arrayCopy
+
+	/*	arrayCopy := make([]int16, len(arr))
+		copy(arrayCopy, int16(arr))
+		return arrayCopy*/
 }
 
 func (this *DistanceLimitedPathsExist) Query(p int, q int, limit int) bool {
@@ -74,10 +87,10 @@ func (this *DistanceLimitedPathsExist) Query(p int, q int, limit int) bool {
 	ufState := this.m[weight]
 
 	// check whether in this state, nodes P and Q were in the same MST subgraph
-	return Find(ufState, p) == Find(ufState, q)
+	return Find(ufState, int16(p)) == Find(ufState, int16(q))
 }
 
-func Find(parents []int, x int) int { // recursive version
+func Find(parents []int16, x int16) int16 { // recursive version
 	if parents[x] == x { // parent points to itself -> reached the root
 		return x
 	}
