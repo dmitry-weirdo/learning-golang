@@ -787,6 +787,9 @@ func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every gr
 
 // ========================= Test functions ========================= //
 func testPrim1() {
+	fmt.Println()
+	fmt.Println("====================")
+
 	edges := [][]int{
 		// from - to - weight
 		{0, 1, 10},
@@ -862,6 +865,9 @@ func testPrimSuite() {
 }
 
 func testKruskal1() {
+	fmt.Println()
+	fmt.Println("====================")
+
 	edges := [][]int{
 		// from - to - weight
 		{0, 1, 10},
@@ -885,8 +891,99 @@ func testKruskal1() {
 		{1, 2, 4},
 	}
 
+	expectedMstAllNodesUsed := true
+
 	mst := getMinimumSpanningTreeKruskalNodesStartFrom0(5, edges)
 
+	// validate MST all nodes in single component
+	fmt.Printf("MST all nodes used: %v \n", mst.allNodesUsed)
+	fmt.Printf("Expected MST all nodes used: %v \n", expectedMstAllNodesUsed)
+
+	if mst.allNodesUsed != expectedMstAllNodesUsed {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstAllNodesUsed, mst.allNodesUsed)
+	}
+
+	// validate MST weight
+	fmt.Printf("MST weight: %v \n", mst.weight)
+	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
+
+	if mst.weight != expectedMstWeight {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstWeight, mst.weight)
+	}
+
+	// validate edges
+	result := mst.edges
+	expectedResult := expectedMstEdges
+
+	fmt.Printf("MST edges: \n")
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected MST edges: \n")
+	matrixCommon.PrintIntMatrix(expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	// todo: since union-find
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}
+
+func testKruskal2() {
+	fmt.Println()
+	fmt.Println("====================")
+
+	edges := [][]int{
+		// from - to - weight
+		{1, 2, 3},
+		{3, 4, 4},
+	}
+
+	expectedMstWeight := 7 // 3 + 4, not connected
+
+	// from, to, weight
+	// For Kruskal's, we're taking the edges in weight order (if not yet in tree)
+	// In our implementation, we're ordering on from-to in case of the same weight.
+	expectedMstEdges := [][]int{
+		{1, 2, 3},
+		{3, 4, 4},
+	}
+
+	expectedMstAllNodesUsed := false
+
+	mst := getMinimumSpanningTreeKruskalNodesStartFrom1(4, edges) // nodes start from 1
+
+	// validate MST all nodes in single component
+	fmt.Printf("MST all nodes used: %v \n", mst.allNodesUsed)
+	fmt.Printf("Expected MST all nodes used: %v \n", expectedMstAllNodesUsed)
+
+	if mst.allNodesUsed != expectedMstAllNodesUsed {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstAllNodesUsed, mst.allNodesUsed)
+	}
+
+	// validate MST weight
 	fmt.Printf("MST weight: %v \n", mst.weight)
 	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
 
@@ -936,6 +1033,7 @@ func testKruskal1() {
 
 func testKruskalSuite() {
 	testKruskal1()
+	testKruskal2()
 }
 
 func main() {
