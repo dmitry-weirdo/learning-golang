@@ -1,6 +1,10 @@
-package graphsCommon
+package main
 
-import "container/heap"
+import (
+	"container/heap"
+	"demo/matrixCommon"
+	"fmt"
+)
 
 func createAdjacencyListUndirectedUnweighted(n int, edges [][]int) [][]int {
 	adj := make([][]int, n)
@@ -333,7 +337,7 @@ func getShortestDistancesDijkstra(n int, adj [][][]int, start int, distanceNotFo
 
 	nodesReached := 0 // we can stop iteration earlier if we reached all the nodes (this will happen not always)
 
-	pq := createMinHeap()
+	pq := createMinHeapDijkstra()
 	heap.Push(pq, NodeWeight{start, 0}) // start node is 0 weight
 
 	for pq.Len() > 0 {
@@ -398,8 +402,8 @@ func createIntArrayWithDefaultValues(n int, defaultValue int) []int {
 }
 
 // heap with <cost, value> struct, contains NodeWeight value
-func createMinHeap() *PriorityQueue {
-	return &PriorityQueue{
+func createMinHeapDijkstra() *PriorityQueueDijkstra {
+	return &PriorityQueueDijkstra{
 		less: func(a, b NodeWeight) bool {
 			// min heap
 			return a.distance < b.distance
@@ -407,33 +411,33 @@ func createMinHeap() *PriorityQueue {
 	}
 }
 
-type PriorityQueue struct {
+type PriorityQueueDijkstra struct {
 	items []NodeWeight
 	less  func(a, b NodeWeight) bool // comparator function, returns boolean, not integer!
 }
 
 // implementation of sort.Interface
-func (pq *PriorityQueue) Len() int {
+func (pq *PriorityQueueDijkstra) Len() int {
 	return len(pq.items)
 }
 
 // implementation of sort.Interface
-func (pq *PriorityQueue) Less(i, j int) bool {
+func (pq *PriorityQueueDijkstra) Less(i, j int) bool {
 	return pq.less(pq.items[i], pq.items[j])
 }
 
 // implementation of sort.Interface
-func (pq *PriorityQueue) Swap(i, j int) {
+func (pq *PriorityQueueDijkstra) Swap(i, j int) {
 	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
 }
 
 // implementation of heap.Interface
-func (pq *PriorityQueue) Push(x any) { // interface needs `x any`, else the override will not work
+func (pq *PriorityQueueDijkstra) Push(x any) { // interface needs `x any`, else the override will not work
 	pq.items = append(pq.items, x.(NodeWeight))
 }
 
 // implementation of heap.Interface
-func (pq *PriorityQueue) Pop() any { // interface needs `x any`, else the override will not work
+func (pq *PriorityQueueDijkstra) Pop() any { // interface needs `x any`, else the override will not work
 	n := len(pq.items)
 	lastItem := pq.items[n-1]
 
@@ -443,8 +447,250 @@ func (pq *PriorityQueue) Pop() any { // interface needs `x any`, else the overri
 }
 
 // helper function -> get the top of the heap without removing it
-func (pq *PriorityQueue) Peek() NodeWeight {
+func (pq *PriorityQueueDijkstra) Peek() NodeWeight {
 	return pq.items[0] // return the root
 }
 
 // ========================= Dijkstra shortest paths end ========================= //
+
+// ========================= Prim's algorithm for MST begin ========================= //
+type MinimumSpanningTree struct {
+	edges  [][]int // every edge is from/to/weight
+	weight int     // total weight for all edges
+}
+
+type Edge struct {
+	from   int
+	to     int
+	weight int
+}
+
+func getMinimumSpanningTreePrimNodesStartFrom0(adj [][][]int) MinimumSpanningTree {
+	n := len(adj)
+
+	return getMinimumSpanningTreePrim(n, adj, 0) // start from node 0
+}
+
+func getMinimumSpanningTreePrimNodesStartFrom1(adj [][][]int) MinimumSpanningTree {
+	n := len(adj)
+
+	return getMinimumSpanningTreePrim(n+1, adj, 1) // start from node 1
+}
+
+func getMinimumSpanningTreePrim(n int, adj [][][]int, start int) MinimumSpanningTree { // start can be 0 or 1
+	// Prim can works with negative edge weights.
+	// Returns an array of edges of MST.
+	// We assume that the graph is undirected.
+
+	// If nodes are starting from 0 -> pass N, start = 0
+	// If nodes are starting from 1 -> pass (N + 1), start = 1
+	visited := make([]bool, n)
+
+	nodesReached := 0 // we can stop iteration earlier if we reached all the nodes (this will happen not always)
+
+	mst := MinimumSpanningTree{
+		edges:  make([][]int, 0),
+		weight: 0,
+	}
+
+	// mark start node as visited
+	visited[start] = true
+
+	pq := createMinHeapPrim()
+
+	// add all neighbors of the start node to the heap
+	for _, v := range adj[start] {
+		neighbor, weight := v[0], v[1]
+
+		if visited[neighbor] { // avoid self-cycle on the start node
+			continue
+		}
+
+		heap.Push(pq, Edge{from: start, to: neighbor, weight: weight})
+	}
+
+	for pq.Len() > 0 {
+		edge := heap.Pop(pq).(Edge)
+
+		if visited[edge.to] {
+			// node was already visited -> do not handle it again
+			continue
+		}
+
+		// update if distance for this node is not yet found
+		visited[edge.to] = true
+
+		// Add the current edge to MST
+		mst.edges = append(mst.edges, []int{edge.from, edge.to, edge.weight})
+
+		// Add the edge weight to total weight
+		mst.weight += edge.weight
+
+		nodesReached++
+
+		// todo: this must be adopted if node numeration starts from 1
+		// cut first -> if we reached all nodes, stop iteration
+		if nodesReached >= (n - 1) {
+			break
+		}
+
+		// Add all neighbors of this node to the heap.
+		// !!! We're NOT skipping the nodes already in the heap.
+		// The trick is - we can push same node multiple times, but the min-heap will select the shortest distance first
+		for _, v := range adj[edge.to] {
+			neighbor, weight := v[0], v[1]
+
+			// neighbor was already reached with a shorter distance -> no reason to put it again
+			if visited[neighbor] {
+				// node was already reached -> do not handle it again
+				continue
+			}
+
+			e := Edge{
+				from:   edge.to,
+				to:     neighbor, // neighbor
+				weight: weight,   // unlike Dijkstra, we just add the edge weight, NOT the summary path weight
+			}
+
+			heap.Push(pq, e)
+		}
+	}
+
+	return mst
+}
+
+func createMinHeapPrim() *PriorityQueuePrim {
+	return &PriorityQueuePrim{
+		less: func(a, b Edge) bool {
+			if a.weight == b.weight { // for stable MST return -> in case of same weight -> return earlier edge
+				return a.to < b.to
+			}
+
+			// min heap
+			return a.weight < b.weight
+		},
+	}
+}
+
+type PriorityQueuePrim struct {
+	items []Edge
+	less  func(a, b Edge) bool // comparator function, returns boolean, not integer!
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Len() int {
+	return len(pq.items)
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Less(i, j int) bool {
+	return pq.less(pq.items[i], pq.items[j])
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Swap(i, j int) {
+	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
+}
+
+// implementation of heap.Interface
+func (pq *PriorityQueuePrim) Push(x any) { // interface needs `x any`, else the override will not work
+	pq.items = append(pq.items, x.(Edge))
+}
+
+// implementation of heap.Interface
+func (pq *PriorityQueuePrim) Pop() any { // interface needs `x any`, else the override will not work
+	n := len(pq.items)
+	lastItem := pq.items[n-1]
+
+	pq.items = pq.items[0 : n-1] // remove the last element
+
+	return lastItem
+}
+
+// helper function -> get the top of the heap without removing it
+func (pq *PriorityQueuePrim) Peek() Edge {
+	return pq.items[0] // return the root
+}
+
+// ========================= Prim's algorithm for MST end ========================= //
+
+// ========================= Test functions ========================= //
+
+func testPrim1() {
+	edges := [][]int{
+		// from - to - weight
+		{0, 1, 10},
+		{0, 2, 3},
+		{1, 2, 4},
+		{1, 3, 1},
+		{2, 3, 4},
+		{2, 4, 4},
+		{3, 4, 2},
+	}
+
+	adj := createAdjacencyListUndirectedWeighted(5, edges)
+
+	expectedMstWeight := 10 // 3 + 4 + 1 + 2
+
+	// from, to, weight
+	expectedMstEdges := [][]int{
+		{0, 2, 3},
+		{2, 1, 4},
+		{1, 3, 1},
+		{3, 4, 2},
+	}
+
+	mst := getMinimumSpanningTreePrimNodesStartFrom0(adj)
+
+	fmt.Printf("MST weight: %v \n", mst.weight)
+	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
+
+	if mst.weight != expectedMstWeight {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstWeight, mst.weight)
+	}
+
+	// validate edges
+	result := mst.edges
+	expectedResult := expectedMstEdges
+
+	fmt.Printf("MST edges: \n")
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected MST edges: \n")
+	matrixCommon.PrintIntMatrix(expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}
+
+func testPrimSuite() {
+	testPrim1()
+}
+
+func main() {
+	testPrimSuite()
+}
