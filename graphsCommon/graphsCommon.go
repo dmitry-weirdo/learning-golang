@@ -457,8 +457,9 @@ func (pq *PriorityQueueDijkstra) Peek() NodeWeight {
 
 // ========================= Prim's algorithm for MST begin ========================= //
 type MinimumSpanningTree struct {
-	edges  [][]int // every edge is from/to/weight
-	weight int     // total weight for all edges
+	edges        [][]int // every edge is from/to/weight
+	weight       int     // total weight for all edges
+	allNodesUsed bool    // false if there are multiple non-connected components
 }
 
 type Edge struct {
@@ -554,6 +555,9 @@ func getMinimumSpanningTreePrim(n int, adj [][][]int, start int) MinimumSpanning
 		}
 	}
 
+	// todo: fix when nodes start with 1
+	mst.allNodesUsed = len(mst.edges) == n-1
+
 	return mst
 }
 
@@ -613,7 +617,18 @@ func (pq *PriorityQueuePrim) Peek() Edge {
 // ========================= Prim's algorithm for MST end ========================= //
 
 // ========================= Kruskal's algorithm for MST begin ========================= //
-func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { // start can be 0 or 1
+func getMinimumSpanningTreeKruskalNodesStartFrom0(n int, edges [][]int) MinimumSpanningTree {
+	return getMinimumSpanningTreeKruskal(n, 0, edges) // start from node 0
+}
+
+func getMinimumSpanningTreeKruskalNodesStartFrom1(n int, edges [][]int) MinimumSpanningTree {
+	return getMinimumSpanningTreeKruskal(n+1, 1, edges) // start from node 1
+}
+
+func getMinimumSpanningTreeKruskal(n int, startIndex int, edges [][]int) MinimumSpanningTree { // start can be 0 or 1
+	// If nodes start with 0, set n = N, startIndex = 0
+	// If nodes start with 1, set n = N + 1, startIndex = 1
+
 	// Prim can work with negative edge weights.
 	// Returns an array of edges of MST.
 	// We assume that the graph is undirected. It's necessary for Kruskal's since we're uniting 2 nodes with Union-Find
@@ -645,10 +660,10 @@ func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { /
 		weight: 0,
 	}
 
+	// index in edges[] array
 	i := 0
 
-	// todo: this must be adopted if node numeration starts from 1
-	for (len(mst.edges) < n-1) && (i < len(edges)) {
+	for (len(mst.edges) < n-startIndex-1) && (i < len(edges)) {
 		from := edges[i][0]
 		to := edges[i][1]
 		weight := edges[i][2]
@@ -667,6 +682,10 @@ func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { /
 		// go to next edge
 		i++
 	}
+
+	// check whether all nodes are in the single MST component
+	// We will have (N - 1) nodes in the MST in this case.
+	mst.allNodesUsed = len(mst.edges) == (n - startIndex - 1)
 
 	return mst
 }
@@ -866,7 +885,7 @@ func testKruskal1() {
 		{1, 2, 4},
 	}
 
-	mst := getMinimumSpanningTreeKruskal(5, edges)
+	mst := getMinimumSpanningTreeKruskalNodesStartFrom0(5, edges)
 
 	fmt.Printf("MST weight: %v \n", mst.weight)
 	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
