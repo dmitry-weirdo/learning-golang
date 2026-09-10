@@ -1,9 +1,11 @@
 package main
 
 import (
+	"cmp"
 	"container/heap"
 	"demo/matrixCommon"
 	"fmt"
+	"slices"
 )
 
 func createAdjacencyListUndirectedUnweighted(n int, edges [][]int) [][]int {
@@ -486,8 +488,6 @@ func getMinimumSpanningTreePrim(n int, adj [][][]int, start int) MinimumSpanning
 	// If nodes are starting from 1 -> pass (N + 1), start = 1
 	visited := make([]bool, n)
 
-	nodesReached := 0 // we can stop iteration earlier if we reached all the nodes (this will happen not always)
-
 	mst := MinimumSpanningTree{
 		edges:  make([][]int, 0),
 		weight: 0,
@@ -526,11 +526,9 @@ func getMinimumSpanningTreePrim(n int, adj [][][]int, start int) MinimumSpanning
 		// Add the edge weight to total weight
 		mst.weight += edge.weight
 
-		nodesReached++
-
 		// todo: this must be adopted if node numeration starts from 1
 		// cut first -> if we reached all nodes, stop iteration
-		if nodesReached >= (n - 1) {
+		if len(mst.edges) >= (n - 1) {
 			break
 		}
 
@@ -614,8 +612,160 @@ func (pq *PriorityQueuePrim) Peek() Edge {
 
 // ========================= Prim's algorithm for MST end ========================= //
 
-// ========================= Test functions ========================= //
+// ========================= Kruskal's algorithm for MST begin ========================= //
+func getMinimumSpanningTreeKruskal(n int, edges [][]int) MinimumSpanningTree { // start can be 0 or 1
+	// Prim can work with negative edge weights.
+	// Returns an array of edges of MST.
+	// We assume that the graph is undirected. It's necessary for Kruskal's since we're uniting 2 nodes with Union-Find
 
+	// Instead of using a complex Heap structure for getting the smallest edge, we can just sort an array of edges by weight
+	// Complexity should be the save O(E * log E)
+	slices.SortFunc(edges, func(a, b []int) int {
+		// from = v[0]
+		// to = v[1]
+		// weight = v[2]
+
+		if a[2] != b[2] { // different weights -> compare by weights
+			return cmp.Compare(a[2], b[2])
+		}
+
+		if a[0] != b[0] { // different from -> compare by from
+			return cmp.Compare(a[0], b[0])
+		}
+
+		// compare by to
+		return cmp.Compare(a[1], b[1])
+	})
+
+	// union-find controls the visited by including them in the same node set
+	uf := NewUnionFind(n)
+
+	mst := MinimumSpanningTree{
+		edges:  make([][]int, 0),
+		weight: 0,
+	}
+
+	i := 0
+
+	// todo: this must be adopted if node numeration starts from 1
+	for (len(mst.edges) < n-1) && (i < len(edges)) {
+		from := edges[i][0]
+		to := edges[i][1]
+		weight := edges[i][2]
+
+		if !uf.Union(from, to) { // from and to already in the same MST set -> skip this edge
+			continue
+		}
+
+		// Add the current edge to MST
+		mst.edges = append(mst.edges, []int{from, to, weight})
+
+		// Add the edge weight to total weight
+		mst.weight += weight
+
+		// go to next edge
+		i++
+	}
+
+	return mst
+}
+
+type UnionFind struct {
+	parents []int // if parent[i] = i, it is the root, else it's the index of the parent
+	sizes   []int // sizes of the tree for every element
+}
+
+func NewUnionFind(n int) UnionFind {
+	parents := make([]int, n)
+	sizes := make([]int, n)
+
+	for i := range n {
+		// every group is just a root
+		parents[i] = i
+
+		// every group has a size of 1
+		sizes[i] = 1
+	}
+
+	return UnionFind{
+		parents: parents,
+		sizes:   sizes,
+	}
+}
+
+func (uf UnionFind) Find(x int) int { // recursive version
+	if uf.parents[x] == x { // parent points to itself -> reached the root
+		return x
+	}
+
+	// path compression -> set the root to every parents[i] in the chain
+	uf.parents[x] = uf.Find(uf.parents[x])
+
+	return uf.parents[x]
+}
+
+func (uf UnionFind) Print() {
+	fmt.Printf("Parents: %v \n", uf.parents)
+	fmt.Printf("Sizes: %v \n", uf.sizes)
+}
+
+func (uf UnionFind) Union(x, y int) bool { // returns false if they're already in the same set
+	// these find will perform path compression
+	rootX := uf.Find(x)
+	rootY := uf.Find(y)
+
+	//fmt.Printf("root of %d: %d, root of %d: %d\n", x, rootX, y, rootY)
+
+	// x and y are already in the same set -> nothing to merge
+	if rootX == rootY {
+		//fmt.Printf("Element %v and %v already belong to the same root %v. Nothing to merge. \n", x, y, rootX)
+		return false
+	}
+
+	// merge the smaller group into the bigger group
+	// todo: ideally, we should merge the tree with smaller depth into the tree with bigger depth
+	if uf.sizes[rootX] < uf.sizes[rootY] { // merge x into y
+		//fmt.Printf("sizes[%v] = %v < sizes[%v] = %v. Merging root %v into root %v \n", rootX, uf.sizes[rootX], rootY, uf.sizes[rootY], rootX, rootY)
+
+		uf.parents[rootX] = rootY
+		uf.sizes[rootY] += uf.sizes[rootX]
+	} else { // merge y into x
+		//fmt.Printf("sizes[%v] = %v >= sizes[%v] = %v. Merging root %v into root %v \n", rootX, uf.sizes[rootX], rootY, uf.sizes[rootY], rootY, rootX)
+
+		uf.parents[rootY] = rootX
+		uf.sizes[rootX] += uf.sizes[rootY]
+	}
+
+	return true
+}
+
+func (uf UnionFind) GroupSize(x int) int {
+	return uf.sizes[uf.Find(x)]
+}
+
+func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every group
+	m := make(map[int]int)
+
+	for i := range uf.parents {
+		if uf.Find(i) == i { // root node
+			// every root group will be iterated just once, no need to check whether it's already in the map
+			m[i] = uf.GroupSize(i)
+
+			/*
+				if _, ok := m[i]; !ok {
+					// group not yet in map -> add it
+					m[i] = uf.groupSize(i)
+				}
+			*/
+		}
+	}
+
+	return m
+}
+
+// ========================= Kruskal's algorithm for MST end ========================= //
+
+// ========================= Test functions ========================= //
 func testPrim1() {
 	edges := [][]int{
 		// from - to - weight
@@ -691,6 +841,84 @@ func testPrimSuite() {
 	testPrim1()
 }
 
+func testKruskal1() {
+	edges := [][]int{
+		// from - to - weight
+		{0, 1, 10},
+		{0, 2, 3},
+		{1, 2, 4},
+		{1, 3, 1},
+		{2, 3, 4},
+		{2, 4, 4},
+		{3, 4, 2},
+	}
+
+	expectedMstWeight := 10 // 3 + 4 + 1 + 2
+
+	// from, to, weight
+	// For Kruskal's, we're taking the edges in weight order (if not yet in tree)
+	// In our implementation, we're ordering on from-to in case of the same weight.
+	expectedMstEdges := [][]int{
+		{1, 3, 1},
+		{3, 4, 2},
+		{0, 2, 3},
+		{1, 2, 4},
+	}
+
+	mst := getMinimumSpanningTreeKruskal(5, edges)
+
+	fmt.Printf("MST weight: %v \n", mst.weight)
+	fmt.Printf("Expected MST weight: %v \n", expectedMstWeight)
+
+	if mst.weight != expectedMstWeight {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedMstWeight, mst.weight)
+	}
+
+	// validate edges
+	result := mst.edges
+	expectedResult := expectedMstEdges
+
+	fmt.Printf("MST edges: \n")
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected MST edges: \n")
+	matrixCommon.PrintIntMatrix(expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	// todo: since union-find
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+}
+
+func testKruskalSuite() {
+	testKruskal1()
+}
+
 func main() {
 	testPrimSuite()
+	testKruskalSuite()
 }

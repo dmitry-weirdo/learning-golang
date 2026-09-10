@@ -12,6 +12,8 @@ func minCostConnectPoints(points [][]int) int {
 	// Slow, 510-560 ms
 	// Same time as Dijkstra's,
 	// O(E log E) = O(E log V^2) = O(2E log V) = O(E log V) = O(V^2 * log V)
+
+	// Actually, it's also O(V^2) on constructing the adjacency list.
 	return minCostConnectPoints_prim(points)
 }
 
