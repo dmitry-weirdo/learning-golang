@@ -626,6 +626,7 @@ func getMinimumSpanningTreeKruskalNodesStartFrom1(n int, edges [][]int) MinimumS
 	return getMinimumSpanningTreeKruskal(n+1, 1, edges) // start from node 1
 }
 
+// todo: for many problems, we only need to connect the MST.weight. So we can save time and space on collecting the edges.
 func getMinimumSpanningTreeKruskal(n int, startIndex int, edges [][]int) MinimumSpanningTree { // start can be 0 or 1
 	// If nodes start with 0, set n = N, startIndex = 0
 	// If nodes start with 1, set n = N + 1, startIndex = 1

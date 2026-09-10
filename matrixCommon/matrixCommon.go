@@ -20,10 +20,8 @@ func PrintIntMatrixWithDifferentColumnsCount(mat [][]int) {
 }
 
 func PrintIntMatrix(mat [][]int) {
-	rows, columns := getRowsAndColumns(mat)
-
-	for i := range rows {
-		for j := range columns {
+	for i, row := range mat {
+		for j := range row {
 			fmt.Printf("%v ", mat[i][j])
 		}
 
@@ -32,10 +30,8 @@ func PrintIntMatrix(mat [][]int) {
 }
 
 func PrintByteMatrix(mat [][]byte) { // prints elements as characters, NOT as numeric byte values
-	rows, columns := getRowsAndColumnsOfByteMatrix(mat)
-
-	for i := range rows {
-		for j := range columns {
+	for i, row := range mat {
+		for j := range row {
 			fmt.Printf("%v ", mat[i][j])
 		}
 
@@ -44,10 +40,8 @@ func PrintByteMatrix(mat [][]byte) { // prints elements as characters, NOT as nu
 }
 
 func PrintBoolMatrix(mat [][]bool) {
-	rows, columns := getRowsAndColumnsOfBoolMatrix(mat)
-
-	for i := range rows {
-		for j := range columns {
+	for i, row := range mat {
+		for j := range row {
 			var v string
 
 			if mat[i][j] {
