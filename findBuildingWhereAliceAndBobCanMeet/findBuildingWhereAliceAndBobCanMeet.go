@@ -121,7 +121,6 @@ func GetNextGreaterWithIndexesOptimized(a []int, noElementValue int, q map[int][
 						r[query.queryIndex] = -1
 					} else {
 						r[query.queryIndex] = (*stack)[index].index
-
 					}
 				}
 

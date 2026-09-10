@@ -58,6 +58,33 @@ func searchInsertPosition(arr []int, target int) int {
 	)
 }
 
+func searchRightmostLessThanTarget(arr []int, target int) int {
+	condition := func(x int) bool {
+		return x >= target
+	}
+
+	index := binarySearchGeneric(
+		arr,
+		0,
+		len(arr), // insert position can be after the end of the array
+		condition,
+	)
+
+	// there is no previous element -> no result
+	if index <= 0 {
+		return -1
+	}
+
+	// go one element left -> this will be the last element < target
+	index--
+
+	if arr[index] >= target {
+		return -1
+	}
+
+	return index
+}
+
 func binarySearchGeneric(
 	arr []int, // todo: we can also generalize the type in the array
 	left int, // usually it starts with 0, if we search in the complete array
