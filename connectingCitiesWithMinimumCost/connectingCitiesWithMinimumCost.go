@@ -2,11 +2,79 @@ package main
 
 import (
 	"cmp"
+	"container/heap"
 	"fmt"
 	"slices"
 )
 
 func minimumCost(n int, connections [][]int) int {
+	// Prim's should be faster for non-connected graphs,
+	// since it will only iterate the component containing the starting node.
+	// But it is actually slower since we're building an adj list and using a heap
+	// passes in 30-65 ms
+	return minimumCost_prim(n, connections)
+
+	// passes in 13-32 ms
+	//return minimumCost_kruskal(n, connections)
+}
+
+func minimumCost_prim(n int, connections [][]int) int {
+	// edge numbers are from 1 to N
+
+	adj := createAdjacencyListUndirectedWeighted(n+1, connections)
+
+	// We need MST and check that all nodes are connected.
+	// In Kruskal's algorithm, we can check whether union-find will connect just 1 group or more.
+	mst := getMinimumSpanningTreePrimNodesStartFrom1(n, adj)
+
+	if !mst.allNodesUsed {
+		return -1
+	}
+
+	return mst.weight
+}
+
+func createAdjacencyListUndirectedWeighted(n int, edges [][]int) [][][]int {
+	// todo: we can return an array of {node, weight} structs instead of 2-elements array
+	// adj[i][j][0] - "to" node
+	// adj[i][j][1] - weight of "from-to" edge
+	// we're assuming there are no duplicate parallel edges for the same "from + to"
+
+	adj := make([][][]int, n)
+
+	from := 0
+	to := 0
+	weight := 0
+	toAndWeight := []int{}
+	fromAndWeight := []int{}
+
+	for _, v := range edges {
+		from = v[0]
+		to = v[1]
+		weight = v[2]
+
+		toAndWeight = []int{to, weight}
+		fromAndWeight = []int{from, weight}
+
+		// add v1 to v2
+		if adj[from] == nil {
+			adj[from] = [][]int{toAndWeight}
+		} else {
+			adj[from] = append(adj[from], toAndWeight)
+		}
+
+		// add v2 to v1
+		if adj[to] == nil {
+			adj[to] = [][]int{fromAndWeight}
+		} else {
+			adj[to] = append(adj[to], fromAndWeight)
+		}
+	}
+
+	return adj
+}
+
+func minimumCost_kruskal(n int, connections [][]int) int {
 	// edge numbers are from 1 to N
 
 	// We need MST and check that all nodes are connected.
@@ -194,6 +262,162 @@ func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every gr
 }
 
 // ========================= Kruskal's algorithm for MST end ========================= //
+
+// ========================= Prim's algorithm for MST begin ========================= //
+type Edge struct {
+	from   int
+	to     int
+	weight int
+}
+
+func getMinimumSpanningTreePrimNodesStartFrom0(n int, adj [][][]int) MinimumSpanningTree {
+	// adj will contain n elements
+	return getMinimumSpanningTreePrim(n, 0, adj) // start from node 0
+}
+
+func getMinimumSpanningTreePrimNodesStartFrom1(n int, adj [][][]int) MinimumSpanningTree {
+	// adj will contain n + 1 elements
+	return getMinimumSpanningTreePrim(n+1, 1, adj) // start from node 1
+}
+
+func getMinimumSpanningTreePrim(n int, startIndex int, adj [][][]int) MinimumSpanningTree { // start can be 0 or 1
+	// If nodes start with 0, set n = N, startIndex = 0
+	// If nodes start with 1, set n = N + 1, startIndex = 1
+
+	// Prim can work with negative edge weights.
+	// Returns an array of edges of MST.
+	// We assume that the graph is undirected.
+
+	// If nodes are starting from 0 -> pass N, start = 0
+	// If nodes are starting from 1 -> pass (N + 1), start = 1
+	visited := make([]bool, n)
+
+	mst := MinimumSpanningTree{
+		edges:  make([][]int, 0),
+		weight: 0,
+	}
+
+	// mark start node as visited
+	visited[startIndex] = true
+
+	pq := createMinHeapPrim()
+
+	// add all neighbors of the start node to the heap
+	for _, v := range adj[startIndex] {
+		neighbor, weight := v[0], v[1]
+
+		if visited[neighbor] { // avoid self-cycle on the start node
+			continue
+		}
+
+		heap.Push(pq, Edge{from: startIndex, to: neighbor, weight: weight})
+	}
+
+	for pq.Len() > 0 {
+		edge := heap.Pop(pq).(Edge)
+
+		if visited[edge.to] {
+			// node was already visited -> do not handle it again
+			continue
+		}
+
+		// update if distance for this node is not yet found
+		visited[edge.to] = true
+
+		// Add the current edge to MST
+		mst.edges = append(mst.edges, []int{edge.from, edge.to, edge.weight})
+
+		// Add the edge weight to total weight
+		mst.weight += edge.weight
+
+		// cut first -> if we reached all nodes, stop iteration
+		if len(mst.edges) >= (n - startIndex - 1) {
+			break
+		}
+
+		// Add all neighbors of this node to the heap.
+		// !!! We're NOT skipping the nodes already in the heap.
+		// The trick is - we can push same node multiple times, but the min-heap will select the shortest distance first
+		for _, v := range adj[edge.to] {
+			neighbor, weight := v[0], v[1]
+
+			// neighbor was already reached with a shorter distance -> no reason to put it again
+			if visited[neighbor] {
+				// node was already reached -> do not handle it again
+				continue
+			}
+
+			e := Edge{
+				from:   edge.to,
+				to:     neighbor, // neighbor
+				weight: weight,   // unlike Dijkstra, we just add the edge weight, NOT the summary path weight
+			}
+
+			heap.Push(pq, e)
+		}
+	}
+
+	// check whether all nodes are in the single MST component
+	// We will have (N - 1) nodes in the MST in this case.
+	mst.allNodesUsed = len(mst.edges) == (n - startIndex - 1)
+
+	return mst
+}
+
+func createMinHeapPrim() *PriorityQueuePrim {
+	return &PriorityQueuePrim{
+		less: func(a, b Edge) bool {
+			if a.weight == b.weight { // for stable MST return -> in case of same weight -> return earlier edge
+				return a.to < b.to
+			}
+
+			// min heap
+			return a.weight < b.weight
+		},
+	}
+}
+
+type PriorityQueuePrim struct {
+	items []Edge
+	less  func(a, b Edge) bool // comparator function, returns boolean, not integer!
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Len() int {
+	return len(pq.items)
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Less(i, j int) bool {
+	return pq.less(pq.items[i], pq.items[j])
+}
+
+// implementation of sort.Interface
+func (pq *PriorityQueuePrim) Swap(i, j int) {
+	pq.items[i], pq.items[j] = pq.items[j], pq.items[i]
+}
+
+// implementation of heap.Interface
+func (pq *PriorityQueuePrim) Push(x any) { // interface needs `x any`, else the override will not work
+	pq.items = append(pq.items, x.(Edge))
+}
+
+// implementation of heap.Interface
+func (pq *PriorityQueuePrim) Pop() any { // interface needs `x any`, else the override will not work
+	n := len(pq.items)
+	lastItem := pq.items[n-1]
+
+	pq.items = pq.items[0 : n-1] // remove the last element
+
+	return lastItem
+}
+
+// helper function -> get the top of the heap without removing it
+func (pq *PriorityQueuePrim) Peek() Edge {
+	return pq.items[0] // return the root
+}
+
+// ========================= Prim's algorithm for MST end ========================= //
 
 func test(n int, m [][]int, expectedResult int) {
 	fmt.Println()

@@ -462,21 +462,19 @@ type MinimumSpanningTree struct {
 	allNodesUsed bool    // false if there are multiple non-connected components
 }
 
-type Edge struct {
+type Edge struct { // element to be stored in the heap for the Kruskal's algorithm
 	from   int
 	to     int
 	weight int
 }
 
-func getMinimumSpanningTreePrimNodesStartFrom0(adj [][][]int) MinimumSpanningTree {
-	n := len(adj)
-
+func getMinimumSpanningTreePrimNodesStartFrom0(n int, adj [][][]int) MinimumSpanningTree {
+	// adj will contain n elements
 	return getMinimumSpanningTreePrim(n, 0, adj) // start from node 0
 }
 
-func getMinimumSpanningTreePrimNodesStartFrom1(adj [][][]int) MinimumSpanningTree {
-	n := len(adj)
-
+func getMinimumSpanningTreePrimNodesStartFrom1(n int, adj [][][]int) MinimumSpanningTree {
+	// adj will contain (n + 1) elements
 	return getMinimumSpanningTreePrim(n+1, 1, adj) // start from node 1
 }
 
