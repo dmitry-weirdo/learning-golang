@@ -4,14 +4,135 @@ import (
 	"cmp"
 	"fmt"
 	"slices"
+	"strconv"
 )
 
 type DistanceLimitedPathsExist struct {
 	m map[int][]int16 // weight -> UF array for this weight
 	w []int           // weights , to do binary-search for (value < weight), since we do NOT have sortedMap/treeMap in Go
+
+	graphNodeToKrtNode map[int]*KrtNode
+	ufRootToKrtRoot    map[int]*KrtNode
 }
 
 func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
+	return constructor_krt(n, edges)
+
+	// fails MLE on big counts
+	//return constructor_naive(n, edges)
+}
+
+func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
+	graphNodeToKrtNode := make(map[int]*KrtNode) // node -> tree node in KRT
+
+	ufRootToKrtRoot := make(map[int]*KrtNode) // UF root to KRT root
+
+	for nodeId := range n {
+		nodeKrtNode := &KrtNode{
+			nodeType: Node,
+			id:       nodeId,
+			label:    "node_" + strconv.Itoa(nodeId),
+			left:     nil,
+			right:    nil,
+			parent:   nil,
+		}
+
+		// At the start, every node is its own KRT tree
+		graphNodeToKrtNode[nodeId] = nodeKrtNode
+		ufRootToKrtRoot[nodeId] = nodeKrtNode
+	}
+
+	// Simplified Kruskal
+	// We don't need the MST, we only need the UF states
+	startIndex := 0 // nodes start with 0
+
+	sortEdgesForKruskal(edges)
+
+	// union-find controls the visited by including them in the same node set
+	uf := NewUnionFind(n)
+
+	totalEdges := 0
+
+	// index in edges[] array
+	i := 0
+
+	for (totalEdges < n-startIndex-1) && (i < len(edges)) {
+		from := edges[i][0]
+		to := edges[i][1]
+		weight := edges[i][2]
+
+		ufRootFrom := uf.Find(from)
+		ufRootTo := uf.Find(to)
+
+		if !uf.Union(from, to) { // from and to already in the same MST set -> skip this edge
+			i++
+			continue
+		}
+
+		/*		// should we still put to the map if uf.Union returned false? No, since the edge is not added
+				if weight%10 == 0 {
+					// with int, it fails on 1880
+					// with int16, it fails on 7690 - much better, but still MLE, we need 10000 to work :(
+					fmt.Printf("%v \n", weight)
+				}
+		*/
+
+		newUfRoot := uf.Find(from) // after union
+
+		krtRootFrom := ufRootToKrtRoot[ufRootFrom]
+		krtRootTo := ufRootToKrtRoot[ufRootTo]
+
+		edgeKrtNode := &KrtNode{
+			nodeType: Edge,
+			weight:   weight,
+			label:    "edge_" + strconv.Itoa(from) + "-" + strconv.Itoa(to),
+			left:     krtRootFrom,
+			right:    krtRootTo,
+		}
+
+		krtRootFrom.parent = edgeKrtNode
+		krtRootTo.parent = edgeKrtNode
+
+		// !!! We only care about the roots of the UF in the ufRootToKrtRoot map.
+		// In the test example, after merging nodes 2 and 3, we're setting the parent just to one node 2 that is now the parent of both 2 and 3 (in the UF).
+		// ufRootToKrtRoot[3] remains unchanged in ufRootToKrtRoot, but we're not using it anymore.
+		// 1 -> node_1, 2 -> edge_2-3, 3 -> node_3, 4 -> node_4, 5 -> node_5, 0 -> node_0,
+
+		// from and to now belong to the new root of the edge
+		ufRootToKrtRoot[newUfRoot] = edgeKrtNode
+		//ufRootToKrtRoot[from] = edgeKrtNode
+		//ufRootToKrtRoot[to] = edgeKrtNode
+
+		fmt.Println()
+		fmt.Printf("KRT root for edge %v is now the parent of %v and %v. \n", edgeKrtNode.label, krtRootFrom.label, krtRootTo.label)
+		fmt.Printf("KRT root node of new UF root %v set to %v \n", newUfRoot, edgeKrtNode.label)
+		//fmt.Printf("KRT root node of %v set to %v \n", from, edgeKrtNode.label)
+		//fmt.Printf("KRT root node of %v set to %v \n", to, edgeKrtNode.label)
+
+		fmt.Printf("ufRootToKrtRoot: \n")
+		for k, v := range ufRootToKrtRoot {
+			fmt.Printf("%v -> %v, ", k, v.label)
+		}
+		fmt.Println()
+
+		// increase the MST edges counter
+		totalEdges++
+
+		// go to next edge
+		i++
+	}
+
+	// todo: we need to store the UF.parents array to quickly define the component
+
+	return DistanceLimitedPathsExist{
+		m:                  nil, // todo: remove legacy field of other implementation
+		w:                  nil, // todo: remove legacy field of other implementation
+		graphNodeToKrtNode: graphNodeToKrtNode,
+		ufRootToKrtRoot:    ufRootToKrtRoot,
+	}
+}
+
+func constructor_naive(n int, edges [][]int) DistanceLimitedPathsExist {
 	// clone of UF array for every weight
 	// If multiple node have the same weights, we will override after adding more nodes.
 	m := make(map[int][]int16) // weight -> UF array for this weight
@@ -78,6 +199,68 @@ func copyArray(arr []int) []int16 {
 }
 
 func (this *DistanceLimitedPathsExist) Query(p int, q int, limit int) bool {
+	return this.Query_Krt(p, q, limit)
+
+	// Nice and O(1), but we will get MLE on saving all the UF arrays
+	//return this.Query_Naive(p, q, limit)
+}
+
+func (this *DistanceLimitedPathsExist) Query_Krt(p int, q int, limit int) bool {
+	// we need to find the LCA of p and q. This will be the minimum weight in their paths
+	/*	if this.graphNodeToKrtRoot[p] != this.graphNodeToKrtRoot[q] { // nodes belong to different components
+			return false
+		}
+	*/
+	// todo: this is a stupid O(N) solution with iterating from node to its parent. This is basically the same as DFS through the MST graph
+	// find the LCA
+	np := this.graphNodeToKrtNode[p]
+	nq := this.graphNodeToKrtNode[q]
+
+	lca := lowestCommonAncestor_byParent(np, nq)
+
+	if lca == nil { // this must never happen
+		//panic(fmt.Sprintf("Nodes %v and %v belong to the same KRT but have no LCA.", p, q))
+		fmt.Printf("LCA of nodes %v and %v not found. \n", p, q)
+		return false
+	}
+
+	fmt.Printf("LCA of nodes %v and %v: %v, weight = %v (%v) \n", p, q, lca.label, lca.weight, lca)
+	return lca.weight < limit
+}
+
+func lowestCommonAncestor_byParent(p *KrtNode, q *KrtNode) *KrtNode { // copied from "1650. Lowest Common Ancestor of a Binary Tree III"
+	// if we want O(1) space optimization logic, we can:
+	// - calculate depths of both nodes
+	// - go from the deeper node up to align the depths
+	// - move up step by step until the nodes are the same
+	// It will still be O(h) time complexity
+
+	m := make(map[string]*KrtNode)
+
+	// go from P to the root, collect all the values in the path into a map
+	current := p
+
+	for current != nil {
+		m[current.label] = current
+		current = current.parent
+	}
+
+	// go from Q to the root. The first node in the path that was already in the path of P is the LCA
+	current = q
+
+	for current != nil {
+		if _, ok := m[current.label]; ok {
+			return current
+		}
+
+		current = current.parent
+	}
+
+	// this must never happen, at least the root should be the LCA
+	return nil
+}
+
+func (this *DistanceLimitedPathsExist) Query_Naive(p int, q int, limit int) bool {
 	// find biggest existing weight < weight
 	index := searchRightmostLessThanTarget(this.w, limit)
 	if index < 0 { // there is no weight less than limit
@@ -333,6 +516,27 @@ func (uf UnionFind) GetGroupsSizes() map[int]int { // returns sizes for every gr
 }
 
 // ========================= Kruskal's algorithm for MST end ========================= //
+
+// ========================= My KRT implementation begin ========================= //
+type KrtNodeType int
+
+const (
+	Node KrtNodeType = iota // node of the original graph
+	Edge                    // edge of the original graph
+)
+
+type KrtNode struct {
+	nodeType KrtNodeType
+	weight   int    // for edge only
+	id       int    // for node only
+	label    string // to uniquely identify the node
+
+	left   *KrtNode // not necessary, but for consistency
+	right  *KrtNode // not necessary, but for consistency
+	parent *KrtNode // to iterate upwards to find the LCA
+}
+
+// ========================= My KRT implementation end ========================= //
 
 func testQuery(d DistanceLimitedPathsExist, p, q, limit int, expectedResult bool) {
 	fmt.Println()
