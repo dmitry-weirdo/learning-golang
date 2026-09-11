@@ -134,9 +134,27 @@ func getLca(up [][]int, levels []int, a, b int) int {
 		return lower
 	}
 
-	// todo: implement the search
+	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
+	n := len(up)
 
-	return -666
+	log := log2(n) + 1
+
+	for i := log - 1; i >= 0; i-- {
+		// if the ancestor of this level is the same, continue to the next level
+		// I.e. this level is LCA or above
+		if up[lower][i] == up[upper][i] {
+			continue
+		}
+
+		// Ancestors of this level is different -> this level is below LCA
+		// Move to this level (to the power of 2)
+		// LCA will be still above.
+		lower = up[lower][i]
+		upper = up[upper][i]
+	}
+
+	// both nodes will be directly below their LCA
+	return up[lower][0]
 }
 
 // todo: get K-th node up from 1483. Kth Ancestor of a Tree Node should be a common function with tests as well
@@ -259,6 +277,70 @@ func testBinaryLiftingDfs1() {
 	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
 }
 
+func testLca(n int, arr []any, expectedLca int) { // nodes can be null
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("N - count of nodes in the tree: %v \n", n)
+	fmt.Printf("Tree array: %v \n", arr)
+
+	tree := trees.TreeFromArray(arr)
+	fmt.Printf("Initial tree: \n")
+	trees.PrintTreeTopDown(tree)
+
+	result, levels := getBinaryLiftingDfs(n, tree)
+
+	// test the Binary Lifting matrix
+	fmt.Printf("Binary lifting matrix: %v \n", result)
+	matrixCommon.PrintIntMatrix(result)
+
+	fmt.Printf("Expected result: %v \n", expectedResult)
+	matrixCommon.PrintIntMatrix(expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, resultRow := range result {
+		expectedResultRow := expectedResult[i]
+
+		// check that rows have the same length
+		if len(resultRow) != len(expectedResultRow) {
+			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
+
+			return
+		}
+
+		// same length -> check all row values
+		for j, resultValue := range resultRow {
+			expectedResultValue := expectedResultRow[j]
+
+			if resultValue != expectedResultValue {
+				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
+
+				return
+			}
+		}
+	}
+
+	// test the levels array
+	fmt.Printf("Node levels: %v \n", levels)
+	fmt.Printf("Expected result: %v \n", expectedLevels)
+
+	if len(levels) != len(expectedLevels) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range levels {
+		if v != expectedLevels[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func testLca1() {
 	// taken from https://leetcode.com/problems/kth-ancestor-of-a-tree-node/
 	n := 7
@@ -275,11 +357,14 @@ func testLca1() {
 
 	node1 := 1
 	node2 := 5
+
+	expectedLca := 0
+
 	lca := getLca(up, levels, node1, node2)
 
 	fmt.Printf("LCA of %v and %v is %v \n", node1, node2, lca)
 
-	// todo: test the values
+	// todo: test with the expected values
 }
 
 func main() {
