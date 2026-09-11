@@ -113,6 +113,63 @@ func createIntMatrix(rows, columns int) [][]int {
 	return m
 }
 
+func getLca(up [][]int, levels []int, a, b int) int {
+	// define what node is deeper in the tree
+	lower, upper := a, b
+
+	if levels[a] < levels[b] {
+		lower, upper = b, a
+	}
+
+	levelDiff := levels[lower] - levels[upper]
+
+	fmt.Printf("Lower node: %v, upper node: %v, level difference: %v \n", lower, upper, levelDiff)
+
+	// move from the lower (deeper) node to the same level as the upper (shallower) node
+	lower = GetKthAncestor(up, lower, levelDiff)
+
+	fmt.Printf("Lower node moved to the same level %v as upper node %v. Lower node moved up to %v. \n", levels[upper], upper, lower)
+
+	if lower == upper { // at the same level, nodes are the same -> upper node is the LCA
+		return lower
+	}
+
+	// todo: implement the search
+
+	return -666
+}
+
+// todo: get K-th node up from 1483. Kth Ancestor of a Tree Node should be a common function with tests as well
+func GetKthAncestor(up [][]int, node int, k int) int {
+	// todo: handle -1 specially?
+	n := len(up)
+
+	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
+	log := log2(n) + 1
+
+	current := node
+
+	for i := log - 1; i >= 0; i-- {
+		if current == -1 { // no need to traverse further if we're above the root
+			return -1
+		}
+
+		// k = 100 -> we'll go
+		powerOf2 := 1 << i
+		//fmt.Printf("Power of 2^%v = %v \n", i, powerOf2)
+
+		if k >= powerOf2 {
+			// go up 2^i levels, decreasing K
+			current = up[current][i]
+
+			k -= powerOf2
+		}
+	}
+
+	return current
+}
+
+// =========================== tests =========================== //
 func testBinaryLiftingDfs(n int, arr []any, expectedResult [][]int, expectedLevels []int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
@@ -202,6 +259,31 @@ func testBinaryLiftingDfs1() {
 	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
 }
 
+func testLca1() {
+	// taken from https://leetcode.com/problems/kth-ancestor-of-a-tree-node/
+	n := 7
+
+	arr := []any{
+		0,
+		1, 2,
+		3, 4, 5, 6,
+	}
+
+	tree := trees.TreeFromArray(arr)
+
+	up, levels := getBinaryLiftingDfs(n, tree)
+
+	node1 := 1
+	node2 := 5
+	lca := getLca(up, levels, node1, node2)
+
+	fmt.Printf("LCA of %v and %v is %v \n", node1, node2, lca)
+
+	// todo: test the values
+}
+
 func main() {
 	testBinaryLiftingDfs1()
+
+	testLca1()
 }

@@ -124,6 +124,8 @@ func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
 
 	// todo: we need to store the UF.parents array to quickly define the component
 
+	// todo: for every tree in the KRT forest, pre-calculate the binary lifting and the levels
+
 	return DistanceLimitedPathsExist{
 		m:                  nil, // todo: remove legacy field of other implementation
 		w:                  nil, // todo: remove legacy field of other implementation
