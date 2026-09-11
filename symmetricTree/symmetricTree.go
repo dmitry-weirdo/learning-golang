@@ -96,6 +96,7 @@ func test4() {
 
 func main() {
 	// 101. Symmetric Tree
+	// Similar to "100. Same Tree", just swap Left/Right and Right/Left comparisons.
 	test1()
 	test2()
 	test3()
