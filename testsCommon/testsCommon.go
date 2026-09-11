@@ -615,6 +615,26 @@ func testStringArrayToInt(arr []string, expectedResult int) {
 	}
 }
 
+func StringArrayToBoolFunction(arr []string) bool {
+	return len(arr) > 0
+}
+
+func testStringArrayToBool(arr []string, expectedResult bool) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text if required
+
+	result := StringArrayToBoolFunction(arr) // todo: update to your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
 func StringArrayToStringFunction(arr []string) string {
 	return arr[0]
 }
