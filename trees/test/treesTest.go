@@ -9,7 +9,7 @@ import (
 )
 
 // todo: move this function to trees.go
-func getBinaryLiftingDfs(n int, root *TreeNode) [][]int { // todo: also return levels
+func getBinaryLiftingDfs(n int, root *TreeNode) (binaryLifting [][]int, levels []int) {
 	// see https://www.youtube.com/watch?v=dOAxrhAUIhA
 
 	// todo: we should also handle node indexes, not values
@@ -28,15 +28,18 @@ func getBinaryLiftingDfs(n int, root *TreeNode) [][]int { // todo: also return l
 		up[root.Val][i] = -1
 	}
 
-	// todo: also fill a levels array
+	// also fill the levels array
+	levels = make([]int, n) // for nodes 0 to n - 1
 
-	var dfs func(n *TreeNode)
+	var dfs func(n *TreeNode, level int)
 
 	// todo: probably we need to map not to [int] but to [*TreeNode]
-	dfs = func(n *TreeNode) {
+	dfs = func(n *TreeNode, level int) {
 		if n == nil {
 			return
 		}
+
+		levels[n.Val] = level
 
 		// left
 		if n.Left != nil {
@@ -60,7 +63,7 @@ func getBinaryLiftingDfs(n int, root *TreeNode) [][]int { // todo: also return l
 				}
 			}
 
-			dfs(n.Left)
+			dfs(n.Left, level+1)
 		}
 
 		// right
@@ -84,12 +87,12 @@ func getBinaryLiftingDfs(n int, root *TreeNode) [][]int { // todo: also return l
 				}
 			}
 
-			dfs(n.Right)
+			dfs(n.Right, level+1)
 		}
 	}
 
-	dfs(root)
-	return up
+	dfs(root, 0) // root has level 0
+	return up, levels
 }
 
 func log2(n int) int {
@@ -110,7 +113,7 @@ func createIntMatrix(rows, columns int) [][]int {
 	return m
 }
 
-func testBinaryLiftingDfs(n int, arr []any, expectedResult [][]int) { // nodes can be null
+func testBinaryLiftingDfs(n int, arr []any, expectedResult [][]int, expectedLevels []int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
@@ -121,9 +124,7 @@ func testBinaryLiftingDfs(n int, arr []any, expectedResult [][]int) { // nodes c
 	fmt.Printf("Initial tree: \n")
 	trees.PrintTreeTopDown(tree)
 
-	result := getBinaryLiftingDfs(n, tree)
-
-	// todo: also test the levels array
+	result, levels := getBinaryLiftingDfs(n, tree)
 
 	// test the Binary Lifting matrix
 	fmt.Printf("Binary lifting matrix: %v \n", result)
@@ -158,6 +159,22 @@ func testBinaryLiftingDfs(n int, arr []any, expectedResult [][]int) { // nodes c
 			}
 		}
 	}
+
+	// test the levels array
+	fmt.Printf("Node levels: %v \n", levels)
+	fmt.Printf("Expected result: %v \n", expectedLevels)
+
+	if len(levels) != len(expectedLevels) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range levels {
+		if v != expectedLevels[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
 }
 
 func testBinaryLiftingDfs1() {
@@ -170,7 +187,7 @@ func testBinaryLiftingDfs1() {
 		3, 4, 5, 6,
 	}
 
-	expected := [][]int{
+	expectedBinaryLifting := [][]int{
 		{-1, -1, -1},
 		{0, -1, -1},
 		{0, -1, -1},
@@ -180,7 +197,9 @@ func testBinaryLiftingDfs1() {
 		{2, 0, -1},
 	}
 
-	testBinaryLiftingDfs(n, arr, expected)
+	expectedLevels := []int{0, 1, 1, 2, 2, 2, 2}
+
+	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
 }
 
 func main() {
