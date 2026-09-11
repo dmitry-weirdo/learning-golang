@@ -381,6 +381,37 @@ func infinity() {
 	fmt.Printf("Min int32 > Negative infinity: %v \n", math.MinInt32 > negativeInfinity)
 }
 
+func log2(n int) int {
+	// todo: log2 should be handled separately, it's undefined
+	return int(math.Log2(float64(n)))
+
+	// for positive integers, counting bits can be used:
+	// bits.Len(uint(n)) - 1
+}
+
+func log2AndExpect(n int, expectedResult int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	result := log2(n)
+
+	fmt.Printf("Log2(%v): %v \n", n, result)
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func testLog2() {
+	log2AndExpect(1, 0)
+	log2AndExpect(63, 5)
+	log2AndExpect(64, 6)
+	log2AndExpect(100, 6) // 6 (round down)
+	log2AndExpect(127, 6) // 6 (round down)
+	log2AndExpect(128, 7) // 7 (exact value)
+}
+
 func main() {
 	stringBuilder()
 	stringFunctions()
@@ -388,4 +419,5 @@ func main() {
 	sliceFunctions()
 
 	infinity()
+	testLog2()
 }
