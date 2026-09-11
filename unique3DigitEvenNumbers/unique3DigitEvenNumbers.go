@@ -92,6 +92,7 @@ func test4() {
 
 func main() {
 	// 3483. Unique 3-Digit Even Numbers
+	// It's the same as "2094. Finding 3-Digit Even Numbers"
 	test1()
 	test2()
 	test3()
