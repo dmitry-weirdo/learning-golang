@@ -2,6 +2,7 @@ package main
 
 import (
 	"cmp"
+	"demo/matrixCommon"
 	"fmt"
 	"slices"
 )
@@ -31,19 +32,35 @@ func maximumWeight(intervals [][]int) []int {
 
 	//fmt.Printf("Intervals with indexes sorted by right, left: \n%v\n", intervalsWithIndexes)
 
+	// Using (N + 1) rows is a trick to not handle the "no left intervals found before"
+	// So intervals[i] corresponds to dp[i + 1] and indices[i + 1]
+	// The complete row dp[0][j] is 0.
+
+	// From the binary search, we're using also indexes [i + 1],
+	// So if the binary search returns -1, we're taking the 0 values from dp[0] and empty indices indices[0]
+
 	// DP matrix
 	// i - using intervals from 0 to i
 	// j - how many intervals are used (from 0 to 4)
-	dp := createIntMatrix(n+1, 5) // todo: why N+1, not N?
+	dp := createIntMatrix(n+1, 5) // !!! N+1, not N, with additional 0-row dp[0]
 
 	// for every dp[i][j], save the SORTED original interval indexes used
-	indices := make([][][]int, n+1) // todo: why N+1, not N?
+	indices := make([][][]int, n+1) // !!! N+1, not N, with additional empty-arrays row indices[0]
+
 	for i := range n + 1 {
 		indices[i] = make([][]int, 5)
 
-		for j := range 5 { // fill with empty index lists // todo: do we need?
-			indices[i][j] = make([]int, 0)
+		// initialize the pseudo row 0 with empty indices
+		if i == 0 {
+			for j := range 5 { // fill with empty index lists
+				indices[i][j] = make([]int, 0)
+			}
+
+			continue
 		}
+
+		// for j = 0, initialize the column 0 with empty indices (i.e. no intervals selected)
+		indices[i][0] = make([]int, 0)
 	}
 
 	for i, v := range intervalsWithIndexes {
@@ -60,16 +77,21 @@ func maximumWeight(intervals [][]int) []int {
 		// !!! We're searching just to the left of [i], since the intervals are sorted
 		// If there is no previous interval, we're using [i] itself
 		k := searchRightmostLessThanTarget(intervalsWithIndexes, i, left)
-		k++ // todo: why we're using the count of intervals, and NOT the k-th interval??? So in case of -1 it will be 0
+
+		// For non-found -1, we will be using the pseudo-row dp[0] and indices[0].
+		// For intervals[j], we're using index [j+1]
+		// This is the trick to not handle the case "no left intervals" and replace it with dummy empty row [0].
+		k++
 
 		//fmt.Printf("Rightmost interval[%v] with right < interval[%v].left = %v: [%v; %v] \n", k, i, left, intervalsWithIndexes[k][0], intervalsWithIndexes[k][1])
 
+		// !!! Note that for j = 1, the pseudo column dp[x][0] is used, and empty indices indices[0] are used.
 		for j := 1; j < 5; j++ { // all possible intervals used up to index [i]
-			s1 := dp[i][j]            // do not select the current interval (will be filled in from the previous step)
+			s1 := dp[i][j]            // do not select the current interval (will be filled in from the previous interval[i - 1])
 			s2 := dp[k][j-1] + weight // select [j - 1] intervals from the last interval that is before interval[i], add weight of interval[i]
 
 			if s1 > s2 { // Adding an interval[i] from interval[k] provides NO improvement from the current dp[i][j]
-				// propagate to [i + 1], so it will be s1 for the next [i]
+				// For the current interval[i], copy data from interval[i - 1]
 				dp[i+1][j] = dp[i][j]
 				indices[i+1][j] = copyArray(indices[i][j])
 				continue
@@ -80,16 +102,20 @@ func maximumWeight(intervals [][]int) []int {
 			newIndices = append(newIndices, index)   // add the index of intervals[i]
 			slices.Sort(newIndices)
 
-			// compareLists compares lexicographically if the scores are equal
+			// compareLists compares lexicographically if the scores are equal to "do not select the current interval"
 			if (s1 == s2) && compareListsLexicographically(indices[i][j], newIndices) < 0 {
-				// if old result for [i][j] was the same result, and it was lexicographically smaller -> use the old result
+				// if old result from intervals[i-1][j] was lexicographically smaller -> use the old result
 				newIndices = copyArray(indices[i][j])
 			}
 
-			dp[i+1][j] = s2 // interval [i+1][j] is not selected?
+			// current interval [i] is set to the row dp[i+1]
+			dp[i+1][j] = s2
 			indices[i+1][j] = newIndices
 		}
 	}
+
+	fmt.Printf("DP matrix: \n")
+	matrixCommon.PrintIntMatrix(dp)
 
 	// collect the result from "after checking all N intervals", use 4 intervals
 	return indices[n][4] // !!! notably it's [n], NOT [n - 1]
