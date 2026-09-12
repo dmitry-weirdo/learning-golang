@@ -43,7 +43,7 @@ func getBinaryLiftingDfs(n int, root *TreeNode) (binaryLifting [][]int, levels [
 
 		// left
 		if n.Left != nil {
-			fmt.Printf("Root: %v, left: %v \n", root.Val, n.Left.Val)
+			//fmt.Printf("Root: %v, left: %v \n", root.Val, n.Left.Val)
 
 			// todo: value should be *TreeNode?
 			// 2^0 - direct parent
@@ -68,7 +68,7 @@ func getBinaryLiftingDfs(n int, root *TreeNode) (binaryLifting [][]int, levels [
 
 		// right
 		if n.Right != nil {
-			fmt.Printf("Root: %v, right: %v \n", root.Val, n.Right.Val)
+			//fmt.Printf("Root: %v, right: %v \n", root.Val, n.Right.Val)
 
 			// 2^0 - direct parent
 			v := n.Right.Val
@@ -277,7 +277,7 @@ func testBinaryLiftingDfs1() {
 	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
 }
 
-func testLca(n int, arr []any, expectedLca int) { // nodes can be null
+func testLca(n int, arr []any, node1, node2 int, expectedResult int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
@@ -288,56 +288,17 @@ func testLca(n int, arr []any, expectedLca int) { // nodes can be null
 	fmt.Printf("Initial tree: \n")
 	trees.PrintTreeTopDown(tree)
 
-	result, levels := getBinaryLiftingDfs(n, tree)
+	fmt.Printf("Nodes to find LCA: %v and %v \n", node1, node2)
 
-	// test the Binary Lifting matrix
-	fmt.Printf("Binary lifting matrix: %v \n", result)
-	matrixCommon.PrintIntMatrix(result)
+	// we don't test this method here
+	up, levels := getBinaryLiftingDfs(n, tree)
 
+	result := getLca(up, levels, node1, node2)
+	fmt.Printf("LCA of %v and %v: %v \n", node1, node2, result)
 	fmt.Printf("Expected result: %v \n", expectedResult)
-	matrixCommon.PrintIntMatrix(expectedResult)
 
-	if len(result) != len(expectedResult) {
-		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
-		return
-	}
-
-	for i, resultRow := range result {
-		expectedResultRow := expectedResult[i]
-
-		// check that rows have the same length
-		if len(resultRow) != len(expectedResultRow) {
-			fmt.Printf("FAILURE: expectedResult[%v] length = %v, actualResult[%v] length = %v \n", i, len(expectedResultRow), i, len(resultRow))
-
-			return
-		}
-
-		// same length -> check all row values
-		for j, resultValue := range resultRow {
-			expectedResultValue := expectedResultRow[j]
-
-			if resultValue != expectedResultValue {
-				fmt.Printf("FAILURE: expectedResult[%v][%v] = %v, actualResult[%v][%v]  = %v \n", i, j, expectedResultValue, i, j, resultValue)
-
-				return
-			}
-		}
-	}
-
-	// test the levels array
-	fmt.Printf("Node levels: %v \n", levels)
-	fmt.Printf("Expected result: %v \n", expectedLevels)
-
-	if len(levels) != len(expectedLevels) {
-		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
-		return
-	}
-
-	for i, v := range levels {
-		if v != expectedLevels[i] {
-			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
-			return
-		}
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
 	}
 }
 
@@ -351,20 +312,11 @@ func testLca1() {
 		3, 4, 5, 6,
 	}
 
-	tree := trees.TreeFromArray(arr)
+	testLca(n, arr, 1, 5, 0)
+	testLca(n, arr, 3, 4, 1)
+	testLca(n, arr, 5, 6, 2)
+	testLca(n, arr, 3, 6, 0)
 
-	up, levels := getBinaryLiftingDfs(n, tree)
-
-	node1 := 1
-	node2 := 5
-
-	expectedLca := 0
-
-	lca := getLca(up, levels, node1, node2)
-
-	fmt.Printf("LCA of %v and %v is %v \n", node1, node2, lca)
-
-	// todo: test with the expected values
 }
 
 func main() {
