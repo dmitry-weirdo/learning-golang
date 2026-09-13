@@ -151,3 +151,18 @@ func reverseMatrixRows(m [][]int) {
 		}
 	}
 }
+
+func copyIntMatrix(m [][]int) [][]int {
+	r := make([][]int, len(m))
+
+	for i, row := range m {
+		// todo: will copy array via copy() work faster for every row?
+		r[i] = make([]int, len(row))
+
+		for j, v := range row {
+			r[i][j] = v
+		}
+	}
+
+	return r
+}
