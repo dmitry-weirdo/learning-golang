@@ -232,6 +232,16 @@ func getLongAndShortStrings(a, b string) (long, short string) {
 	return b, a
 }
 
+func lowercaseEnglishLettersStringToFrequencies(s string) []int {
+	freq := make([]int, 26)
+
+	for _, ch := range s {
+		freq[ch-'a']++
+	}
+
+	return freq
+}
+
 func getMinAndMax(a, b int) (smaller, greater int) {
 	if a <= b {
 		return a, b
