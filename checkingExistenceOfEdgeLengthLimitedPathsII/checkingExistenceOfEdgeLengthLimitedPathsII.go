@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 )
@@ -13,6 +14,14 @@ type DistanceLimitedPathsExist struct {
 
 	graphNodeToKrtNode map[int]*KrtNode
 	ufRootToKrtRoot    map[int]*KrtNode
+	indexToKrtIndex    []int
+	krtData            map[string]*KrtTreeData
+}
+
+type KrtTreeData struct {
+	binaryLifting [][]int
+	levels        []int
+	valueToNode   []*KrtNode // index [0; n-1] to node of this tree.
 }
 
 func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
@@ -23,6 +32,8 @@ func Constructor(n int, edges [][]int) DistanceLimitedPathsExist {
 }
 
 func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
+	const VALUE_NOT_SET = -1
+
 	graphNodeToKrtNode := make(map[int]*KrtNode) // node -> tree node in KRT
 
 	ufRootToKrtRoot := make(map[int]*KrtNode) // UF root to KRT root
@@ -32,6 +43,7 @@ func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
 			nodeType: Node,
 			id:       nodeId,
 			label:    "node_" + strconv.Itoa(nodeId),
+			value:    VALUE_NOT_SET, // not set yet
 			left:     nil,
 			right:    nil,
 			parent:   nil,
@@ -86,6 +98,7 @@ func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
 			nodeType: Edge,
 			weight:   weight,
 			label:    "edge_" + strconv.Itoa(from) + "-" + strconv.Itoa(to),
+			value:    VALUE_NOT_SET, // not set yet
 			left:     krtRootFrom,
 			right:    krtRootTo,
 		}
@@ -103,17 +116,20 @@ func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
 		//ufRootToKrtRoot[from] = edgeKrtNode
 		//ufRootToKrtRoot[to] = edgeKrtNode
 
-		fmt.Println()
-		fmt.Printf("KRT root for edge %v is now the parent of %v and %v. \n", edgeKrtNode.label, krtRootFrom.label, krtRootTo.label)
-		fmt.Printf("KRT root node of new UF root %v set to %v \n", newUfRoot, edgeKrtNode.label)
+		//fmt.Println()
+		//fmt.Printf("KRT root for edge %v is now the parent of %v and %v. \n", edgeKrtNode.label, krtRootFrom.label, krtRootTo.label)
+		//fmt.Printf("KRT root node of new UF root %v set to %v \n", newUfRoot, edgeKrtNode.label)
+
 		//fmt.Printf("KRT root node of %v set to %v \n", from, edgeKrtNode.label)
 		//fmt.Printf("KRT root node of %v set to %v \n", to, edgeKrtNode.label)
 
-		fmt.Printf("ufRootToKrtRoot: \n")
-		for k, v := range ufRootToKrtRoot {
-			fmt.Printf("%v -> %v, ", k, v.label)
-		}
-		fmt.Println()
+		/*
+			fmt.Printf("ufRootToKrtRoot: \n")
+			for k, v := range ufRootToKrtRoot {
+				fmt.Printf("%v -> %v, ", k, v.label)
+			}
+			fmt.Println()
+		*/
 
 		// increase the MST edges counter
 		totalEdges++
@@ -122,15 +138,113 @@ func constructor_krt(n int, edges [][]int) DistanceLimitedPathsExist {
 		i++
 	}
 
-	// todo: we need to store the UF.parents array to quickly define the component
+	// todo: split this hell into separate methods
+	// map ufRootToKrtRoot for every node to its actual tree root
 
-	// todo: for every tree in the KRT forest, pre-calculate the binary lifting and the levels
+	// collect KRt-tree identifiers
+	krtTreeLabels := make(map[string]*KrtNode) // KRT-tree label →
+
+	for i = range n {
+		parent := uf.Find(i)
+		ufRootToKrtRoot[i] = ufRootToKrtRoot[parent]
+
+		krtTreeLabels[ufRootToKrtRoot[parent].label] = ufRootToKrtRoot[parent]
+	}
+
+	// for every KRT tree, pre-calculate binaryLifting and levels
+
+	// !!! KRT trees do NOT have nodes 0...n -1:
+	// - There can be multiple components
+	// - There will be nodes for the edges
+
+	// Therefore, to have every tree to have [0; n - 1] numeration,
+	// let's assign a special Val field with the increasing counter while iterating the tree.
+	// We will also need to map the original node indexes/values to the KRT nodes.
+
+	// KrtRoot.label identifies the KRT tree
+	// indexes can be repeated for different trees, so we have to check whether the nodes belong to the same component (i.e. KRT tree).
+	indexToKrtIndex := make([]int, n)
+
+	// for every tree
+	componentsCount := len(krtTreeLabels)
+
+	fmt.Println()
+	fmt.Printf("Total graph components (KRT trees): %v \n", componentsCount)
+
+	// we need to know the count of nodes for every KRT
+	krtNodesCount := make(map[string]int, componentsCount)
+
+	// krtLabel -> mapping of krtNodeIndex to the node
+	krtNodeMappings := make(map[string][]*KrtNode)
+
+	for krtLabel, krtTreeRoot := range krtTreeLabels {
+		//fmt.Printf("KRT tree root: %v \n", krtTreeRoot.label)
+
+		// dfs KRT tree from the root
+		// set KrtNode.value and save the mapping from the original node
+
+		value := 0
+
+		indexToNode := make([]*KrtNode, 0)
+
+		var dfs func(kn *KrtNode)
+
+		dfs = func(kn *KrtNode) {
+			if kn == nil {
+				return
+			}
+
+			if kn.value == VALUE_NOT_SET {
+				// value is set for both nodes and edges
+				kn.value = value
+
+				if kn.nodeType == Node { // save the mapping from the original node index only for edges
+					indexToKrtIndex[kn.id] = value
+				}
+
+				indexToNode = append(indexToNode, kn)
+
+				value++
+			}
+
+			dfs(kn.left)
+			dfs(kn.right)
+		}
+
+		dfs(krtTreeRoot)
+
+		// save N for every KRT
+		krtNodesCount[krtLabel] = value
+		fmt.Printf("Total nodes in KRT[%v]: %v \n", krtTreeRoot.label, value)
+
+		// save
+		// index [0; N - 1] -> node
+		// mappings for every KRT
+		krtNodeMappings[krtLabel] = indexToNode
+	}
+
+	// Now we have KRT with values 0...n in KrtNode.value, so we can calculate BinaryLifting and LCA for every KRT
+	krtData := make(map[string]*KrtTreeData) // save KRT -> binary lifting pre-calculation
+
+	for krtLabel, krtTreeRoot := range krtTreeLabels {
+		krtN := krtNodesCount[krtLabel]
+
+		up, levels := getBinaryLiftingDfs(krtN, krtTreeRoot)
+
+		krtData[krtLabel] = &KrtTreeData{
+			binaryLifting: up,
+			levels:        levels,
+			valueToNode:   krtNodeMappings[krtLabel],
+		}
+	}
 
 	return DistanceLimitedPathsExist{
 		m:                  nil, // todo: remove legacy field of other implementation
 		w:                  nil, // todo: remove legacy field of other implementation
 		graphNodeToKrtNode: graphNodeToKrtNode,
 		ufRootToKrtRoot:    ufRootToKrtRoot,
+		indexToKrtIndex:    indexToKrtIndex,
+		krtData:            krtData,
 	}
 }
 
@@ -208,6 +322,38 @@ func (this *DistanceLimitedPathsExist) Query(p int, q int, limit int) bool {
 }
 
 func (this *DistanceLimitedPathsExist) Query_Krt(p int, q int, limit int) bool {
+	// Querying LCA using Binary Lifting is O(log N)
+	// If the tree is split into several components, N will be smaller.
+	// This passes in 100-120 ms!
+	return this.lca_binaryLifting(p, q, limit)
+
+	// this is a stupid O(N) solution with iterating from node to its parent. This is basically the same as DFS through the MST graph
+	// without binary-lifting, O(N) search is failing on TLE
+	//return this.lca_byParent(p, q, limit)
+}
+
+func (this *DistanceLimitedPathsExist) lca_binaryLifting(p int, q int, limit int) bool {
+	if this.ufRootToKrtRoot[p] != this.ufRootToKrtRoot[q] {
+		// P and Q are in different components -> return false
+		return false
+	}
+
+	// P and Q are in the same component
+	// -> find LCA in the KRT of this component and check whether its weight < limit
+	krtLabel := this.ufRootToKrtRoot[p].label
+	krt := this.krtData[krtLabel]
+
+	pIndexInKrt := this.indexToKrtIndex[p]
+	qIndexInKrt := this.indexToKrtIndex[q]
+
+	lcaIndex := getLca(krt.binaryLifting, krt.levels, pIndexInKrt, qIndexInKrt)
+	lcaNode := krt.valueToNode[lcaIndex]
+	//fmt.Printf("KRT[%v]: LCA of %v and %v is %v (weight: %v) \n", krtLabel, pIndexInKrt, qIndexInKrt, lcaNode.label, lcaNode.weight)
+
+	return lcaNode.weight < limit
+}
+
+func (this *DistanceLimitedPathsExist) lca_byParent(p int, q int, limit int) bool {
 	// we need to find the LCA of p and q. This will be the minimum weight in their paths
 	/*	if this.graphNodeToKrtRoot[p] != this.graphNodeToKrtRoot[q] { // nodes belong to different components
 			return false
@@ -533,12 +679,196 @@ type KrtNode struct {
 	id       int    // for node only
 	label    string // to uniquely identify the node
 
+	value int // [0; n - 1] values, N nodes in the tree. To be numerated [0; n - 1] for the binary lifting and LCA
+
 	left   *KrtNode // not necessary, but for consistency
 	right  *KrtNode // not necessary, but for consistency
 	parent *KrtNode // to iterate upwards to find the LCA
 }
 
 // ========================= My KRT implementation end ========================= //
+
+// ========================= Binary Lifting and LCA implementation begin ========================= //
+func getBinaryLiftingDfs(n int, root *KrtNode) (binaryLifting [][]int, levels []int) { // adopted from *TreeNode to *KrtNode for this task
+	// see https://www.youtube.com/watch?v=dOAxrhAUIhA
+
+	// todo: generalize how get Val from TreeNode! It's not always TreeNode.Val
+
+	// todo: we should also handle node indexes, not values
+
+	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
+	log := log2(n) + 1
+
+	// up[v][i]
+	// v - [0; n-1] - tree node values
+	// i - 2^i jumps from 0 to log2(n)
+	// todo: probably we need to map not to [int] but to [*TreeNode] ???
+	up := createIntMatrix(n, log)
+
+	// set -1 for root, all levels
+	for i := range log {
+		up[root.value][i] = -1
+	}
+
+	// also fill the levels array
+	levels = make([]int, n) // for nodes 0 to n - 1
+
+	var dfs func(n *KrtNode, level int)
+
+	// todo: probably we need to map not to [int] but to [*TreeNode]
+	dfs = func(n *KrtNode, level int) {
+		if n == nil {
+			return
+		}
+
+		levels[n.value] = level
+
+		// left
+		if n.left != nil {
+			//fmt.Printf("Root: %v, left: %v \n", root.Val, n.Left.Val)
+
+			// todo: value should be *TreeNode?
+			// 2^0 - direct parent
+			v := n.left.value
+			up[v][0] = n.value
+
+			// fill 2^i ancestor:
+			// 2^i = 2^(i - 1) + 2^(i - 1)
+			for i := 1; i < log; i++ { // powers 1, 2, ..., log2(n). For 100, we will iterate from 2^1 = 2 to 2^6 = 64
+				// at this 2^i jump level, fill all the nodes
+				p := up[v][i-1]
+
+				if p == -1 { // reached the parent // todo: do we need this?
+					up[v][i] = -1
+				} else { // from 2^(i-1) parent, get it 2^(i-1) parent. The sum will sum up to 2^i parent of the current node.
+					up[v][i] = up[p][i-1]
+				}
+			}
+
+			dfs(n.left, level+1)
+		}
+
+		// right
+		if n.right != nil {
+			//fmt.Printf("Root: %v, right: %v \n", root.Val, n.Right.Val)
+
+			// 2^0 - direct parent
+			v := n.right.value
+			up[v][0] = n.value
+
+			// fill 2^i ancestor:
+			// 2^i = 2^(i - 1) + 2^(i - 1)
+			for i := 1; i < log; i++ { // powers 1, 2, ..., log2(n). For 100, we will iterate from 2^1 = 2 to 2^6 = 64
+				// at this 2^i jump level, fill all the nodes
+				p := up[v][i-1]
+
+				if p == -1 { // reached the parent // todo: do we need this?
+					up[v][i] = -1
+				} else { // from 2^(i-1) parent, get it 2^(i-1) parent. The sum will sum up to 2^i parent of the current node.
+					up[v][i] = up[p][i-1]
+				}
+			}
+
+			dfs(n.right, level+1)
+		}
+	}
+
+	dfs(root, 0) // root has level 0
+	return up, levels
+}
+
+func log2(n int) int {
+	// todo: log2 should be handled separately, it's undefined
+	return int(math.Log2(float64(n)))
+
+	// for positive integers, counting bits can be used:
+	// bits.Len(uint(n)) - 1
+}
+
+func createIntMatrix(rows, columns int) [][]int {
+	m := make([][]int, rows)
+
+	for i := range rows {
+		m[i] = make([]int, columns)
+	}
+
+	return m
+}
+
+func getLca(up [][]int, levels []int, a, b int) int {
+	// define what node is deeper in the tree
+	lower, upper := a, b
+
+	if levels[a] < levels[b] {
+		lower, upper = b, a
+	}
+
+	levelDiff := levels[lower] - levels[upper]
+
+	//fmt.Printf("Lower node: %v, upper node: %v, level difference: %v \n", lower, upper, levelDiff)
+
+	// move from the lower (deeper) node to the same level as the upper (shallower) node
+	lower = GetKthAncestor(up, lower, levelDiff)
+
+	//fmt.Printf("Lower node moved to the same level %v as upper node %v. Lower node moved up to %v. \n", levels[upper], upper, lower)
+
+	if lower == upper { // at the same level, nodes are the same -> upper node is the LCA
+		return lower
+	}
+
+	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
+	n := len(up)
+
+	log := log2(n) + 1
+
+	for i := log - 1; i >= 0; i-- {
+		// if the ancestor of this level is the same, continue to the next level
+		// I.e. this level is LCA or above
+		if up[lower][i] == up[upper][i] {
+			continue
+		}
+
+		// Ancestors of this level is different -> this level is below LCA
+		// Move to this level (to the power of 2)
+		// LCA will be still above.
+		lower = up[lower][i]
+		upper = up[upper][i]
+	}
+
+	// both nodes will be directly below their LCA
+	return up[lower][0]
+}
+
+func GetKthAncestor(up [][]int, node int, k int) int {
+	// todo: handle -1 specially?
+	n := len(up)
+
+	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
+	log := log2(n) + 1
+
+	current := node
+
+	for i := log - 1; i >= 0; i-- {
+		if current == -1 { // no need to traverse further if we're above the root
+			return -1
+		}
+
+		// k = 100 -> we'll go
+		powerOf2 := 1 << i
+		//fmt.Printf("Power of 2^%v = %v \n", i, powerOf2)
+
+		if k >= powerOf2 {
+			// go up 2^i levels, decreasing K
+			current = up[current][i]
+
+			k -= powerOf2
+		}
+	}
+
+	return current
+}
+
+// ========================= Binary Lifting and LCA implementation end ========================= //
 
 func testQuery(d DistanceLimitedPathsExist, p, q, limit int, expectedResult bool) {
 	fmt.Println()

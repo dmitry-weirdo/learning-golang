@@ -12,6 +12,8 @@ import (
 func getBinaryLiftingDfs(n int, root *TreeNode) (binaryLifting [][]int, levels []int) {
 	// see https://www.youtube.com/watch?v=dOAxrhAUIhA
 
+	// todo: generalize how get Val from TreeNode! It's not always TreeNode.Val
+
 	// todo: we should also handle node indexes, not values
 
 	// e.g. for 100, log = 6, and we need powers from 2^0 to 2^6 (from 0 to 64)
@@ -123,12 +125,12 @@ func getLca(up [][]int, levels []int, a, b int) int {
 
 	levelDiff := levels[lower] - levels[upper]
 
-	fmt.Printf("Lower node: %v, upper node: %v, level difference: %v \n", lower, upper, levelDiff)
+	//fmt.Printf("Lower node: %v, upper node: %v, level difference: %v \n", lower, upper, levelDiff)
 
 	// move from the lower (deeper) node to the same level as the upper (shallower) node
 	lower = GetKthAncestor(up, lower, levelDiff)
 
-	fmt.Printf("Lower node moved to the same level %v as upper node %v. Lower node moved up to %v. \n", levels[upper], upper, lower)
+	//fmt.Printf("Lower node moved to the same level %v as upper node %v. Lower node moved up to %v. \n", levels[upper], upper, lower)
 
 	if lower == upper { // at the same level, nodes are the same -> upper node is the LCA
 		return lower
@@ -277,6 +279,27 @@ func testBinaryLiftingDfs1() {
 	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
 }
 
+func testBinaryLiftingDfs2() {
+	n := 5
+
+	arr := []any{ // test if some nodes are not present
+		2,
+		3, 4,
+	}
+
+	expectedBinaryLifting := [][]int{
+		{-1, -1, -1}, // 0 // todo: do we want -1 / - 1 / - 1, same as for root?
+		{-1, -1, -1}, // 1 // todo: do we want -1 / - 1 / - 1, same as for root?
+		{-1, -1, -1}, // 2 // root
+		{2, -1, -1},  // 3 - parent is 2
+		{2, -1, -1},  // 4 - parent is 2
+	}
+
+	expectedLevels := []int{-1, -1, 0, 1, 1}
+
+	testBinaryLiftingDfs(n, arr, expectedBinaryLifting, expectedLevels)
+}
+
 func testLca(n int, arr []any, node1, node2 int, expectedResult int) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
@@ -317,10 +340,13 @@ func testLca1() {
 	testLca(n, arr, 5, 6, 2)
 	testLca(n, arr, 3, 6, 0)
 
+	// todo: this must be fixed, also need to solve if the values do not start with 0 (or some nodes within 0..n-1 are NOT present in the tree)
+	//testLca(n, arr, 1, 7, -1) // node 7 is not in the tree
 }
 
 func main() {
 	testBinaryLiftingDfs1()
+	//testBinaryLiftingDfs2()
 
 	testLca1()
 }
