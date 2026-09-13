@@ -8,6 +8,10 @@ import (
 func largestOverlap(img1 [][]int, img2 [][]int) int {
 	// stupid O(N^6) or like this
 	// Passes in 165-175 ms
+
+	// !!! It's not required to shift M2, we can just shift M1 in both directions.
+	// Then it's twice faster -
+	// Passes in 78-81 ms
 	return largestOverlap_bruteForce(img1, img2)
 }
 
@@ -46,20 +50,22 @@ func largestOverlap_bruteForce(m1 [][]int, m2 [][]int) int {
 				return maxPossibleResult
 			}
 
-			m2Shifted := shift(m2, bufX, bufY, xShift, yShift)
-			count = countIntersection(m2Shifted, m1)
-			maxResult = max(maxResult, count)
+			// actually, we don't need to shift M2, shifting M1 is enough.
+			/*
+				m2Shifted := shift(m2, bufX, bufY, xShift, yShift)
+				count = countIntersection(m2Shifted, m1)
+				maxResult = max(maxResult, count)
 
-			/*			fmt.Println()
-						fmt.Printf("M2 shifted by [%v; %v]: \n", xShift, yShift)
-						matrixCommon.PrintIntMatrix(m2Shifted)
+				//fmt.Println()
+				//fmt.Printf("M2 shifted by [%v; %v]: \n", xShift, yShift)
+				//matrixCommon.PrintIntMatrix(m2Shifted)
+				//
+				//fmt.Printf("Intersection with M1: %v \n", count)
 
-						fmt.Printf("Intersection with M1: %v \n", count)
+				if maxResult == maxPossibleResult {
+					return maxPossibleResult
+				}
 			*/
-			if maxResult == maxPossibleResult {
-				return maxPossibleResult
-			}
-
 		}
 	}
 
