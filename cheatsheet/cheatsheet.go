@@ -197,6 +197,14 @@ func stringFunctions() {
 	upperCase := strings.ToUpper(s)
 
 	fmt.Printf("String: \"%v\", to lowercase: \"%v\", to uppercase: \"%v\" \n", s, lowerCase, upperCase)
+
+	s = " Split these words!!!   "
+	separator := " "
+	split := strings.Split(s, separator) // !!! every leading and trailing space will be a separate string in the split!
+	fmt.Printf("String \"%v\" split by separator \"%v\": %v. Split length: %v \n", s, separator, split, len(split))
+
+	trimmed := strings.TrimSpace(s)
+	fmt.Printf("String \"%v\" trimmed of spaces: \"%v\". \n", s, trimmed)
 }
 
 func stringToIntArray(s string) []int { // every byte converted to int
