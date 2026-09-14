@@ -173,6 +173,34 @@ func testIntArrayToIntArray(arr []int, expectedResult []int) {
 	}
 }
 
+func IntArrayToStringArrayFunction(arr []int) []string {
+	return make([]string, len(arr))
+}
+
+func testIntArrayToStringArray(arr []int, expectedResult []string) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
+
+	result := IntArrayToStringArrayFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func IntArrayToIntMatrixFunction(arr []int) [][]int {
 	return make([][]int, len(arr))
 }
