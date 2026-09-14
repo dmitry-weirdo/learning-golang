@@ -98,6 +98,17 @@ func minAndMaxInArray(arr []int) (minValue, maxValue int) {
 	return minValue, maxValue
 }
 
+func sumOfArray(arr []int) int {
+	// we assume the array is non-empty
+	sum := 0
+
+	for _, v := range arr {
+		sum += v
+	}
+
+	return sum
+}
+
 func uniqueSortedValuesInArray(arr []int) []int {
 	// overall complexity is O(n + n * log n + n) = O(2 * n + n * log n) = O(n * log n)
 
