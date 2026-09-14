@@ -2,15 +2,13 @@ package main
 
 import "fmt"
 
-func computeArea(ax1 int, ay1 int, ax2 int, ay2 int, bx1 int, by1 int, bx2 int, by2 int) int {
-	r1 := createRectangle(Point{ax1, ay1}, Point{ax2, ay2})
-	r2 := createRectangle(Point{bx1, by1}, Point{bx2, by2})
+func isRectangleOverlap(rec1 []int, rec2 []int) bool {
+	r1 := createRectangle(Point{rec1[0], rec1[1]}, Point{rec1[2], rec1[3]})
+	r2 := createRectangle(Point{rec2[0], rec2[1]}, Point{rec2[2], rec2[3]})
 
 	intersectionArea := getIntersectionArea(r1, r2)
 
-	//fmt.Printf("Intersection area of 2 rectangles: %v \n", intersectionArea)
-
-	return r1.square() + r2.square() - intersectionArea
+	return intersectionArea > 0
 }
 
 type Point struct {
@@ -41,16 +39,12 @@ func createRectangle(bottomLeft, topRight Point) Rectangle {
 	}
 }
 
-func (r Rectangle) square() int {
-	return (r.right - r.left) * (r.top - r.bottom)
-}
-
 func getIntersectionArea(r1 Rectangle, r2 Rectangle) int {
 	// make r1 be left or equal to r2
 	r1, r2 = getLeftRightRectangles(r1, r2)
 
-	fmt.Printf("Rectangle 1 (more left): %v \n", r1)
-	fmt.Printf("Rectangle 2 (more right): %v \n", r2)
+	//fmt.Printf("Rectangle 1 (more left): %v \n", r1)
+	//fmt.Printf("Rectangle 2 (more right): %v \n", r2)
 
 	// get horizontal intersection
 	if r2.left >= r1.right { // no horizontal intersection -> square of intersection is 0
@@ -118,16 +112,16 @@ func getTopBottomRectangles(r1, r2 Rectangle) (left, right Rectangle) {
 	return r2, r1
 }
 
-func test(ax1 int, ay1 int, ax2 int, ay2 int, bx1 int, by1 int, bx2 int, by2 int, expectedResult int) { // nodes can be null
+func test(r1, r2 []int, expectedResult bool) { // nodes can be null
 	fmt.Println()
 	fmt.Println("====================")
 
-	fmt.Printf("Rectangle 1: bottom-left: (%v; %v), top-right: (%v, %v). \n", ax1, ay1, ax2, ay2)
-	fmt.Printf("Rectangle 2: top-right: (%v; %v), top-right: (%v, %v). \n", bx1, by1, bx2, by2)
+	fmt.Printf("Rectangle 1: %v \n", r1)
+	fmt.Printf("Rectangle 2: %v \n", r2)
 
-	result := computeArea(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2)
+	result := isRectangleOverlap(r1, r2)
 
-	fmt.Printf("Area covered by both Rectangle 1 and Rectangle 2: %v \n", result)
+	fmt.Printf("Rectangles overlap: %v \n", result)
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if result != expectedResult {
@@ -136,30 +130,33 @@ func test(ax1 int, ay1 int, ax2 int, ay2 int, bx1 int, by1 int, bx2 int, by2 int
 }
 
 func test1() {
-	ax1, ay1 := -3, 0
-	ax2, ay2 := 3, 4
-	bx1, by1 := 0, -1
-	bx2, by2 := 9, 2
-
-	expected := 45
-
-	test(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, expected)
+	test(
+		[]int{0, 0, 2, 2},
+		[]int{1, 1, 3, 3},
+		true,
+	)
 }
 
 func test2() {
-	// same 4x4 squares
-	ax1, ay1 := -2, -2
-	ax2, ay2 := 2, 2
-	bx1, by1 := -2, -2
-	bx2, by2 := 2, 2
+	test(
+		[]int{0, 0, 1, 1},
+		[]int{1, 0, 2, 1},
+		false,
+	)
+}
 
-	expected := 16
-
-	test(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2, expected)
+func test3() {
+	test(
+		[]int{0, 0, 1, 1},
+		[]int{2, 2, 3, 3},
+		false,
+	)
 }
 
 func main() {
-	// 223. Rectangle Area
+	// 836. Rectangle Overlap
+	// This is a simplified version of "223. Rectangle Area".
 	test1()
 	test2()
+	test3()
 }
