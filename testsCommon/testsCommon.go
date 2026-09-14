@@ -350,6 +350,34 @@ func testByteArrayToByte(arr []byte, expectedResult byte) {
 	}
 }
 
+func ByteArrayToByteArrayFunction(arr []byte) []byte {
+	return arr
+}
+
+func testByteArrayToByteArray(arr []byte, expectedResult []byte) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Array: %s \n", arr) // %s if we want to display byte array as string // todo: replace with your text
+
+	result := ByteArrayToByteArrayFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Result: %s \n", result)                  // %s if we want to display byte array as string // todo: replace with your text
+	fmt.Printf("Expected result: %s \n", expectedResult) // %s if we want to display byte array as string
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %c, actual result[%v] = %c \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 // ==================== Int functions ==================== //
 
 func IntToBoolFunction(x int) bool {
