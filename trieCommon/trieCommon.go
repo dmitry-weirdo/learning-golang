@@ -1,5 +1,6 @@
 package trieCommon
 
+// ============================== Trie start ============================== //
 type TrieNode struct {
 	children map[byte]*TrieNode
 	key      byte
@@ -95,3 +96,5 @@ func (this *Trie) StartsWith(prefix string) bool {
 	// for prefix search, we return true regardless of this node is word or not
 	return true
 }
+
+// ============================== Trie end ============================== //
