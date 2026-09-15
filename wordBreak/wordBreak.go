@@ -3,8 +3,63 @@ package main
 import "fmt"
 
 func wordBreak(s string, wordDict []string) bool {
+	// do not iterate the tree from the root, go char by char
+	// Notably it runs in 0-2 ms, but it's probably the LeetCode runtime instability
+	return wordBreak_trieDP_optimized(s, wordDict)
+
 	// passes in 0 ms because of small constraints, but can be optimized
-	return wordBreak_trieDP_naive(s, wordDict)
+	//return wordBreak_trieDP_naive(s, wordDict)
+}
+
+func wordBreak_trieDP_optimized(s string, dict []string) bool {
+	t := NewTrie()
+
+	for _, v := range dict { // add all dictionary words to trie
+		t.Insert(v)
+	}
+
+	n := len(s)
+
+	// DP[i] - whether we can get to s[i-1] with words from the dictionary
+	dp := make([]bool, n+1)
+	dp[0] = true
+
+	for i := range s {
+		//fmt.Printf("i: %v \n", i)
+
+		if !dp[i] { // we cannot get to position i -> skip it
+			continue
+		}
+
+		node := t.GetRoot()
+
+		for j := i; j < n; j++ { // current position is valid -> check from it to the end of S whether S[i:j] is in the dictionary
+			ch := s[j]
+
+			//fmt.Printf("i: %v, j: %v. Checked string: \"%v\". Ch[j]: %c. \n", i, j, s[i:j+1], ch)
+
+			if !node.HasChild(ch) { // there is no prefix for substring -> stop further iteration from this position [i]
+				break
+			}
+
+			// go to the node corresponding to s[j]
+			node = node.children[ch]
+
+			// we reached a node that maps to a word -> mark the position [i + j] as valid word end.
+			if node.word {
+				if j+1 == n { // reached the end of the string with a word end -> return true immediately
+					return true
+				}
+
+				dp[j+1] = true
+			}
+		}
+	}
+
+	//fmt.Printf("DP: %v \n", dp)
+
+	// whether we can get to the last character of S
+	return dp[n]
 }
 
 func wordBreak_trieDP_naive(s string, dict []string) bool {
@@ -21,6 +76,8 @@ func wordBreak_trieDP_naive(s string, dict []string) bool {
 	dp[0] = true
 
 	for i := range s {
+		//fmt.Printf("i: %v \n", i)
+
 		if !dp[i] { // we cannot get to position i -> skip it
 			continue
 		}
@@ -28,13 +85,18 @@ func wordBreak_trieDP_naive(s string, dict []string) bool {
 		for j := i; j < n; j++ { // current position is valid -> check from it to the end of S whether S[i:j] is in the dictionary
 			//fmt.Printf("i: %v, j: %v. Checked string: \"%v\". \n", i, j, s[i:j+1])
 
-			// todo: we shouldn't iterate from Trie root all the time, we should just proceed with 1 position
+			// !!! we shouldn't iterate from Trie root all the time, we should just proceed with 1 position
+			// this is done in the wordBreak_trieDP_optimized version of this method
 
 			if !t.StartsWith(s[i : j+1]) { // there is no prefix for substring -> stop further iteration from this position [i]
 				break
 			}
 
 			if t.Search(s[i : j+1]) {
+				if j+1 == n { // reached the end of the string with a word end -> return true immediately
+					return true
+				}
+
 				dp[j+1] = true
 			}
 		}
@@ -55,6 +117,11 @@ type TrieNode struct {
 
 func (this *TrieNode) Size() int {
 	return len(this.children)
+}
+
+func (this *TrieNode) HasChild(ch byte) bool {
+	_, ok := this.children[ch]
+	return ok
 }
 
 type Trie struct {
@@ -94,7 +161,7 @@ func (this *Trie) Insert(word string) {
 	for _, v := range word {
 		char := byte(v)
 
-		if _, ok := current.children[char]; !ok {
+		if !current.HasChild(char) {
 			current.children[char] = &TrieNode{
 				children: make(map[byte]*TrieNode),
 				key:      char,
@@ -110,37 +177,33 @@ func (this *Trie) Insert(word string) {
 }
 
 func (this *Trie) Search(word string) bool {
-	current := this.root
-
-	for _, v := range word {
-		char := byte(v)
-
-		if _, ok := current.children[char]; !ok {
-			return false
-		}
-
-		current = current.children[char]
-	}
+	found, node := this.FindPrefixNode(word)
 
 	// we return true only if it is the end of the word
-	return current.word
+	return found && node.word
 }
 
 func (this *Trie) StartsWith(prefix string) bool {
+	// for prefix search, we return true regardless of this node is word or not
+	found, _ := this.FindPrefixNode(prefix)
+	return found
+}
+
+func (this *Trie) FindPrefixNode(prefix string) (found bool, node *TrieNode) {
 	current := this.root
 
 	for _, v := range prefix {
 		char := byte(v)
 
-		if _, ok := current.children[char]; !ok {
-			return false
+		if !current.HasChild(char) {
+			return false, nil
 		}
 
 		current = current.children[char]
 	}
 
 	// for prefix search, we return true regardless of this node is word or not
-	return true
+	return true, current
 }
 
 // ============================== Trie end ============================== //

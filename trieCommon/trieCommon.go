@@ -11,6 +11,11 @@ func (this *TrieNode) Size() int {
 	return len(this.children)
 }
 
+func (this *TrieNode) HasChild(ch byte) bool {
+	_, ok := this.children[ch]
+	return ok
+}
+
 type Trie struct {
 	root    *TrieNode
 	rootKey byte
@@ -48,7 +53,7 @@ func (this *Trie) Insert(word string) {
 	for _, v := range word {
 		char := byte(v)
 
-		if _, ok := current.children[char]; !ok {
+		if !current.HasChild(char) {
 			current.children[char] = &TrieNode{
 				children: make(map[byte]*TrieNode),
 				key:      char,
@@ -64,37 +69,33 @@ func (this *Trie) Insert(word string) {
 }
 
 func (this *Trie) Search(word string) bool {
-	current := this.root
-
-	for _, v := range word {
-		char := byte(v)
-
-		if _, ok := current.children[char]; !ok {
-			return false
-		}
-
-		current = current.children[char]
-	}
+	found, node := this.FindPrefixNode(word)
 
 	// we return true only if it is the end of the word
-	return current.word
+	return found && node.word
 }
 
 func (this *Trie) StartsWith(prefix string) bool {
+	// for prefix search, we return true regardless of this node is word or not
+	found, _ := this.FindPrefixNode(prefix)
+	return found
+}
+
+func (this *Trie) FindPrefixNode(prefix string) (found bool, node *TrieNode) {
 	current := this.root
 
 	for _, v := range prefix {
 		char := byte(v)
 
-		if _, ok := current.children[char]; !ok {
-			return false
+		if !current.HasChild(char) {
+			return false, nil
 		}
 
 		current = current.children[char]
 	}
 
 	// for prefix search, we return true regardless of this node is word or not
-	return true
+	return true, current
 }
 
 // ============================== Trie end ============================== //
