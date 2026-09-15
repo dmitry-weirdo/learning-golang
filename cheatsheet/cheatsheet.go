@@ -75,6 +75,10 @@ func copyArray(arr []int) []int {
 }
 
 func maxInArray(arr []int) int {
+	if len(arr) == 0 {
+		panic("maxInArray: no values provided")
+	}
+
 	// we assume the array is non-empty
 	m := arr[0]
 
@@ -259,6 +263,10 @@ func getMinAndMax(a, b int) (smaller, greater int) {
 	}
 
 	return b, a
+}
+
+func getMaxValue(values ...int) int { // wrapper for varargs instead of array
+	return maxInArray(values)
 }
 
 func uniquePrimeFactors(n int) []int { // gets unique prime factors
