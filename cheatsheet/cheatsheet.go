@@ -269,6 +269,27 @@ func getMaxValue(values ...int) int { // wrapper for varargs instead of array
 	return maxInArray(values)
 }
 
+func allFactors(n int) []int { // not just prime factors, but all, including 1 and number itself
+	var small, large []int
+
+	for i := 1; i*i <= n; i++ {
+		if n%i == 0 {
+			small = append(small, i)
+
+			if i != n/i {
+				large = append(large, n/i)
+			}
+		}
+	}
+
+	// large must be reversed
+	slices.Reverse(large)
+
+	small = append(small, large...)
+
+	return small
+}
+
 func uniquePrimeFactors(n int) []int { // gets unique prime factors
 	// todo: handle n == 1
 
@@ -392,6 +413,18 @@ func sign(v int) int {
 	default:
 		return 1
 	}
+}
+
+func isSquare(n int) bool {
+	root := sqrt(n)
+	return root*root == n
+}
+
+func sqrt(n int) int {
+	// gives the floor root
+	// 9 -> 3
+	// 8 -> 2
+	return int(math.Sqrt(float64(n)))
 }
 
 func hexStringToInt(s string) int {
