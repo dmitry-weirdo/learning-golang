@@ -148,7 +148,7 @@ func test4() {
 func test5() {
 	// failing test-case 30/44
 	test(
-		[]int{-5, -2, 0, 0, 3, 9, -2, -5, 4},
+		[]int{-5, -2, 0, 0, 3, 9, -2, -5, 4}, // 3 times * totalSum 2 + 5 (maxPrefixSum) + 9 (maxSuffixSum)
 		5,
 		20,
 	)
