@@ -444,6 +444,16 @@ func isDigit(b byte) bool {
 	return b >= '0' && b <= '9'
 }
 
+func isVowel(b byte) bool {
+	switch b {
+	case 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U':
+		return true
+
+	default:
+		return false
+	}
+}
+
 func infinity() {
 	positiveInfinity := math.Inf(1)  // !!! returns float64, NOT int
 	negativeInfinity := math.Inf(-1) // !!! returns float64, NOT int
