@@ -141,6 +141,52 @@ func getListMiddle(head *ListNode) *ListNode {
 	return slow
 }
 
+func getListMiddleAndBeforeMiddle(head *ListNode) (middle, beforeMiddle *ListNode, middleIndex, totalElements int) {
+	// even elements list: 1 - 2 - 3 - 4 -> return 2, 1, 1, 4
+	// odd elements list:  1 - 2 - 3 - 4 - 5 -> return 3, 2, 2, 5
+
+	// middleIndex starts with 0
+
+	// corner-cases:
+	// 1 - 2 -> return 1
+	// 1 -> return 1
+	// nil -> return nil
+
+	if head == nil {
+		return nil, nil, -1, 0
+	}
+
+	dummyHead := &ListNode{Val: -666, Next: head}
+
+	slowIndex := 0
+	totalElements = 0
+
+	beforeSlow := dummyHead
+	slow := head
+	fast := head.Next // to make it work for both even add odd nodes count
+
+	for (fast != nil) && (fast.Next != nil) {
+		slowIndex++
+		totalElements += 2
+
+		beforeSlow = beforeSlow.Next
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	if fast == nil {
+		totalElements++
+	} else if fast.Next == nil {
+		totalElements += 2
+	}
+
+	//fmt.Printf("Slow index: %v \n", slowIndex)
+	//fmt.Printf("Total elements: %v \n", totalElements)
+	//fmt.Printf("Fast pointer: %v \n", valToString(fast))
+
+	return slow, beforeSlow, slowIndex, totalElements // yes, we will return a dummyHead, so we can remove the head as well
+}
+
 func getListLength(head *ListNode) int {
 	length := 0
 	node := head
