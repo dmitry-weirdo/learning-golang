@@ -5,6 +5,7 @@ import "fmt"
 type StockSpanner struct {
 	stack          *[]MatchingElement
 	result         []MatchingElement
+	totalElements  int
 	noElementValue int
 }
 
@@ -16,14 +17,63 @@ func Constructor() StockSpanner {
 	return StockSpanner{
 		stack:          stack,
 		result:         result,
+		totalElements:  0,
 		noElementValue: -1,
 	}
 }
 
 func (this *StockSpanner) Next(price int) int {
+	return this.Next_optimized(price)
+	//return this.Next_basic(price)
+}
+
+func (this *StockSpanner) Next_optimized(price int) int {
 	// basically, we need the "get previous greater" index, but with adding a new value to the stack
 
-	// todo: yes, this can be optimized -> we don't need to store the complete result array, we can just get all the info from the stack
+	// This is optimized -> we don't need to store the complete result array, we can just get all the info from the stack
+
+	// This is the post-init phase of GetPrevGreaterWithIndexes.
+	// Init phase was in the constructor.
+	// We don't iterate the array, we handle value one-by-one
+
+	// we execute just 1 iteration in the stack
+	i := this.totalElements
+	//fmt.Printf("i: %v, result: %v, stack: %v \n", i, this.result, this.stack)
+
+	v := price
+
+	stack := this.stack
+
+	for stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value <= v) {
+		removeFromStackWithIndex(stack)
+	}
+
+	result := -666
+
+	if stackIsNotEmptyWithIndex(stack) && (getStackTopWithIndex(stack).value > v) {
+		stackTop := getStackTopWithIndex(stack)
+
+		// subtract i - prevGreaterIndex
+		result = i - stackTop.index
+	} else { // no prev greater element
+		// no prev greater -> all elements before should be counted
+		result = i + 1
+	}
+
+	currentElement := MatchingElement{value: v, index: i}
+	pushToStackWithIndex(stack, currentElement)
+
+	this.totalElements++
+
+	return result
+}
+
+func (this *StockSpanner) Next_basic(price int) int {
+	// basically, we need the "get previous greater" index, but with adding a new value to the stack
+
+	// Yes, this can be optimized -> we don't need to store the complete result array, we can just get all the info from the stack
+	// Set the Next_optimized version above
+
 	// This is the post-init phase of GetPrevGreaterWithIndexes.
 	// Init phase was in the constructor.
 	// We don't iterate the array, we handle value one-by-one
@@ -144,6 +194,9 @@ func testNext(s *StockSpanner, price int, expectedResult int) {
 }
 
 func test1() {
+	fmt.Println()
+	fmt.Printf("==================== Test 1 ====================")
+
 	stockSpanner := Constructor()
 
 	s := &stockSpanner
@@ -158,6 +211,9 @@ func test1() {
 }
 
 func test2() {
+	fmt.Println()
+	fmt.Printf("==================== Test 2 ====================")
+
 	// failing test-case 3 / 101
 	stockSpanner := Constructor()
 
