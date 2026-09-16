@@ -97,14 +97,35 @@ func testListToBoolean(values []int, expectedResult bool) {
 
 	list := listsCommon.ArrayToList(values)
 
-	fmt.Println()
-	fmt.Println("========================")
 	fmt.Printf("List: ")
 	listsCommon.PrintList(list)
 
 	result := ListToBooleanFunction(list) // todo: replace with your function
 
-	fmt.Printf("List of %v is a palindrome: %v \n", values, result) // todo: replace with your text
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
+
+func ListToIntFunction(head *ListNode) int {
+	return head.Val
+}
+
+func testListToInt(values []int, expectedResult int) {
+	fmt.Println()
+	fmt.Println("===========================")
+
+	list := listsCommon.ArrayToList(values)
+
+	fmt.Printf("List: ")
+	listsCommon.PrintList(list)
+
+	result := ListToIntFunction(list) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
 	fmt.Printf("Expected result: %v \n", expectedResult)
 
 	if result != expectedResult {
