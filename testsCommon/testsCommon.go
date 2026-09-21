@@ -194,6 +194,34 @@ func testIntArrayToIntArray(arr []int, expectedResult []int) {
 	}
 }
 
+func IntArrayToInt64ArrayFunction(arr []int) []int64 {
+	return []int64{int64(len(arr))}
+}
+
+func testIntArrayToInt64Array(arr []int, expectedResult []int64) {
+	fmt.Println()
+	fmt.Println("========================")
+
+	fmt.Printf("Array: %v \n", arr) // todo: replace with your text
+
+	result := IntArrayToInt64ArrayFunction(arr) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if len(result) != len(expectedResult) {
+		fmt.Printf("FAILURE: expected result length = %v, actual result length = %v \n", len(expectedResult), len(result))
+		return
+	}
+
+	for i, v := range result {
+		if v != expectedResult[i] {
+			fmt.Printf("FAILURE: expected result[%v] = %v, actual result[%v] = %v \n", i, expectedResult[i], i, v)
+			return
+		}
+	}
+}
+
 func IntArrayToStringArrayFunction(arr []int) []string {
 	return make([]string, len(arr))
 }
