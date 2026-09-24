@@ -465,8 +465,12 @@ func infinity() {
 	fmt.Printf("Min int32 > Negative infinity: %v \n", math.MinInt32 > negativeInfinity)
 }
 
+func lsb(x int) int { // least significant bit
+	return x & -x
+}
+
 func log2(n int) int {
-	// todo: log2 should be handled separately, it's undefined
+	// todo: log2(0) should be handled separately, it's undefined
 	return int(math.Log2(float64(n)))
 
 	// for positive integers, counting bits can be used:
