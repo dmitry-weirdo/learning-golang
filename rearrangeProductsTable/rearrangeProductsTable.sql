@@ -1,5 +1,5 @@
 -- 1795. Rearrange Products Table
--- todo: this can be also solved with UNPIVOT
+-- todo: this can be also solved with UNPIVOT, but it's database-specific, not present e.g. in PostgreSQL
 
 (
     select
