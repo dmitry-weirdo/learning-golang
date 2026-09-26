@@ -1360,3 +1360,23 @@ func testIntMatrixToFloat64(m [][]int, expectedResult float64) {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
 	}
 }
+
+func StringMatrixToString(m [][]string) string {
+	return m[0][0]
+}
+
+func testStringMatrixToString(m [][]string, expectedResult string) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: %v \n", m) // todo: replace with your text if required
+
+	result := StringMatrixToString(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
