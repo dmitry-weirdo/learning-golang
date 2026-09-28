@@ -1380,3 +1380,24 @@ func testStringMatrixToString(m [][]string, expectedResult string) {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
 	}
 }
+
+func ByteMatrixToBool(m [][]byte) bool { // e.g. check whether something is possible in the graph (matrix of edges)
+	return len(m) > 2
+}
+
+func testByteMatrixToBool(m [][]byte, expectedResult bool) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: \n") // todo: replace with your text if required
+	matrixCommon.PrintByteMatrix(m)
+
+	result := ByteMatrixToBool(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}

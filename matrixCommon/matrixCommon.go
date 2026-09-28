@@ -32,7 +32,7 @@ func PrintIntMatrix(mat [][]int) {
 func PrintByteMatrix(mat [][]byte) { // prints elements as characters, NOT as numeric byte values
 	for i, row := range mat {
 		for j := range row {
-			fmt.Printf("%v ", mat[i][j])
+			fmt.Printf("%c ", mat[i][j]) // print as characters
 		}
 
 		fmt.Println()
