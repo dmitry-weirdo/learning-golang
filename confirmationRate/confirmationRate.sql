@@ -1,4 +1,5 @@
 -- 1934. Confirmation Rate
+-- Very similar to "1251. Average Selling Price".
 
 select
 distinct
