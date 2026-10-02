@@ -14,5 +14,5 @@ with x as (
     order by p.x
 )
 select
-min(x.next_diff)  as "shortest" -- will ignore next_diff = null for the last row
+min(x.next_diff) as "shortest" -- will ignore next_diff = null for the last row
 from x
