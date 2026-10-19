@@ -105,6 +105,16 @@ func createIntMatrixWithDefaultValues(rows, columns int, defaultValue int) [][]i
 	return m
 }
 
+func createBoolMatrix(rows, columns int) [][]bool {
+	m := make([][]bool, rows)
+
+	for i := range rows {
+		m[i] = make([]bool, columns)
+	}
+
+	return m
+}
+
 func cellExists(rows, columns, row, column int) bool {
 	return (0 <= row) &&
 		(row < rows) &&

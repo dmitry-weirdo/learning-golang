@@ -1401,3 +1401,24 @@ func testByteMatrixToBool(m [][]byte, expectedResult bool) {
 		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
 	}
 }
+
+func ByteMatrixToInt(m [][]byte) int { // e.g. 1730. Shortest Path to Get Food - DFS on character matrix
+	return len(m)
+}
+
+func testByteMatrixToInt(m [][]byte, expectedResult int) {
+	fmt.Println()
+	fmt.Println("====================")
+
+	fmt.Printf("Matrix: \n") // todo: replace with your text if required
+	matrixCommon.PrintByteMatrix(m)
+
+	result := ByteMatrixToInt(m) // todo: replace with your function
+
+	fmt.Printf("Result: %v \n", result) // todo: replace with your text
+	fmt.Printf("Expected result: %v \n", expectedResult)
+
+	if result != expectedResult {
+		fmt.Printf("FAILURE: expected result = %v, actual result = %v \n", expectedResult, result)
+	}
+}
